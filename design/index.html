@@ -1,0 +1,220 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>ねこパチ デザイン案</title>
+<link href="https://fonts.googleapis.com/css2?family=M+PLUS+Rounded+1c:wght@500;800;900&display=swap" rel="stylesheet">
+<style>
+:root{
+  --ink:#5a3a2e; --cream:#fff8ef; --pink:#ffd9e2; --peach:#ffe6cf; --sky:#dff1ff;
+  --gold:#e8b64a; --gold2:#fff1b8; --red:#ff6b8a; --blue:#6bb8ff;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:"M PLUS Rounded 1c",system-ui,sans-serif;color:var(--ink);
+  background:radial-gradient(1200px 600px at 20% 0%,#ffeef3,transparent),radial-gradient(900px 600px at 90% 30%,#e9f6ff,transparent),#fbf6f0;
+  padding:32px 16px 64px}
+h1{text-align:center;font-size:26px;font-weight:900;letter-spacing:.04em}
+.sub{text-align:center;font-size:13px;opacity:.7;margin:6px 0 28px}
+.row{display:flex;gap:28px;justify-content:center;flex-wrap:wrap}
+.col{display:flex;flex-direction:column;align-items:center;gap:12px}
+.cap{font-weight:800;font-size:15px}
+.cap small{display:block;font-weight:500;font-size:12px;opacity:.7;text-align:center;margin-top:2px}
+
+/* ===== 筐体 ===== */
+.cab{width:340px;height:720px;border-radius:38px;position:relative;overflow:hidden;
+  background:linear-gradient(160deg,#fffdf8 0%,#ffe9ef 45%,#ffeedd 100%);
+  box-shadow:0 30px 60px -20px rgba(120,60,40,.35),inset 0 0 0 1.5px rgba(255,255,255,.9),inset 0 0 0 7px rgba(255,214,226,.55)}
+.logo{height:62px;display:flex;align-items:center;justify-content:center;gap:2px;position:relative}
+.logo .lamp{position:absolute;top:12px;width:10px;height:10px;border-radius:50%;background:#ffd34d;box-shadow:0 0 10px #ffcf33}
+.logo .lamp.l{left:24px}.logo .lamp.r{right:24px}
+.st{display:inline-block;font-weight:900;font-size:27px;line-height:1;padding:3px 3px;color:#fff;
+  -webkit-text-stroke:5px var(--ink);paint-order:stroke fill;transform:rotate(var(--r,0deg))}
+.logo .small{font-size:11px;font-weight:800;position:absolute;bottom:4px;opacity:.65;letter-spacing:.2em}
+
+/* 盤面 */
+.board{position:absolute;left:12px;right:12px;top:62px;height:452px;border-radius:150px 150px 26px 26px;
+  background:radial-gradient(120% 80% at 50% 0%,#f3faff 0%,#dff0ff 55%,#fde7ee 100%);
+  box-shadow:inset 0 0 0 3px #f6d38a,inset 0 0 0 7px #fff3cf,inset 0 6px 18px rgba(80,120,170,.25)}
+.board svg.pins{position:absolute;inset:0}
+.paw{position:absolute;width:22px;height:22px;opacity:.13}
+
+/* 液晶 */
+.lcd{position:absolute;left:28px;right:28px;top:56px;height:218px;border-radius:26px;overflow:hidden;
+  background:linear-gradient(180deg,#bfe6ff,#fff1f6);
+  box-shadow:0 0 0 4px rgba(255,255,255,.95),0 0 0 7px #f2c96b,0 10px 22px rgba(70,90,140,.35)}
+.lcd .glass{position:absolute;inset:0;pointer-events:none;background:linear-gradient(160deg,rgba(255,255,255,.55) 0%,rgba(255,255,255,0) 35%)}
+.reels{position:absolute;inset:0;display:flex;justify-content:space-around;align-items:center;padding:0 6px}
+.reel{width:30%;height:100%;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;position:relative}
+.sym{width:74px;height:74px;border-radius:50%;background:#fff;position:relative;
+  box-shadow:0 0 0 3px #fff,0 0 0 5px var(--ring,#ffb3c4),0 6px 10px rgba(0,0,0,.15)}
+.sym img{width:100%;height:100%;object-fit:contain;border-radius:50%}
+.sym.small{width:46px;height:46px;opacity:.5;filter:saturate(.7);box-shadow:0 0 0 2px #fff,0 0 0 3px var(--ring,#ffb3c4)}
+.num{position:absolute;right:-6px;bottom:-4px;width:30px;height:30px;border-radius:50%;display:grid;place-items:center;
+  font-weight:900;font-size:17px;color:#fff;background:var(--ring,#ff8aa6);box-shadow:0 0 0 2.5px #fff,0 2px 4px rgba(0,0,0,.2)}
+.sym.small .num{width:18px;height:18px;font-size:11px;right:-4px;bottom:-3px}
+.k{--ring:#ff7f9e}.n{--ring:#7dbbf0}
+.blur .sym{filter:blur(2.5px)}
+.blur{animation:none}
+.line{position:absolute;left:8px;right:8px;top:50%;height:2px;background:rgba(255,255,255,.7);transform:translateY(-1px)}
+
+/* 液晶の下 */
+.hold{position:absolute;top:286px;left:0;right:0;display:flex;justify-content:center;gap:9px}
+.hold i{width:13px;height:13px;border-radius:50%;background:rgba(255,255,255,.75);box-shadow:inset 0 0 0 1.5px #e4c4cf}
+.hold i.on{background:radial-gradient(circle at 35% 35%,#fff,#ff9fb6 60%);box-shadow:0 0 6px #ff9fb6}
+.heso{position:absolute;top:338px;left:50%;width:44px;height:26px;transform:translateX(-50%);border-radius:0 0 22px 22px;
+  background:linear-gradient(#ffe9a6,#e8b64a);box-shadow:0 0 0 2px #fff,0 3px 6px rgba(0,0,0,.2)}
+.heso:after{content:"START";position:absolute;inset:0;display:grid;place-items:center;font-size:8px;font-weight:900;color:#8a5a14;letter-spacing:.05em}
+.heso .face{position:absolute;top:-22px;left:50%;width:30px;height:30px;transform:translateX(-50%);border-radius:50%;overflow:hidden;background:#fff;box-shadow:0 0 0 2px #fff}
+.heso .face img{width:100%;height:100%;object-fit:contain}
+.atk{position:absolute;top:398px;left:50%;width:120px;height:20px;transform:translateX(-50%);border-radius:6px;
+  background:linear-gradient(#ffd6e0,#ff9fb6);box-shadow:0 0 0 2px #fff,0 3px 6px rgba(0,0,0,.18);
+  display:grid;place-items:center;font-size:9px;font-weight:900;color:#fff;letter-spacing:.2em}
+.atk.open{background:linear-gradient(#fff6c8,#f4b928);box-shadow:0 0 0 2px #fff,0 0 18px #ffd34d;color:#8a5a14;height:26px}
+.ball{position:absolute;width:9px;height:9px;border-radius:50%;background:radial-gradient(circle at 35% 30%,#fff,#c9ced6 55%,#8d939c)}
+
+/* 下のパネル */
+.panel{position:absolute;left:12px;right:12px;bottom:14px;height:190px;border-radius:26px;
+  background:linear-gradient(180deg,rgba(255,255,255,.7),rgba(255,255,255,.45));
+  backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);
+  box-shadow:inset 0 0 0 1.5px rgba(255,255,255,.95),0 8px 20px rgba(120,60,40,.15)}
+.data{display:flex;gap:6px;padding:12px 12px 0}
+.data div{flex:1;background:rgba(90,58,46,.86);color:#fff;border-radius:12px;padding:6px 4px;text-align:center}
+.data b{display:block;font-size:17px;font-weight:900;color:#ffe48a;font-variant-numeric:tabular-nums}
+.data span{font-size:9.5px;opacity:.85}
+.tray{position:absolute;left:12px;bottom:12px;width:184px;height:92px;border-radius:20px;
+  background:linear-gradient(180deg,#fff,#ffeef2);box-shadow:inset 0 3px 8px rgba(160,90,100,.18),0 0 0 1.5px #fff}
+.tray .cnt{position:absolute;left:12px;top:8px;font-size:10px;font-weight:800;opacity:.7}
+.tray .cnt b{font-size:20px;color:var(--ink);opacity:1;display:block;font-variant-numeric:tabular-nums}
+.tray .balls{position:absolute;left:12px;right:10px;bottom:10px;height:30px}
+.tray .rent{position:absolute;right:10px;top:10px;font-size:10px;font-weight:900;padding:6px 10px;border-radius:999px;color:#fff;background:linear-gradient(#ffa3b9,#ff7f9e);box-shadow:0 2px 0 #e0607f}
+.handle{position:absolute;right:16px;bottom:16px;width:92px;height:92px;border-radius:50%;
+  background:radial-gradient(circle at 40% 35%,#fff 0%,#ffe1ea 45%,#f7b6c8 100%);
+  box-shadow:0 8px 16px rgba(160,70,90,.3),inset 0 0 0 3px rgba(255,255,255,.9)}
+.handle .arc{position:absolute;inset:-7px;border-radius:50%;
+  background:conic-gradient(from 210deg,#ffcf4d 0deg,#ff8aa6 var(--pw,150deg),rgba(255,255,255,.4) var(--pw,150deg) 300deg,transparent 300deg);
+  -webkit-mask:radial-gradient(circle,transparent 51px,#000 52px);mask:radial-gradient(circle,transparent 51px,#000 52px)}
+.handle .knob{position:absolute;inset:20px;border-radius:50%;background:#fff;overflow:hidden;box-shadow:0 0 0 3px #ffd0dc}
+.handle .knob img{width:100%;height:100%;object-fit:contain}
+.handle .lbl{position:absolute;left:0;right:0;bottom:3px;text-align:center;font-size:9px;font-weight:900;opacity:.6}
+
+/* 演出 */
+.banner{position:absolute;left:0;right:0;text-align:center;z-index:5}
+.banner .st{font-size:34px}
+.parade{position:absolute;left:-10px;right:-10px;bottom:6px;height:44px;display:flex;gap:2px;z-index:4}
+.parade img{height:44px;width:44px;object-fit:contain;filter:drop-shadow(0 2px 2px rgba(0,0,0,.25))}
+.reach-bg{background:radial-gradient(circle at 50% 55%,#fff6c8 0%,#ffb7c9 55%,#ff8aa6 100%)!important}
+.rays{position:absolute;inset:-50%;background:repeating-conic-gradient(from 0deg,rgba(255,255,255,.35) 0 8deg,transparent 8deg 20deg)}
+.big-bg{background:radial-gradient(circle at 50% 45%,#fffbe6 0%,#ffe08a 45%,#ffb3c4 100%)!important}
+.trio{position:absolute;left:50%;top:0;width:224px;transform:translateX(-50%);filter:drop-shadow(0 6px 8px rgba(120,60,40,.35))}
+.stars{position:absolute;top:8px;left:0;right:0;display:flex;justify-content:center;gap:76px;z-index:5}
+.stars span{font-size:22px;color:#fff;-webkit-text-stroke:3px #e8a01c;paint-order:stroke fill}
+.conf{position:absolute;width:7px;height:11px;border-radius:2px}
+.glow .board{box-shadow:inset 0 0 0 3px #f6d38a,inset 0 0 0 7px #fff3cf,inset 0 0 40px rgba(255,210,80,.7)}
+.glow{box-shadow:0 0 0 3px #ffe48a,0 0 40px rgba(255,200,60,.8),0 30px 60px -20px rgba(120,60,40,.35)}
+
+/* ===== 図柄表 ===== */
+.card{max-width:1100px;margin:44px auto 0;background:rgba(255,255,255,.7);border-radius:28px;padding:24px;
+  box-shadow:0 10px 30px rgba(120,60,40,.1),inset 0 0 0 1.5px #fff}
+.card h2{font-size:18px;font-weight:900;margin-bottom:4px}
+.card p.note{font-size:12.5px;opacity:.75;margin-bottom:16px}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(118px,1fr));gap:14px}
+.cell{background:#fff;border-radius:20px;padding:12px 8px 10px;text-align:center;box-shadow:0 2px 8px rgba(0,0,0,.05)}
+.cell .sym{margin:0 auto 8px;width:72px;height:72px}
+.cell .name{font-weight:800;font-size:14px}
+.tag{display:inline-block;margin-top:4px;font-size:10.5px;font-weight:900;padding:2px 8px;border-radius:999px;color:#fff}
+.tag.k{background:#ff7f9e}.tag.n{background:#7dbbf0}.tag.p{background:linear-gradient(90deg,#f4b928,#ff7f9e)}
+.cell.prem{grid-column:span 2;background:linear-gradient(135deg,#fffbe6,#ffe9ef)}
+.cell.prem img.t{width:150px;display:block;margin:0 auto 4px}
+.flow{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:14px;margin-top:20px}
+.flow div{background:#fff;border-radius:18px;padding:14px 16px;font-size:13px;line-height:1.75}
+.flow b:first-child{font-size:14px;display:block;margin-bottom:4px}
+</style>
+</head>
+<body>
+<h1>ねこパチ（仮）デザイン案</h1>
+<p class="sub">スマホたて画面の見本です（動きはまだありません）。台のなまえは仮です。</p>
+
+<div class="row" id="row"></div>
+
+<div class="card">
+  <h2>図柄（12種類）</h2>
+  <p class="note">3つそろうと大当たり。<b style="color:#ff7f9e">ピンクの番号＝確変</b>（次の大当たりまで当たりやすい）、<b style="color:#4d9be0">水色の番号＝通常</b>（そのあと時短100回）。3人の絵はプレミアム。</p>
+  <div class="grid" id="grid"></div>
+  <div class="flow">
+    <div><b>① ふだん（通常時）</b>ハンドルで玉を打つ → まん中の「START」に入ると液晶がまわる（4つまで保留）。当たりは約1/99（あまめ）。</div>
+    <div><b>② 予告・リーチ</b>肉球ペタペタ予告、ハニー横切り予告、<b>にゃんこ大行進</b>（出たらアツい）。2つそろうとリーチ。家族3人が出てくる「家族リーチ」は激アツ。</div>
+    <div><b>③ 大当たり</b>下のアタッカーが開いて玉がどんどん出る（10ラウンド）。<b>3人そろいは16ラウンド＋確変＋特別ムービー</b>。</div>
+    <div><b>④ 当たりのあと</b>確変：次の当たりまで約1/10。通常：時短100回（玉がへりにくい）。玉がなくなったら「玉をかりる」で無料でもらえる。</div>
+  </div>
+</div>
+
+<script>
+const S=[
+ {id:'jill',name:'ジル'},{id:'lee',name:'リー'},{id:'berry',name:'ベリー'},{id:'nafan',name:'なーふぁん'},
+ {id:'lucky',name:'ラッキー'},{id:'kira',name:'キラ'},{id:'glen',name:'グレン'},{id:'daisuke',name:'だいすけ'},
+ {id:'hiroko',name:'ひろこ'},{id:'nanae',name:'ななえ'},{id:'honey',name:'ハニー'}
+];
+S.forEach((s,i)=>{s.no=i+1;s.k=(s.no%2===1)});
+const sym=(i,cls='')=>{const s=S[i];return `<div class="sym ${s.k?'k':'n'} ${cls}"><img src="${s.id}.png"><span class="num">${s.no}</span></div>`};
+
+function pins(){
+  let p='';const W=316,H=452;
+  for(let r=0;r<16;r++){for(let c=0;c<15;c++){
+    const x=14+c*20+(r%2?10:0), y=22+r*27;
+    if(x>W-12) continue;
+    const dx=(x-W/2)/(W/2), dy=(y-150)/170;  // 上の丸いかど
+    if(y<120 && Math.abs(dx)>Math.sqrt(Math.max(0,1-((120-y)/120)**2))*0.92) continue;
+    if(y>40&&y<285&&x>18&&x<W-18) continue;   // 液晶
+    if(y>325&&y<425&&Math.abs(x-W/2)<70) continue; // ヘソ・アタッカー
+    p+=`<circle cx="${x}" cy="${y}" r="2.2" fill="#d9a83a"/><circle cx="${x-.7}" cy="${y-.7}" r=".8" fill="#fff8d0"/>`;
+  }}
+  return `<svg class="pins" viewBox="0 0 316 452">${p}</svg>`;
+}
+const pawSvg=`<svg viewBox="0 0 24 24" fill="#c0607a"><ellipse cx="12" cy="16" rx="5.5" ry="4.5"/><circle cx="5.5" cy="10" r="2.4"/><circle cx="9.5" cy="6" r="2.4"/><circle cx="14.5" cy="6" r="2.4"/><circle cx="18.5" cy="10" r="2.4"/></svg>`;
+const paws=[[22,300],[270,320],[40,420],[250,40],[30,60]].map(([x,y])=>`<div class="paw" style="left:${x}px;top:${y}px">${pawSvg}</div>`).join('');
+
+function cab(o){
+  const balls=Array.from({length:14},(_,i)=>`<div class="ball" style="left:${i*11}px;bottom:${(i%3)*5}px"></div>`).join('');
+  const flying=(o.flying||[]).map(([x,y])=>`<div class="ball" style="left:${x}px;top:${y}px"></div>`).join('');
+  return `<div class="cab ${o.glow?'glow':''}">
+    <div class="logo"><i class="lamp l"></i><i class="lamp r"></i>
+      ${['ね','こ','パ','チ'].map((c,i)=>`<span class="st" style="--r:${[-6,4,-3,6][i]}deg;color:${['#ff8aa6','#ffc94d','#7dc6ff','#9be08a'][i]}">${c}</span>`).join('')}
+      <span class="small">だいすけ家</span></div>
+    <div class="board">${paws}${pins()}
+      <div class="lcd ${o.lcdCls||''}">${o.lcd}<div class="glass"></div></div>
+      <div class="hold">${[0,1,2,3].map(i=>`<i class="${i<o.hold?'on':''}"></i>`).join('')}</div>
+      <div class="heso"><div class="face"><img src="honey.png"></div></div>
+      <div class="atk ${o.atk?'open':''}">${o.atk?'OPEN!':'ATTACKER'}</div>
+      ${flying}
+    </div>
+    <div class="panel">
+      <div class="data"><div><b>${o.spin}</b><span>回転</span></div><div><b>${o.hits}</b><span>大当たり</span></div><div><b style="color:${o.mode==='確変中'?'#ff9fb6':'#ffe48a'};font-size:${o.mode.length>3?13:17}px;line-height:20px">${o.mode}</b><span>モード</span></div></div>
+      <div class="tray"><div class="cnt">もち玉<b>${o.balls}</b></div><span class="rent">玉をかりる</span><div class="balls">${balls}</div></div>
+      <div class="handle" style="--pw:${o.pw}deg"><div class="arc"></div><div class="knob"><img src="lucky.png"></div><div class="lbl">ハンドル</div></div>
+    </div>
+  </div>`;
+}
+
+const reelCol=(a,b,c,cls='')=>`<div class="reel ${cls}">${sym(a,'small')}${sym(b)}${sym(c,'small')}</div>`;
+const screens=[
+ {cap:'① ふだん（回転中）',sub:'液晶でキャラがたてにまわる',o:{hold:3,spin:57,hits:0,mode:'通常',balls:186,pw:140,
+   flying:[[60,30],[285,210],[290,300]],
+   lcd:`<div class="line"></div><div class="reels">${reelCol(10,0,1)}${reelCol(3,4,5,'blur')}${reelCol(6,7,8)}</div>`}},
+ {cap:'② リーチ＋にゃんこ大行進',sub:'2つそろってまん中がゆっくり',o:{hold:4,spin:112,hits:0,mode:'通常',balls:94,pw:170,lcdCls:'reach-bg',
+   lcd:`<div class="rays"></div><div class="banner" style="top:6px"><span class="st" style="color:#ffe14d;--r:-4deg">リ</span><span class="st" style="color:#ffe14d;--r:3deg">ー</span><span class="st" style="color:#ffe14d;--r:-2deg">チ</span><span class="st" style="color:#fff;--r:6deg">！</span></div>
+     <div class="reels" style="top:14px">${reelCol(3,4,5)}${reelCol(2,9,0,'blur')}${reelCol(3,4,5)}</div>
+     <div class="parade">${['jill','lee','berry','nafan','kira','glen','honey','jill'].map(n=>`<img src="${n}.png">`).join('')}</div>`}},
+ {cap:'③ 3人そろい（いちばんの当たり）',sub:'16ラウンド＋確変＋特別ムービー',o:{glow:1,atk:1,hold:2,spin:0,hits:1,mode:'確変中',balls:412,pw:150,lcdCls:'big-bg',
+   lcd:`<div class="rays"></div>${Array.from({length:26},(_,i)=>`<i class="conf" style="left:${(i*37)%280}px;top:${(i*53)%200}px;background:${['#ff8aa6','#ffc94d','#7dc6ff','#9be08a','#fff'][i%5]};transform:rotate(${i*47}deg)"></i>`).join('')}<div class="stars"><span>★</span><span>★</span><span>★</span></div><img class="trio" src="trio.png">
+     <div class="banner" style="bottom:2px;line-height:1.05">${['家','族','そ','ろ','っ','て'].map((c,i)=>`<span class="st" style="font-size:16px;color:${['#ff8aa6','#ffc94d','#7dc6ff','#9be08a','#ff8aa6','#ffc94d'][i]};--r:${[-5,4,-3,5,-4,3][i]}deg">${c}</span>`).join('')}<br>${['大','当','た','り','!!'].map((c,i)=>`<span class="st" style="font-size:30px;color:#ffe14d;--r:${[-4,3,-2,4,0][i]}deg">${c}</span>`).join('')}</div>
+`,
+   flying:[[150,410],[170,404],[130,415],[190,412],[110,408]]}}
+];
+document.getElementById('row').innerHTML=screens.map(s=>`<div class="col"><div class="cap">${s.cap}<small>${s.sub}</small></div>${cab(s.o)}</div>`).join('');
+
+document.getElementById('grid').innerHTML=S.map((s,i)=>`<div class="cell">${sym(i)}<div class="name">${s.name}</div><span class="tag ${s.k?'k':'n'}">${s.k?'確変':'通常'}</span></div>`).join('')+
+ `<div class="cell prem"><img class="t" src="trio.png"><div class="name">3人そろい ★</div><span class="tag p">プレミアム 16R確変</span></div>`;
+</script>
+</body>
+</html>

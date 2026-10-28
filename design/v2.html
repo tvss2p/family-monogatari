@@ -1,0 +1,267 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>ファミリー物語 デザイン案2</title>
+<link href="https://fonts.googleapis.com/css2?family=M+PLUS+Rounded+1c:wght@500;800;900&display=swap" rel="stylesheet">
+<style>
+:root{--ink:#5a3a2e}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:"M PLUS Rounded 1c",system-ui,sans-serif;color:var(--ink);
+  background:radial-gradient(1200px 600px at 20% 0%,#ffeef3,transparent),radial-gradient(900px 600px at 90% 30%,#e9f6ff,transparent),#fbf6f0;
+  padding:32px 16px 64px}
+h1{text-align:center;font-size:26px;font-weight:900;letter-spacing:.04em}
+.sub{text-align:center;font-size:13px;opacity:.7;margin:6px 0 28px}
+.row{display:flex;gap:28px;justify-content:center;flex-wrap:wrap}
+.col{display:flex;flex-direction:column;align-items:center;gap:12px}
+.cap{font-weight:800;font-size:15px}
+.cap small{display:block;font-weight:500;font-size:12px;opacity:.7;text-align:center;margin-top:2px}
+
+/* ===== 筐体 360×780 ===== */
+.cab{width:360px;height:780px;position:relative}
+.st{display:inline-block;font-weight:900;font-size:27px;line-height:1;padding:3px 2px;color:#fff;
+  -webkit-text-stroke:5px var(--ink);paint-order:stroke fill;transform:rotate(var(--r,0deg))}
+
+/* データカウンター（台の上） */
+.counter{position:absolute;left:46px;right:46px;top:0;height:34px;border-radius:10px;
+  background:linear-gradient(#3b3138,#231c21);box-shadow:inset 0 0 0 1.5px #5d4f58,0 3px 6px rgba(0,0,0,.25);
+  display:flex;align-items:center;justify-content:space-around;padding:0 8px}
+.counter div{display:flex;align-items:baseline;gap:5px;color:#d7c7cf;font-size:8.5px;font-weight:800}
+.counter b{font-family:"Courier New",monospace;font-size:17px;font-weight:900;color:#ff5a6e;text-shadow:0 0 6px #ff3355;letter-spacing:1px}
+
+/* 上のかざり（クラウン） */
+.crown{position:absolute;left:0;right:0;top:40px;height:74px;border-radius:44px 44px 10px 10px;
+  background:linear-gradient(180deg,#fff 0%,#ffe3ec 60%,#ffcfdc 100%);
+  box-shadow:inset 0 0 0 2px #fff,inset 0 -4px 0 #f0b25a,0 4px 10px rgba(120,60,40,.25);z-index:3}
+.crown .arc{position:absolute;left:62px;right:62px;top:5px;display:flex;justify-content:space-between}
+.crown .arc i{width:6px;height:6px;border-radius:50%;background:#ffd34d;box-shadow:0 0 6px #ffc21a}
+.spk{position:absolute;top:13px;width:52px;height:52px;border-radius:50%;
+  background:radial-gradient(circle,#6b5560 1.3px,transparent 1.6px) 0 0/6px 6px,radial-gradient(circle at 40% 35%,#8f7a84,#3f3138);
+  box-shadow:0 0 0 3px #fff,0 0 0 6px #f0b25a,0 3px 6px rgba(0,0,0,.3)}
+.spk.l{left:12px}.spk.r{right:12px}
+.logo{position:absolute;left:66px;right:66px;top:16px;text-align:center;white-space:nowrap}
+.logo .small{display:block;font-size:10px;font-weight:900;letter-spacing:.3em;margin-top:1px;color:#b0607a}
+
+/* 前面のわく（ガラス扉） */
+.frame{position:absolute;left:6px;right:6px;top:108px;height:430px;border-radius:22px 22px 18px 18px;
+  background:linear-gradient(90deg,#f7c4d3,#ffe9f0 12%,#fff6f9 50%,#ffe9f0 88%,#f7c4d3);
+  box-shadow:inset 0 0 0 2px #fff,0 6px 14px rgba(120,60,40,.3);z-index:2}
+.led{position:absolute;top:22px;bottom:22px;width:6px;border-radius:3px;
+  background:linear-gradient(#ff8aa6,#ffd34d,#9be08a,#7dc6ff,#c9a0ff,#ff8aa6);box-shadow:0 0 8px rgba(255,140,170,.9)}
+.led.l{left:3px}.led.r{right:3px}
+/* 大当たり中はまん中の役物が上にひらく */
+.glow .medal{top:4px;box-shadow:0 0 0 3px #fff,0 0 0 7px #ffd34d,0 0 18px #ffc21a}
+.glow .ribbon{top:18px}
+.glow .led{background:linear-gradient(#fff3b0,#ffd34d,#fff3b0,#ffd34d);box-shadow:0 0 14px #ffc21a}
+
+/* 盤面（窓） 320×404 */
+.board{position:absolute;left:14px;top:12px;width:320px;height:404px;border-radius:16px;overflow:hidden;
+  background:#e8f5ff;box-shadow:inset 0 0 0 2px #c79a54,inset 0 4px 14px rgba(40,60,90,.35)}
+.board svg{position:absolute;inset:0}
+.glass{position:absolute;inset:0;pointer-events:none;z-index:20;
+  background:linear-gradient(115deg,rgba(255,255,255,.38) 0%,rgba(255,255,255,0) 22%,rgba(255,255,255,0) 60%,rgba(255,255,255,.18) 66%,rgba(255,255,255,0) 72%)}
+
+/* 液晶 */
+.lcdf{position:absolute;left:28px;top:58px;width:264px;height:206px;border-radius:28px;z-index:5;
+  background:linear-gradient(135deg,#ffe9a6,#e2a93e 40%,#fff1c2 60%,#d79a2e);box-shadow:0 6px 14px rgba(60,40,20,.35)}
+.lcdf .gem{position:absolute;width:10px;height:10px;border-radius:50%;background:radial-gradient(circle at 35% 30%,#fff,#ff7f9e 60%,#c43b62);box-shadow:0 0 0 1.5px #fff7d6}
+.lcd{position:absolute;inset:7px;border-radius:22px;overflow:hidden;background:linear-gradient(180deg,#bfe6ff,#fff1f6)}
+.lcd .shine{position:absolute;inset:0;pointer-events:none;background:linear-gradient(160deg,rgba(255,255,255,.5) 0%,rgba(255,255,255,0) 35%)}
+.medal{position:absolute;left:50%;top:30px;width:58px;height:58px;transform:translateX(-50%);border-radius:50%;z-index:7;
+  background:#fff;box-shadow:0 0 0 3px #fff,0 0 0 7px #e8b64a,0 4px 8px rgba(0,0,0,.3);overflow:hidden}
+.medal img{width:100%;height:100%;object-fit:contain}
+.ribbon{position:absolute;left:50%;top:44px;width:150px;height:22px;transform:translateX(-50%);z-index:6;
+  background:linear-gradient(#ff9fb6,#ff7f9e);border-radius:4px;box-shadow:0 2px 4px rgba(0,0,0,.2)}
+.ribbon:before,.ribbon:after{content:"";position:absolute;top:4px;width:18px;height:22px;background:#e86a8a;z-index:-1}
+.ribbon:before{left:-12px;clip-path:polygon(0 0,100% 0,100% 100%,0 100%,40% 50%)}
+.ribbon:after{right:-12px;clip-path:polygon(0 0,100% 0,60% 50%,100% 100%,0 100%)}
+
+.reels{position:absolute;inset:0;display:flex;justify-content:space-around;align-items:center;padding:6px 4px 0}
+.reel{width:31%;display:flex;flex-direction:column;align-items:center;gap:5px}
+.sym{width:72px;height:72px;border-radius:50%;background:#fff;position:relative;
+  box-shadow:0 0 0 3px #fff,0 0 0 5px var(--ring,#ffb3c4),0 6px 10px rgba(0,0,0,.15)}
+.sym img{width:100%;height:100%;object-fit:contain;border-radius:50%}
+.sym.small{width:42px;height:42px;opacity:.5;filter:saturate(.7);box-shadow:0 0 0 2px #fff,0 0 0 3px var(--ring,#ffb3c4)}
+.num{position:absolute;right:-6px;bottom:-4px;width:28px;height:28px;border-radius:50%;display:grid;place-items:center;
+  font-weight:900;font-size:16px;color:#fff;background:var(--ring);box-shadow:0 0 0 2.5px #fff,0 2px 4px rgba(0,0,0,.2)}
+.sym.small .num{width:17px;height:17px;font-size:10px;right:-4px;bottom:-3px}
+.k{--ring:#ff7f9e}.n{--ring:#7dbbf0}
+.blur .sym{filter:blur(2.5px)}
+
+/* 液晶の下の役物 */
+.stage{position:absolute;left:84px;top:266px;width:152px;height:16px;border-radius:0 0 80px 80px/0 0 16px 16px;z-index:4;
+  background:linear-gradient(rgba(255,255,255,.85),rgba(200,170,255,.55));box-shadow:0 2px 4px rgba(80,60,120,.25),inset 0 -2px 0 rgba(255,255,255,.8)}
+.hold{position:absolute;top:269px;left:0;right:0;display:flex;justify-content:center;gap:8px;z-index:4}
+.hold i{width:10px;height:10px;border-radius:50%;background:rgba(255,255,255,.8);box-shadow:inset 0 0 0 1.5px #d7b4c0}
+.hold i.on{background:radial-gradient(circle at 35% 35%,#fff,#ff9fb6 60%);box-shadow:0 0 6px #ff9fb6}
+.heso{position:absolute;left:50%;top:288px;width:96px;transform:translateX(-50%);z-index:6;text-align:center}
+.heso .fig{width:76px;height:56px;margin:0 auto -7px;border-radius:38px 38px 10px 10px;overflow:hidden;
+  background:linear-gradient(#fffbe6,#ffe6ee);box-shadow:0 0 0 2.5px #fff,0 0 0 5px #e8b64a,0 4px 8px rgba(0,0,0,.25);position:relative}
+.heso .fig img{position:absolute;left:50%;bottom:-2px;width:84px;transform:translateX(-50%)}
+.heso .cup{position:relative;width:38px;height:17px;margin:0 auto;border-radius:0 0 19px 19px;
+  background:linear-gradient(#5b4250,#2c2027);box-shadow:0 0 0 2.5px #e8b64a,0 0 0 4px #fff}
+.heso .cup:after{content:"START";position:absolute;left:0;right:0;top:4px;font-size:7px;font-weight:900;color:#ffe48a;letter-spacing:.06em}
+.wind{position:absolute;width:30px;height:30px;z-index:4;margin:-15px 0 0 -15px}
+.atk{position:absolute;left:50%;top:364px;width:96px;height:15px;transform:translateX(-50%);border-radius:4px;z-index:4;
+  background:linear-gradient(#ffd6e0,#ff8fae);box-shadow:0 0 0 2px #fff,0 2px 4px rgba(0,0,0,.2);
+  display:grid;place-items:center;font-size:7.5px;font-weight:900;color:#fff;letter-spacing:.25em}
+.atk.open{background:linear-gradient(#fff6c8,#f4b928);box-shadow:0 0 0 2px #fff,0 0 16px #ffd34d;color:#8a5a14;height:21px;top:361px}
+.out{position:absolute;left:50%;top:388px;width:44px;height:14px;transform:translateX(-50%);border-radius:22px 22px 0 0;background:#2c2027;z-index:4;box-shadow:0 0 0 2px #c79a54}
+.ball{position:absolute;width:8px;height:8px;border-radius:50%;z-index:8;background:radial-gradient(circle at 35% 30%,#fff,#c9ced6 55%,#7d838c)}
+
+/* 演出 */
+.banner{position:absolute;left:0;right:0;text-align:center;z-index:5}
+.parade{position:absolute;left:-8px;right:-8px;bottom:4px;height:40px;display:flex;gap:1px;z-index:4}
+.parade img{height:40px;width:40px;object-fit:contain;filter:drop-shadow(0 2px 2px rgba(0,0,0,.25))}
+.reach-bg{background:radial-gradient(circle at 50% 55%,#fff6c8 0%,#ffb7c9 55%,#ff8aa6 100%)}
+.rays{position:absolute;inset:-50%;background:repeating-conic-gradient(from 0deg,rgba(255,255,255,.35) 0 8deg,transparent 8deg 20deg)}
+.big-bg{background:radial-gradient(circle at 50% 45%,#fffbe6 0%,#ffe08a 45%,#ffb3c4 100%)}
+.trio{position:absolute;left:50%;top:0;width:214px;transform:translateX(-50%);filter:drop-shadow(0 6px 8px rgba(120,60,40,.35))}
+.stars{position:absolute;top:6px;left:0;right:0;display:flex;justify-content:center;gap:70px;z-index:5}
+.stars span{font-size:20px;color:#fff;-webkit-text-stroke:3px #e8a01c;paint-order:stroke fill}
+.conf{position:absolute;width:7px;height:11px;border-radius:2px}
+
+/* 上皿 */
+.tray1{position:absolute;left:2px;right:2px;top:532px;height:116px;z-index:3;border-radius:20px 20px 34px 34px;
+  background:linear-gradient(180deg,#fff 0%,#ffe6ee 30%,#f7c4d3 75%,#e7a3b8 100%);
+  box-shadow:inset 0 2px 0 #fff,inset 0 -5px 0 rgba(190,100,130,.35),0 10px 16px rgba(120,60,40,.3)}
+.pool{position:absolute;left:14px;top:12px;width:136px;height:62px;border-radius:14px 14px 26px 26px;
+  background:linear-gradient(180deg,#d9c7cf,#fff 70%);box-shadow:inset 0 4px 8px rgba(90,40,60,.3),0 0 0 2px #fff}
+.pool .ball{position:absolute}
+.pool .lbl{position:absolute;left:8px;bottom:-24px;font-size:9px;font-weight:900;color:#a0506a}
+.push{position:absolute;left:50%;top:6px;width:76px;height:76px;transform:translateX(-50%);border-radius:50%;
+  background:radial-gradient(circle at 40% 30%,#fff 0%,#ffb3c6 40%,#ff6f93 100%);
+  box-shadow:0 0 0 4px #fff,0 0 0 8px #e8b64a,0 8px 12px rgba(150,40,70,.45),inset 0 -6px 10px rgba(160,30,70,.35);
+  display:grid;place-items:center}
+.push span{font-size:15px;font-weight:900;color:#fff;-webkit-text-stroke:3px #c2345c;paint-order:stroke fill;letter-spacing:.05em}
+.btns{position:absolute;right:14px;top:12px;width:104px;display:flex;flex-direction:column;gap:6px}
+.disp{background:#2c2027;border-radius:8px;padding:4px 8px;color:#d7c7cf;font-size:8px;font-weight:800;box-shadow:inset 0 0 0 1.5px #5d4f58}
+.disp b{display:block;font-family:"Courier New",monospace;font-size:16px;color:#7dffb0;text-shadow:0 0 6px #33ff88;text-align:right}
+.btns .b2{display:flex;gap:5px}
+.btns .b2 span{flex:1;text-align:center;font-size:9.5px;font-weight:900;color:#fff;padding:6px 0;border-radius:8px;
+  background:linear-gradient(#8ccaff,#5aa8ef);box-shadow:0 2px 0 #3f86c8}
+.btns .b2 span+span{background:linear-gradient(#cfc4ca,#a99ca3);box-shadow:0 2px 0 #847880}
+
+/* 下皿・ハンドル */
+.tray2{position:absolute;left:18px;top:660px;width:206px;height:92px;border-radius:16px 16px 30px 30px;z-index:2;
+  background:linear-gradient(180deg,#fbe0e8,#f2b8c9);box-shadow:inset 0 2px 0 #fff,0 8px 14px rgba(120,60,40,.28)}
+.tray2 .in{position:absolute;left:12px;right:12px;top:10px;height:52px;border-radius:12px 12px 22px 22px;
+  background:linear-gradient(180deg,#cdb6c0,#fff 75%);box-shadow:inset 0 4px 8px rgba(90,40,60,.3)}
+.tray2 .lever{position:absolute;left:50%;bottom:8px;width:44px;height:10px;transform:translateX(-50%);border-radius:5px;background:linear-gradient(#e9e2e6,#b9adb4)}
+.body{position:absolute;left:10px;right:10px;top:636px;bottom:0;border-radius:0 0 26px 26px;z-index:1;
+  background:linear-gradient(180deg,#ffe9f0,#f9d3de)}
+.handle{position:absolute;right:16px;top:648px;width:108px;height:108px;border-radius:50%;z-index:4;
+  background:conic-gradient(from 0deg,#f3f3f5,#b8bcc4,#fbfbfc,#9da2ab,#eef0f2,#b8bcc4,#f3f3f5);
+  box-shadow:0 10px 16px rgba(60,40,50,.4),inset 0 0 0 2px #fff}
+.handle .arc{position:absolute;inset:6px;border-radius:50%;
+  background:conic-gradient(from 210deg,#ffcf4d 0deg,#ff6f93 var(--pw,150deg),rgba(255,255,255,.5) var(--pw,150deg) 300deg,transparent 300deg);
+  -webkit-mask:radial-gradient(circle,transparent 41px,#000 42px);mask:radial-gradient(circle,transparent 41px,#000 42px)}
+.handle .knob{position:absolute;inset:18px;border-radius:50%;background:radial-gradient(circle at 40% 35%,#fff,#ffe1ea 60%,#f3a9be);
+  box-shadow:0 4px 8px rgba(0,0,0,.25),inset 0 0 0 2px #fff;display:grid;place-items:center}
+.handle .knob i{width:24px;height:24px;opacity:.55}
+.handle .lbl{position:absolute;left:0;right:0;bottom:-15px;text-align:center;font-size:9px;font-weight:900;opacity:.6}
+</style>
+</head>
+<body>
+<h1>ファミリー物語 デザイン案 2</h1>
+<p class="sub">実機らしい筐体の形にしました（データカウンター・スピーカー・LED・ガラス扉・上皿・下皿・ハンドル）。ヘソは家族3人。</p>
+<div class="row" id="row"></div>
+
+<script>
+const S=[
+ {id:'jill',name:'ジル'},{id:'lee',name:'リー'},{id:'berry',name:'ベリー'},{id:'nafan',name:'なーふぁん'},
+ {id:'lucky',name:'ラッキー'},{id:'kira',name:'キラ'},{id:'glen',name:'グレン'},{id:'daisuke',name:'だいすけ'},
+ {id:'hiroko',name:'ひろこ'},{id:'nanae',name:'ななえ'},{id:'honey',name:'ハニー'}
+];
+S.forEach((s,i)=>{s.no=i+1;s.k=(s.no%2===1)});
+const sym=(i,cls='')=>{const s=S[i];return `<div class="sym ${s.k?'k':'n'} ${cls}"><img src="${s.id}.png"><span class="num">${s.no}</span></div>`};
+const pawSvg=`<svg viewBox="0 0 24 24" fill="#c0607a"><ellipse cx="12" cy="16" rx="5.5" ry="4.5"/><circle cx="5.5" cy="10" r="2.4"/><circle cx="9.5" cy="6" r="2.4"/><circle cx="14.5" cy="6" r="2.4"/><circle cx="18.5" cy="10" r="2.4"/></svg>`;
+
+// 盤面：外レール（上が大きな丸）、左の発射レーン、釘
+const RAIL='M6 392 L6 106 A100 100 0 0 1 106 6 L214 6 A100 100 0 0 1 314 106 L314 380 A18 18 0 0 1 296 398 L24 398 A18 18 0 0 1 6 380 Z';
+function inside(x,y){ // 内側（発射レーンの内）に入っているか
+  if(x<26||x>306||y<24||y>392) return false;
+  const c=(cx,cy,r)=>Math.hypot(x-cx,y-cy)<=r;
+  if(y<108&&x<108) return c(108,108,82);
+  if(y<108&&x>212) return c(212,108,92);
+  return true;
+}
+function boardSvg(){
+  let p='';
+  for(let r=0;r<15;r++)for(let c=0;c<16;c++){
+    const x=20+c*19+(r%2?9.5:0), y=26+r*25.5;
+    if(!inside(x,y)) continue;
+    if(x>22&&x<298&&y>52&&y<272) continue;          // 液晶
+    if(Math.abs(x-160)<50&&y>280&&y<360) continue;   // ヘソ
+    if(Math.abs(x-160)<62&&y>352&&y<400) continue;   // アタッカー・アウト
+    if(Math.hypot(x-52,y-318)<20||Math.hypot(x-268,y-318)<20) continue; // 風車
+    p+=`<circle cx="${x}" cy="${y}" r="2" fill="#c99a3c"/><circle cx="${x-.6}" cy="${y-.6}" r=".7" fill="#fff6c8"/>`;
+  }
+  const paws=[[30,300],[272,350],[248,22],[44,40]].map(([x,y])=>`<g transform="translate(${x} ${y}) scale(.9)" opacity=".12">${pawSvg.replace(/<\/?svg[^>]*>/g,'')}</g>`).join('');
+  return `<svg viewBox="0 0 320 404">
+    <defs><radialGradient id="bg" cx="50%" cy="20%" r="90%"><stop offset="0" stop-color="#f6fbff"/><stop offset=".6" stop-color="#dcefff"/><stop offset="1" stop-color="#fde3ec"/></radialGradient>
+    <linearGradient id="gold" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#fff0b3"/><stop offset=".5" stop-color="#d9a23a"/><stop offset="1" stop-color="#ffe58f"/></linearGradient></defs>
+    <rect width="320" height="404" fill="#f3d9e2"/>
+    <path d="${RAIL}" fill="url(#bg)"/>${paws}
+    <path d="${RAIL}" fill="none" stroke="url(#gold)" stroke-width="5"/>
+    <path d="M20 394 L20 108 A88 88 0 0 1 108 20 L196 20" fill="none" stroke="#e9eef3" stroke-width="3.5"/>
+    <path d="M20 394 L20 108 A88 88 0 0 1 108 20 L196 20" fill="none" stroke="#9aa3ad" stroke-width="1" transform="translate(1 1)"/>
+    ${p}</svg>`;
+}
+const windmill=(x,y,r)=>`<svg class="wind" style="left:${x}px;top:${y}px" viewBox="0 0 30 30"><g transform="rotate(${r} 15 15)">${[0,60,120,180,240,300].map(a=>`<path d="M15 15 L15 3 Q20 6 15 15" fill="${a%120?'#ff9fb6':'#ffd34d'}" stroke="#fff" stroke-width=".8" transform="rotate(${a} 15 15)"/>`).join('')}</g><circle cx="15" cy="15" r="3" fill="#fff" stroke="#c99a3c"/></svg>`;
+
+function cab(o){
+  const pool=Array.from({length:o.pool||22},(_,i)=>`<div class="ball" style="left:${8+(i%11)*11+(Math.floor(i/11)%2)*5}px;top:${34-Math.floor(i/11)*8}px"></div>`).join('');
+  const low=Array.from({length:o.low||0},(_,i)=>`<div class="ball" style="left:${16+(i%14)*11}px;top:${40-Math.floor(i/14)*8}px"></div>`).join('');
+  const flying=(o.flying||[[11,330],[11,250],[40,12]]).map(([x,y])=>`<div class="ball" style="left:${x}px;top:${y}px"></div>`).join('');
+  const gems=[[20,-3],[124,-4],[230,-3],[-4,96],[256,96],[60,200],[194,200]].map(([x,y])=>`<i class="gem" style="left:${x}px;top:${y}px"></i>`).join('');
+  return `<div class="cab ${o.glow?'glow':''}">
+    <div class="counter"><div>回転<b>${String(o.spin).padStart(3,'0')}</b></div><div>大当り<b>${String(o.hits).padStart(2,'0')}</b></div><div>確変<b style="color:${o.kakuhen?'#ff5a6e':'#5a3a44'};text-shadow:${o.kakuhen?'':'none'}">${o.kakuhen?'ON':'--'}</b></div></div>
+    <div class="crown"><div class="arc">${Array.from({length:12},()=>'<i></i>').join('')}</div>
+      <div class="spk l"></div><div class="spk r"></div>
+      <div class="logo">${['フ','ァ','ミ','リ','ー'].map((c,i)=>`<span class="st" style="font-size:${i==1?17:23}px;--r:${[-6,4,-3,5,-2][i]}deg;color:${['#ff8aa6','#ffc94d','#7dc6ff','#9be08a','#c9a0ff'][i]}">${c}</span>`).join('')}${['物','語'].map((c,i)=>`<span class="st" style="font-size:29px;--r:${[4,-4][i]}deg;color:#ffd34d">${c}</span>`).join('')}</div>
+    </div>
+    <div class="body"></div>
+    <div class="frame"><i class="led l"></i><i class="led r"></i>
+      <div class="board">${boardSvg()}
+        <div class="lcdf">${gems}<div class="lcd ${o.lcdCls||''}">${o.lcd}<div class="shine"></div></div></div>
+        <div class="ribbon"></div><div class="medal"><img src="nafan.png"></div>
+        <div class="stage"></div>
+        <div class="hold">${[0,1,2,3].map(i=>`<i class="${i<o.hold?'on':''}"></i>`).join('')}</div>
+        <div class="heso"><div class="fig"><img src="trio.png"></div><div class="cup"></div></div>
+        ${windmill(52,318,10)}${windmill(268,318,40)}
+        <div class="atk ${o.atk?'open':''}">${o.atk?'OPEN!':'ATTACKER'}</div>
+        <div class="out"></div>
+        ${flying}
+        <div class="glass"></div>
+      </div>
+    </div>
+    <div class="tray1">
+      <div class="pool">${pool}<span class="lbl">うえざら</span></div>
+      <div class="push"><span>PUSH</span></div>
+      <div class="btns"><div class="disp">もち玉<b>${o.balls}</b></div><div class="b2"><span>玉貸</span><span>返却</span></div></div>
+    </div>
+    <div class="tray2"><div class="in">${low}</div><div class="lever"></div></div>
+    <div class="handle" style="--pw:${o.pw}deg"><div class="arc"></div><div class="knob"><i>${pawSvg}</i></div><div class="lbl">ハンドル</div></div>
+  </div>`;
+}
+
+const reelCol=(a,b,c,cls='')=>`<div class="reel ${cls}">${sym(a,'small')}${sym(b)}${sym(c,'small')}</div>`;
+const conf=Array.from({length:26},(_,i)=>`<i class="conf" style="left:${(i*37)%240}px;top:${(i*53)%185}px;background:${['#ff8aa6','#ffc94d','#7dc6ff','#9be08a','#fff'][i%5]};transform:rotate(${i*47}deg)"></i>`).join('');
+const screens=[
+ {cap:'① ふだん（回転中）',sub:'液晶でキャラがたてにまわる',o:{hold:3,spin:57,hits:0,balls:186,pw:140,pool:20,
+   lcd:`<div class="reels">${reelCol(10,0,1)}${reelCol(3,4,5,'blur')}${reelCol(6,7,8)}</div>`}},
+ {cap:'② リーチ＋にゃんこ大行進',sub:'2つそろってまん中がゆっくり',o:{hold:4,spin:112,hits:0,balls:94,pw:170,pool:9,lcdCls:'reach-bg',
+   lcd:`<div class="rays"></div><div class="banner" style="top:22px">${['リ','ー','チ','！'].map((c,i)=>`<span class="st" style="font-size:30px;color:${i<3?'#ffe14d':'#fff'};--r:${[-4,3,-2,6][i]}deg">${c}</span>`).join('')}</div>
+     <div class="reels" style="padding-top:22px">${reelCol(3,4,5)}${reelCol(2,9,0,'blur')}${reelCol(3,4,5)}</div>
+     <div class="parade">${['jill','lee','berry','nafan','kira','glen','honey'].map(n=>`<img src="${n}.png">`).join('')}</div>`}},
+ {cap:'③ 3人そろい（いちばんの当たり）',sub:'16ラウンド＋確変＋特別ムービー',o:{glow:1,atk:1,hold:2,spin:0,hits:1,kakuhen:1,balls:412,pw:150,pool:22,low:30,lcdCls:'big-bg',
+   flying:[[150,356],[166,350],[134,352],[11,300],[11,200]],
+   lcd:`<div class="rays"></div>${conf}<div class="stars"><span>★</span><span>★</span><span>★</span></div><img class="trio" src="trio.png">
+     <div class="banner" style="bottom:2px;line-height:1.05">${['家','族','揃','っ','て'].map((c,i)=>`<span class="st" style="font-size:17px;color:${['#ff8aa6','#ffc94d','#7dc6ff','#9be08a','#ff8aa6'][i]};--r:${[-5,4,-3,5,-4][i]}deg">${c}</span>`).join('')}<br>${['大','当','た','り','！'].map((c,i)=>`<span class="st" style="font-size:28px;color:#ffe14d;--r:${[-4,3,-2,4,6][i]}deg">${c}</span>`).join('')}</div>`}}
+];
+document.getElementById('row').innerHTML=screens.map(s=>`<div class="col"><div class="cap">${s.cap}<small>${s.sub}</small></div>${cab(s.o)}</div>`).join('');
+</script>
+</body>
+</html>
