@@ -54,6 +54,20 @@ function drawStatic(layout, scale) {
   line(ctx, layout.walls, gold, 3);
   line(ctx, [layout.kicker], '#ff8fae', 4);
 
+  // アウト口：外れ玉が吸いこまれる穴（金のふち）
+  const o = layout.out;
+  if (o) {
+    const hole = ctx.createRadialGradient(o.x, o.y + 4, 2, o.x, o.y + 4, o.w / 2);
+    hole.addColorStop(0, '#120a10');
+    hole.addColorStop(1, '#4a2a38');
+    ctx.fillStyle = hole;
+    ctx.beginPath(); ctx.ellipse(o.x, o.y + 4, o.w / 2 + 2, 9, 0, Math.PI, 0); ctx.lineTo(o.x + o.w / 2 + 2, layout.h); ctx.lineTo(o.x - o.w / 2 - 2, layout.h); ctx.fill();
+    ctx.strokeStyle = gold; ctx.lineWidth = 3;
+    ctx.beginPath(); ctx.ellipse(o.x, o.y + 4, o.w / 2 + 2, 9, 0, Math.PI, 0); ctx.stroke();
+    ctx.fillStyle = '#ffe9a8'; ctx.font = 'bold 6px sans-serif'; ctx.textAlign = 'center';
+    ctx.fillText('OUT', o.x, o.y + 2);
+  }
+
   for (const p of layout.pins) {
     if (p.r > 4) continue;
     ctx.fillStyle = '#b8862e';
