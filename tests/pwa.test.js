@@ -7,7 +7,7 @@ const walk = dir => readdirSync(dir, { withFileTypes: true }).flatMap(d => (d.is
 
 test('service worker precaches every game file', () => {
   const sw = readFileSync('sw.js', 'utf8');
-  const files = [...walk('src'), ...walk('styles'), ...walk('assets/img'), 'index.html', 'manifest.webmanifest'];
+  const files = [...walk('src'), ...walk('styles'), ...walk('assets/img'), ...walk('assets/audio'), 'index.html', 'manifest.webmanifest'];
   const missing = files.filter(f => !sw.includes(`'./${f}'`));
   assert.deepEqual(missing, []);
 });

@@ -81,14 +81,14 @@ test('no ball stays stuck', () => {
   }
 });
 
-test('heso rate at best power is 10–13%, boost is 1.5x or more', () => {
+test('heso rate at best power is 8–10% (between the first and second tuning), boost is 1.5x or more', () => {
   const table = [];
   for (let pw = 0.1; pw <= 0.95; pw += 0.05) table.push([+pw.toFixed(2), shoot(pw, 400).rate]);
   const [best] = table.slice().sort((a, b) => b[1] - a[1])[0];
   const r = shoot(best, 3000);
   const boost = shoot(best, 3000, { attackerOpen: false, hesoBoost: true });
   console.log('heso table', JSON.stringify(table), 'best', best, r.rate, 'boost', boost.rate);
-  assert.ok(r.rate >= 0.10 && r.rate <= 0.13, `rate ${r.rate} at ${best}`);
+  assert.ok(r.rate >= 0.08 && r.rate <= 0.10, `rate ${r.rate} at ${best}`);
   assert.ok(boost.rate >= r.rate * 1.5, `boost ${boost.rate}`);
 });
 
