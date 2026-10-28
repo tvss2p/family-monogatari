@@ -85,11 +85,22 @@ export function createLcd(root) {
       const title = id === PREMIUM_ID
         ? st(['家', '族', '揃', 'っ', 'て'], 17, ['#ff8aa6', '#ffc94d', '#7dc6ff', '#9be08a', '#ff8aa6'], [-5, 4, -3, 5, -4]) + '<br>'
         : st([s.type === 'kakuhen' ? '確変' : '通常'], 15, ['#fff'], [0]) + '<br>';
-      movie.innerHTML = `${conf}${head}<div class="ttl">${title}${st(['大', '当', 'た', 'り', '！'], 28, ['#ffe14d'], [-4, 3, -2, 4, 6])}</div><div class="round"></div>`;
+      const marchers = [...SYMBOLS.filter(x => x.id !== PREMIUM_ID), ...SYMBOLS.filter(x => x.id !== PREMIUM_ID)]
+        .map((x, i) => `<img src="${x.img}" alt="" style="animation-delay:${-(i * 0.17).toFixed(2)}s">`).join('');
+      const hearts = id === PREMIUM_ID ? Array.from({ length: 10 }, (_, i) => `<i class="heartUp" style="left:${8 + i * 23}px;animation-delay:${-(i * 0.37) % 2.6}s">♥</i>`).join('') : '';
+      movie.innerHTML = `${conf}${hearts}<div class="bob">${head}</div><div class="ttl">${title}${st(['大', '当', 'た', 'り', '！'], 28, ['#ffe14d'], [-4, 3, -2, 4, 6])}</div><div class="march"><div class="track">${marchers}</div></div><div class="round"></div><div class="roundCut"></div>`;
     },
     setRound(n, total) {
       const r = movie.querySelector('.round');
       if (r) r.textContent = `${n}R / ${total}R`;
+      // ラウンドが変わるたびに「ROUND n」と、その回の主役が飛び出す
+      const cut = movie.querySelector('.roundCut');
+      if (!cut) return;
+      const star = SYMBOLS[(n - 1) % SYMBOLS.length];
+      cut.innerHTML = `<img src="${star.img}" alt="">${st(['R', 'O', 'U', 'N', 'D', ' ', String(n)], 22, ['#fff', '#ffe14d'], [-4, 3, -2, 4, 0, 0, 6])}`;
+      cut.classList.remove('go');
+      void cut.offsetWidth;
+      cut.classList.add('go');
     },
     update(now) {
       if (now - lastTick < 80) return;

@@ -7,6 +7,9 @@ let bg = null;
 let ballSprite = null;
 let cachedScale = null;
 
+// 別のタブ・アプリから戻ったとき、Android は取っておいた絵の中身を捨てることがあるので作りなおす
+export function resetBoardCache() { cachedScale = null; }
+
 function makeBall(scale) {
   const c = makeCanvas();
   c.width = c.height = Math.round(BALL_R * 2 * scale);
