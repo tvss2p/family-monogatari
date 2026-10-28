@@ -1,0 +1,8 @@
+node_modules/
+assets/original/
+gpt/
+refs/
+.DS_Store
+.superpowers/
+.claude/
+screenshots/
