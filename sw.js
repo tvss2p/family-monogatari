@@ -1,6 +1,6 @@
 // オフラインでも開けるように、ゲームのファイルを先に保存しておく。
 // このファイルは tools/build-sw.mjs が作る（手で直さない）
-const VERSION = 'fm-8450d58517da';
+const VERSION = 'fm-40564394009f';
 const FILES = [
   './',
   './index.html',
@@ -55,6 +55,7 @@ const FILES = [
   './src/config.js',
   './src/cues.js',
   './src/fit.js',
+  './src/hud.js',
   './src/input.js',
   './src/lever.js',
   './src/lottery.js',
