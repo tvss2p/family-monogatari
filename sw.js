@@ -1,6 +1,6 @@
 // オフラインでも開けるように、ゲームのファイルを先に保存しておく。
 // このファイルは tools/build-sw.mjs が作る（手で直さない）
-const VERSION = 'fm-00410b1addc3';
+const VERSION = 'fm-23fea175e2d6';
 const FILES = [
   './',
   './index.html',
@@ -40,13 +40,16 @@ const FILES = [
   './src/lottery.js',
   './src/machine.js',
   './src/main.js',
+  './src/payout.js',
   './src/physics.js',
   './src/render/board.js',
   './src/render/gimmicks.js',
   './src/render/lcd.js',
   './src/render/parts.js',
+  './src/render/tray.js',
   './src/scenario.js',
   './src/storage.js',
+  './src/story.js',
   './src/symbols.js',
   './src/wakelock.js',
   './styles/cabinet.css',
