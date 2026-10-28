@@ -1,6 +1,6 @@
 // オフラインでも開けるように、ゲームのファイルを先に保存しておく。
 // このファイルは tools/build-sw.mjs が作る（手で直さない）
-const VERSION = 'fm-11a01ab9c795';
+const VERSION = 'fm-b848445ea24b';
 const FILES = [
   './',
   './index.html',
@@ -13,6 +13,7 @@ const FILES = [
   './assets/img/part-arm.webp',
   './assets/img/part-heso.webp',
   './assets/img/part-jarashi.webp',
+  './assets/img/part-knob.webp',
   './assets/img/part-nafan.webp',
   './assets/img/part-push.webp',
   './assets/img/part-windmill.webp',
