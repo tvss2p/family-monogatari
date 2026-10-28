@@ -8,7 +8,7 @@ const walk = dir => readdirSync(dir, { withFileTypes: true })
   .filter(f => !f.split('/').pop().startsWith('.'));
 
 export function gameFiles() {
-  return ['index.html', 'manifest.webmanifest', ...['src', 'styles', 'assets/img'].flatMap(walk).sort()];
+  return ['index.html', 'manifest.webmanifest', ...['src', 'styles', 'assets/img', 'assets/audio'].flatMap(walk).sort()];
 }
 
 export function contentVersion(files) {
