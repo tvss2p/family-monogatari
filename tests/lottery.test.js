@@ -6,7 +6,7 @@ import { mulberry32 } from './helpers.js';
 
 test('symbols table matches spec', () => {
   assert.equal(SYMBOLS.length, 12);
-  assert.deepEqual(SYMBOLS.map(s => s.name), ['ジル', 'リー', 'ベリー', 'なーふぁん', 'ラッキー', 'キラ', 'グレン', 'だいすけ', 'ひろこ', 'ななえ', 'ハニー', '家族3人']);
+  assert.deepEqual(SYMBOLS.map(s => s.name), ['ジル', 'リー', 'ベリー', 'なーふぁん', 'ラッキー', 'キラ', 'グレン', 'だいすけ', 'ばあちゃん', 'ななえ', 'ハニー', '家族3人']);
   for (const s of NUMBERED) assert.equal(s.type, s.no % 2 === 1 ? 'kakuhen' : 'normal');
   assert.equal(NUMBERED.length, 11);
   const last = SYMBOLS[11];

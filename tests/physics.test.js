@@ -81,14 +81,14 @@ test('no ball stays stuck', () => {
   }
 });
 
-test('heso rate at best power is 5–10%, boost is 1.5x or more', () => {
+test('heso rate at best power is 10–13%, boost is 1.5x or more', () => {
   const table = [];
   for (let pw = 0.1; pw <= 0.95; pw += 0.05) table.push([+pw.toFixed(2), shoot(pw, 400).rate]);
   const [best] = table.slice().sort((a, b) => b[1] - a[1])[0];
   const r = shoot(best, 3000);
   const boost = shoot(best, 3000, { attackerOpen: false, hesoBoost: true });
   console.log('heso table', JSON.stringify(table), 'best', best, r.rate, 'boost', boost.rate);
-  assert.ok(r.rate >= 0.05 && r.rate <= 0.10, `rate ${r.rate} at ${best}`);
+  assert.ok(r.rate >= 0.10 && r.rate <= 0.13, `rate ${r.rate} at ${best}`);
   assert.ok(boost.rate >= r.rate * 1.5, `boost ${boost.rate}`);
 });
 
@@ -132,4 +132,19 @@ test('a too-weak shot goes partway up the lane and falls back out', () => {
   for (let i = 0; i < 120 && !ev.length; i++) { ev = p.step(1 / 60, CLOSED); if (p.balls[0]) minY = Math.min(minY, p.balls[0].y); }
   assert.equal(ev[0].type, 'out');
   assert.ok(minY < 360 && minY > 100, `rose to ${minY}`);
+});
+
+test('外れ玉は盤面の下のアウト口に吸いこまれて消える（途中で消えない）', () => {
+  const p = createPhysics(LAYOUT, mulberry32(5));
+  const outs = [];
+  let t = 0, launched = 0;
+  while (launched < 150 || p.balls.length) {
+    if (launched < 150 && t >= launched * 0.6) { p.launch(0.4 + (launched % 7) * 0.05); launched++; }
+    for (const e of p.step(1 / 60, CLOSED)) if (e.type === 'out' && e.x !== undefined) outs.push(e);
+    t += 1 / 60;
+    if (t > 200) throw new Error('balls never finished');
+  }
+  assert.ok(outs.length > 100);
+  const o = LAYOUT.out;
+  for (const e of outs) assert.ok(Math.abs(e.x - o.x) <= o.w / 2 && e.y >= o.y - 2, `out at ${e.x.toFixed(1)},${e.y.toFixed(1)}`);
 });
