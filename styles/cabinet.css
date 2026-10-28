@@ -29,7 +29,7 @@ button{font:inherit;border:0;background:none;color:inherit;cursor:pointer}
   -webkit-mask:radial-gradient(circle at 50% 40%,#000 30%,transparent 70%);mask:radial-gradient(circle at 50% 40%,#000 30%,transparent 70%)}
 .ph-jackpot .backrays{opacity:1;animation:spin 8s linear infinite}
 
-.counter{position:absolute;left:70px;right:70px;top:0;height:24px;border-radius:9px;z-index:8;
+.counter{position:absolute;left:70px;right:70px;top:var(--cut,0px);height:24px;border-radius:9px;z-index:8;
   background:linear-gradient(#3b3138,#231c21);box-shadow:inset 0 0 0 1.5px #5d4f58,0 3px 6px rgba(0,0,0,.25);display:flex;align-items:center;justify-content:space-around}
 .counter div{display:flex;align-items:baseline;gap:4px;color:#d7c7cf;font-size:8px;font-weight:800}
 .counter b{font-family:"Courier New",monospace;font-size:15px;font-weight:900;color:#ff5a6e;text-shadow:0 0 6px #ff3355}
@@ -165,7 +165,7 @@ button{font:inherit;border:0;background:none;color:inherit;cursor:pointer}
 .pushwrap.up .push{animation:pulse .3s ease-in-out infinite alternate}
 .pushwrap.pressed .push{filter:brightness(1.5)}
 @keyframes pulse{to{filter:brightness(1.25)}}
-.b2{position:absolute;left:126px;top:104px;width:108px;display:flex;gap:6px}
+.b2{position:absolute;left:16px;top:104px;width:108px;display:flex;gap:6px}
 .b2 button{flex:1;text-align:center;font-size:11px;font-weight:900;color:#fff;padding:7px 0;border-radius:10px;background:linear-gradient(#ffb3c6,#ff7f9e);box-shadow:0 2px 0 #d0557a,0 0 0 1.5px #ffe48a}
 .b2 button+button{background:linear-gradient(#cfc4ca,#a99ca3);box-shadow:0 2px 0 #847880,0 0 0 1.5px #ffe48a}
 .b2 button:active{transform:translateY(2px);box-shadow:none}
@@ -194,19 +194,20 @@ button{font:inherit;border:0;background:none;color:inherit;cursor:pointer}
 .menu button{display:block;width:100%;margin-top:8px;padding:12px 0;border-radius:14px;font-size:15px;font-weight:900;color:#fff;background:linear-gradient(#ffb3c6,#ff7f9e);box-shadow:0 3px 0 #d0557a}
 .menu #mReset,.menu #mResetYes{background:linear-gradient(#cfc4ca,#a99ca3);box-shadow:0 3px 0 #847880}
 .menu #mResetYes{background:linear-gradient(#ff8a8a,#e85a5a);box-shadow:0 3px 0 #b83a3a}
+.menu .card p.credit{margin:14px 0 0;font-size:10px;font-weight:700;line-height:1.5;color:#8a6a76;word-break:break-all}
 .menu .confirmRows{display:none}
 .menu.confirm .confirmRows{display:block}.menu.confirm .normalRows{display:none}
 
-/* ハンドルの固定・強さ */
-.lock{position:absolute;left:16px;top:104px;width:50px;height:24px;border-radius:12px;font-size:11px;font-weight:900;color:#fff;
+/* ハンドルの固定・強さ：ハンドルのすぐ左に「＋ 固定 −」を縦に並べる */
+.lock{position:absolute;left:241px;top:107px;width:46px;height:24px;border-radius:12px;font-size:11px;font-weight:900;color:#fff;
   background:linear-gradient(#cfc4ca,#a99ca3);box-shadow:0 2px 0 #847880,0 0 0 1.5px #ffe48a;z-index:4}
 .lock.on{background:linear-gradient(#ffe48a,#f4b928);color:#7a4a00;box-shadow:0 2px 0 #b98410,0 0 10px #ffcc33}
-.pstep{position:absolute;top:104px;width:26px;height:24px;border-radius:12px;font-size:16px;font-weight:900;line-height:1;color:#fff;z-index:4;
+.pstep{position:absolute;width:30px;height:24px;border-radius:12px;font-size:16px;font-weight:900;line-height:1;color:#fff;z-index:4;
   background:linear-gradient(#ffb3c6,#ff7f9e);box-shadow:0 2px 0 #d0557a,0 0 0 1.5px #ffe48a}
-.pstep.minus{left:68px}.pstep.plus{left:97px}
+.pstep.plus{left:249px;top:80px}.pstep.minus{left:249px;top:134px}
 .pstep:active,.lock:active{transform:translateY(2px);box-shadow:none}
 .handle.locked .arc{filter:drop-shadow(0 0 4px #ffcc33)}
-.powerLabel{position:absolute;left:226px;top:52px;width:120px;text-align:center;font-size:13px;font-weight:900;color:#fff;
+.powerLabel{position:absolute;left:229px;top:57px;width:120px;text-align:center;font-size:13px;font-weight:900;color:#fff;
   -webkit-text-stroke:3px #c2345c;paint-order:stroke fill;opacity:0;transition:opacity .2s;pointer-events:none;z-index:5}
 .powerLabel.show{opacity:1}
 /* 保留の色（青→緑→赤→金。金は当たり確定） */
