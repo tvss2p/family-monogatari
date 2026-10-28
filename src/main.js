@@ -17,6 +17,7 @@ import { createCueRunner } from './cues.js';
 import { isFiring, stepPower, powerLabel } from './lever.js';
 import { createBgm, trackFor } from './bgm.js';
 import { fitCabinet } from './fit.js';
+import { modeDisplay } from './hud.js';
 import { BGM_FILES, SE_FILES, AUDIO_DIR } from './sounds.js';
 import { createWakeLock } from './wakelock.js';
 
@@ -248,7 +249,12 @@ function updateHud() {
   const s = machine.state;
   show('spin', s.spins, v => { $('#cSpin').textContent = String(Math.min(v, 999)).padStart(3, '0'); });
   show('hit', s.hits, v => { $('#cHit').textContent = String(Math.min(v, 99)).padStart(2, '0'); });
-  show('k', s.mode, v => { const k = $('#cK'); k.textContent = v === 'kakuhen' ? 'ON' : v === 'jitan' ? '時短' : '--'; k.classList.toggle('off', v === 'normal'); });
+  show('k', `${s.mode}/${s.jitanLeft}`, () => {
+    const d = modeDisplay(s.mode, s.jitanLeft), k = $('#cK');
+    $('#cKl').textContent = d.label;
+    k.textContent = d.value;
+    k.classList.toggle('off', !d.on);
+  });
   show('balls', s.balls, v => {
     $('#cBalls').textContent = v;
   });
