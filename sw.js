@@ -1,6 +1,6 @@
 // オフラインでも開けるように、ゲームのファイルを先に保存しておく。
 // このファイルは tools/build-sw.mjs が作る（手で直さない）
-const VERSION = 'fm-b848445ea24b';
+const VERSION = 'fm-00410b1addc3';
 const FILES = [
   './',
   './index.html',
@@ -48,6 +48,7 @@ const FILES = [
   './src/scenario.js',
   './src/storage.js',
   './src/symbols.js',
+  './src/wakelock.js',
   './styles/cabinet.css',
   './styles/lcd.css',
 ];
