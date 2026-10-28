@@ -1,6 +1,6 @@
 // オフラインでも開けるように、ゲームのファイルを先に保存しておく。
 // このファイルは tools/build-sw.mjs が作る（手で直さない）
-const VERSION = 'fm-cfba1f4f539f';
+const VERSION = 'fm-11a01ab9c795';
 const FILES = [
   './',
   './index.html',
@@ -30,10 +30,12 @@ const FILES = [
   './assets/img/sym-nanae.png',
   './assets/img/sym-trio.png',
   './src/audio.js',
+  './src/bgm.js',
   './src/board-layout.js',
   './src/config.js',
   './src/cues.js',
   './src/input.js',
+  './src/lever.js',
   './src/lottery.js',
   './src/machine.js',
   './src/main.js',
