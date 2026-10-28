@@ -108,5 +108,6 @@ export function createLcd(root) {
       state.forEach((s, i) => { if (s.spin) drawReel(i); });
     },
     get spin() { return current; },
+    get spinning() { return state.filter(s => s.spin).length; },
   };
 }
