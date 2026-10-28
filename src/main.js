@@ -67,6 +67,7 @@ let labelTimer = null;
 function setPower(p, show = true) {
   power = p;
   $('#handleArc').style.setProperty('--pw', `${powerToDeg(p)}deg`);
+  $('#knob').style.setProperty('--rot', `${-150 + p * 300}deg`);
   if (!show) return;
   const el = $('#powerLabel');
   el.textContent = powerLabel(p);
@@ -89,12 +90,12 @@ bindInput({
   lockEl: $('#lock'), plusEl: $('#pPlus'), minusEl: $('#pMinus'),
   getPower: () => power,
   onPower: setPower,
-  onFire: on => { holding = on; updateFiring(); },
-  onLock: () => { locked = !locked; updateFiring(); persist(); },
-  onStep: dir => setPower(stepPower(power, dir)),
+  onFire: on => { holding = on; updateFiring(); if (on) audio.play('grab'); },
+  onLock: () => { locked = !locked; updateFiring(); audio.play('click'); persist(); },
+  onStep: dir => { setPower(stepPower(power, dir)); audio.play('click'); },
   onPush: () => { if (gimmicks.push()) { audio.play('push'); audio.play('meow', 1.2, 0.25); vibrate(80); } },
   onRent: () => { machine.rent(); audio.play('payout'); },
-  onMenu: () => openMenu(),
+  onMenu: () => { audio.play('click'); openMenu(); },
   onAnyTap: () => audio.unlock(),
 });
 
@@ -114,6 +115,7 @@ function openMenu() {
 menu.addEventListener('click', e => {
   if (!menuGuard.allowed(performance.now())) return;
   const id = e.target.closest('button')?.id;
+  if (id) audio.play('click');
   if (id === 'mSound') { audio.setOn(!audio.on); renderMenu(); persist(); }
   if (id === 'mBgm') { bgmOn = !bgmOn; bgm.setOn(bgmOn); renderMenu(); persist(); }
   if (id === 'mReset') { menu.classList.add('confirm'); menuGuard.arm(performance.now()); }
@@ -210,6 +212,7 @@ function updateHud() {
 }
 
 let last = performance.now();
+let lastTick = 0, lastPin = 0, lastHits = 0;
 function frame(now) {
   const ms = now - last;
   stats.frames++;
@@ -234,6 +237,12 @@ function frame(now) {
   if (!runner.active && machine.state.phase === 'idle') startSpin(now);
   runCues(now);
   lcd.update(now);
+  // リールが回っている音（カタカタ）と、玉が釘に当たる音（チン。鳴らしすぎない）
+  if (lcd.spinning && now - lastTick > 85) { lastTick = now; audio.play('tick', 0.9 + lcd.spinning * 0.08); }
+  if (physics.pinHits !== lastHits) {
+    if (now - lastPin > 70) { lastPin = now; audio.play('pin', 0.85 + Math.random() * 0.4); }
+    lastHits = physics.pinHits;
+  }
   drawBoard(ctx, LAYOUT, physics.balls, drawScale, opts);
   updateHud();
   const scene = (cab.className.match(/ph-(\w+)/) || [])[1];

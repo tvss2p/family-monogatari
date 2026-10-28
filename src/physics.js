@@ -40,6 +40,7 @@ function laneAt(s) {
 export function createPhysics(layout, rng = Math.random) {
   const balls = [];
   let nextId = 1;
+  let pinHits = 0;
 
   // 釘を升目に入れて、近くの釘だけ調べる
   const grid = new Map();
@@ -113,6 +114,7 @@ export function createPhysics(layout, rng = Math.random) {
         const d2 = dx * dx + dy * dy;
         if (d2 < min * min) {
           const d = Math.sqrt(d2) || 0.0001;
+          if (Math.abs(b.vx * dx + b.vy * dy) / d > 120) pinHits++;
           bounce(b, dx / d, dy / d, min - d, E_PIN);
           b.vx += (rng() - 0.5) * 30;
         }
@@ -126,6 +128,7 @@ export function createPhysics(layout, rng = Math.random) {
 
   return {
     balls,
+    get pinHits() { return pinHits; },
     addBall(x, y, vx, vy) {
       const id = nextId++;
       balls.push({ id, x, y, vx, vy, age: 0 });

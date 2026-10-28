@@ -55,6 +55,10 @@ export function createAudio({ AC = typeof window === 'undefined' ? null : (windo
       [NOTES.G5, NOTES.E5, NOTES.C5].forEach((f, i) => tone(f, t + i * 0.18, 0.22, { type: 'square', gain: 0.07, slide: 0.97 }));
       tone(NOTES.C5 / 2, t + 0.54, 0.7, { type: 'sawtooth', gain: 0.06, slide: 0.8 });
     },
+    tick: (t, pitch = 1) => tone(1400 * pitch, t, 0.025, { type: 'square', gain: 0.025 }),
+    pin: (t, pitch = 1) => tone(2600 * pitch, t, 0.03, { type: 'sine', gain: 0.03 }),
+    click: t => tone(1200, t, 0.04, { type: 'triangle', gain: 0.12, slide: 0.7 }),
+    grab: t => tone(500, t, 0.06, { type: 'triangle', gain: 0.1, slide: 1.4 }),
     stopBig: t => { tone(160, t, 0.18, { gain: 0.3, slide: 0.5 }); noiseHit(t, 0.08, 2000, 0.25); },
     ending: t => {
       [NOTES.C5, NOTES.G5, NOTES.E6, NOTES.C6].forEach((f, i) => tone(f, t + i * 0.14, 0.3, { type: 'square', gain: 0.07 }));
