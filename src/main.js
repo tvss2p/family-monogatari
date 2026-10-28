@@ -10,12 +10,14 @@ import { createGimmicks } from './render/gimmicks.js';
 import { createTray } from './render/tray.js';
 import { gems } from './render/parts.js';
 import { bindInput, powerToDeg } from './input.js';
-import { createAudio, vibrate } from './audio.js';
+import { createAudio, vibrate, decodeAudio } from './audio.js';
 import { save, load, clear } from './storage.js';
 import { createTapGuard } from './render/gimmicks.js';
 import { createCueRunner } from './cues.js';
 import { isFiring, stepPower, powerLabel } from './lever.js';
 import { createBgm, trackFor } from './bgm.js';
+import { fitCabinet } from './fit.js';
+import { BGM_FILES, SE_FILES, AUDIO_DIR } from './sounds.js';
 import { createWakeLock } from './wakelock.js';
 
 const wake = createWakeLock();
@@ -35,10 +37,11 @@ const ctx = canvas.getContext('2d');
 let drawScale = 1;
 function fit() {
   const box = $('#fit').getBoundingClientRect();
-  // 盤面がほぼ横幅いっぱいになるよう、左右の柱の外側（12px ずつ）と下のスピーカーの段（約80px）は画面の外に出してよい
-  const s = Math.min(box.width / 336, box.height / 722);
+  const { s, top, cut } = fitCabinet(box.width, box.height);
   cab.style.setProperty('--s', s);
-  cab.style.setProperty('--top', `${Math.max(0, (box.height - 722 * s) / 2)}px`);
+  cab.style.setProperty('--top', `${top}px`);
+  // 上を切ったときは、回転数などの表示を見えている一番上に下ろす
+  cab.style.setProperty('--cut', `${cut}px`);
   drawScale = Math.max(1, Math.min(3, s * (window.devicePixelRatio || 1)));
   canvas.width = Math.round(LAYOUT.w * drawScale);
   canvas.height = Math.round(LAYOUT.h * drawScale);
@@ -66,7 +69,9 @@ lcd.onEvent = e => {
 };
 const audio = createAudio();
 audio.setOn(!saved || saved.sound !== false);
-const bgm = createBgm(audio);
+const filesIn = map => Object.fromEntries(Object.entries(map).map(([k, f]) => [k, `${AUDIO_DIR}/${f}`]));
+audio.loadSamples(filesIn(SE_FILES));
+const bgm = createBgm(audio, { files: filesIn(BGM_FILES), decode: decodeAudio });
 let bgmOn = !saved || saved.bgm !== false;
 bgm.setOn(audio.on && bgmOn);
 let power = saved && Number.isFinite(saved.power) ? saved.power : 0.55;

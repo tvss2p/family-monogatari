@@ -1,6 +1,8 @@
-// BGM：場面ごとのオリジナル曲を、その場で合成してくり返す
+// BGM：場面ごとに魔王魂の曲（sounds.js）をくり返す。曲のファイルが読めるまでは、下の楽譜を合成して鳴らす
 // 楽譜の書き方：音名（C5・F#4・Bb3）＝鳴らす、- ＝前の音をのばす、. ＝休み。1文字ぶんが step 拍
 // ドラムは k（キック）・s（スネア）・h（ハイハット）
+
+import { loopBounds, prefetchFor } from './sounds.js';
 
 const bars = (...b) => b.join(' ');
 const rep = (s, n) => Array(n).fill(s).join(' ');
@@ -116,12 +118,34 @@ const PARSED = Object.fromEntries(Object.entries(TRACKS).map(([k, tr]) => [k, {
   ...tr, parts: tr.parts.map(p => ({ ...p, events: parseLine(p.line, p.step) })),
 }]));
 
-// 鳴らす部分（audio の AudioContext と出口を使う）
-export function createBgm(audio) {
+// 曲のファイルを読む：ほどいた音はメモリを使うので、24000Hz で読み、持っておくのは MAX_KEEP 曲まで
+const FILE_RATE = 24000;
+const MAX_KEEP = 4;
+
+// 鳴らす部分（audio の AudioContext と出口を使う）。files：{ 曲の名前: URL }
+export function createBgm(audio, { files = {}, fetchFn = typeof fetch === 'undefined' ? null : fetch, decode = null } = {}) {
   let ctx = null, out = null, lane = null;
   let name = null, loopStart = 0, until = 0;
   let on = true;
   let noise = null;
+  let fileSrc = null;
+  const buffers = new Map();
+  const loading = new Map();
+
+  // 曲のファイルを読んでおく（同じ曲は一度だけ）
+  function want(n) {
+    if (!files[n] || !fetchFn || !decode || buffers.has(n)) return Promise.resolve(buffers.get(n));
+    if (!loading.has(n)) {
+      loading.set(n, fetchFn(files[n]).then(r => r.arrayBuffer()).then(b => decode(b, FILE_RATE)).then(buf => {
+        const d = buf.getChannelData(0);
+        buffers.set(n, { buf, ...loopBounds(d, buf.sampleRate) });
+        // 古いものから手放す（いま鳴っている曲と、ふだんの曲はのこす）
+        for (const k of buffers.keys()) if (buffers.size > MAX_KEEP && k !== name && k !== n && k !== 'normal') buffers.delete(k);
+        return buffers.get(n);
+      }).catch(() => null).finally(() => loading.delete(n)));
+    }
+    return loading.get(n);
+  }
 
   function setup() {
     const c = audio.context;
@@ -138,16 +162,34 @@ export function createBgm(audio) {
     return true;
   }
 
+  // 曲を切りかえる：前の曲は 0.05 秒でしぼる。ファイルが読めていればファイル、まだなら合成で鳴らし、読めたら差しかえる
   function start(n) {
     if (lane) {
-      const old = lane;
+      const old = lane, oldSrc = fileSrc;
       old.gain.setTargetAtTime(0, ctx.currentTime, 0.05);
-      setTimeout(() => old.disconnect(), 400);
+      setTimeout(() => { old.disconnect(); if (oldSrc) try { oldSrc.stop(); } catch (e) { /* なにもしない */ } }, 400);
     }
+    fileSrc = null;
     lane = ctx.createGain();
     lane.connect(out);
     loopStart = ctx.currentTime + 0.06;
     until = loopStart;
+    const f = buffers.get(n);
+    if (f) {
+      // 使った曲を「最近」にする
+      buffers.delete(n); buffers.set(n, f);
+      const src = ctx.createBufferSource();
+      src.buffer = f.buf;
+      src.loop = true;
+      src.loopStart = f.start;
+      src.loopEnd = f.end;
+      src.connect(lane);
+      src.start(loopStart, f.start);
+      fileSrc = src;
+    } else {
+      want(n).then(got => { if (got && name === n && !fileSrc && ctx) start(n); });
+    }
+    prefetchFor(n).forEach(want);
   }
 
   function drum(kind, t, g) {
@@ -187,7 +229,7 @@ export function createBgm(audio) {
 
   // 少し先（0.25 秒）までの音を予約する
   function tick() {
-    if (!name || !setup() || ctx.state !== 'running' || !lane) return;
+    if (!name || !setup() || ctx.state !== 'running' || !lane || fileSrc) return;
     const tr = PARSED[name];
     const beat = 60 / tr.bpm, loopLen = tr.beats * beat;
     const from = Math.max(until, ctx.currentTime), to = ctx.currentTime + 0.25;
@@ -206,6 +248,8 @@ export function createBgm(audio) {
     until = to;
   }
   setInterval(tick, 60);
+  // ふだんの曲と、すぐ使う曲は最初に読んでおく
+  ['normal', ...prefetchFor('normal')].forEach(want);
 
   return {
     play(n) {
@@ -219,5 +263,8 @@ export function createBgm(audio) {
     },
     get on() { return on; },
     get track() { return name; },
+    // 確かめ用：ファイルの曲が鳴っているか、読んである曲とくり返し位置
+    get fromFile() { return !!fileSrc; },
+    get loaded() { return [...buffers].map(([k, f]) => `${k} ${f.start.toFixed(3)}-${f.end.toFixed(2)}/${f.buf.duration.toFixed(2)}s ${f.buf.sampleRate}Hz`); },
   };
 }

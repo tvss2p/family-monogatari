@@ -1,4 +1,5 @@
-// 合成の効果音。iPhone は指をはなしたとき（pointerup / click）にしか音を出せないので、そこで unlock する
+// 効果音。魔王魂のファイル（loadSamples）が読めたらそれを鳴らし、まだなら合成の音で鳴らす
+// iPhone は指をはなしたとき（pointerup / click）にしか音を出せないので、そこで unlock する
 const NOTES = { C5: 523.25, D5: 587.33, E5: 659.25, G5: 783.99, A5: 880, C6: 1046.5, E6: 1318.5, G6: 1568 };
 
 export function createAudio({ AC = typeof window === 'undefined' ? null : (window.AudioContext || window.webkitAudioContext) } = {}) {
@@ -6,6 +7,9 @@ export function createAudio({ AC = typeof window === 'undefined' ? null : (windo
   let master = null;
   let on = true;
   let triedResume = false;
+  const samples = {};
+  // ファイルの効果音の大きさ（合成の音とつりあう大きさ）
+  const SAMPLE_GAIN = 0.55;
 
   function ensure() {
     if (ctx && ctx.state !== 'closed') return ctx;
@@ -73,6 +77,14 @@ export function createAudio({ AC = typeof window === 'undefined' ? null : (windo
       [NOTES.C5, NOTES.E5, NOTES.G5].forEach(f => tone(f, t + 0.6, 0.9, { type: 'triangle', gain: 0.1 }));
     },
   };
+
+  function playSample(buffer, t) {
+    const s = ctx.createBufferSource(), g = ctx.createGain();
+    s.buffer = buffer;
+    g.gain.value = SAMPLE_GAIN;
+    s.connect(g).connect(master);
+    s.start(t);
+  }
 
   // ノイズの音（パンチ・ドン）と、高さが動くノイズ（シュバッ）
   let noiseBuf = null;
@@ -149,8 +161,19 @@ export function createAudio({ AC = typeof window === 'undefined' ? null : (windo
     },
     play(name, opt, delay = 0) {
       if (!on || !ctx || ctx.state !== 'running' || !SOUNDS[name]) return;
-      SOUNDS[name](ctx.currentTime + 0.005 + delay, opt);
+      const t = ctx.currentTime + 0.005 + delay;
+      if (samples[name]) playSample(samples[name], t);
+      else SOUNDS[name](t, opt);
     },
+    // 効果音のファイルを読みこむ（{ 名前: URL }）。読めなかったものは合成の音のまま
+    loadSamples(map, fetchFn = fetch) {
+      return Promise.all(Object.entries(map).map(([name, url]) => fetchFn(url)
+        .then(r => r.arrayBuffer())
+        .then(buf => decodeAudio(buf, 44100))
+        .then(b => { samples[name] = b; })
+        .catch(() => {})));
+    },
+    get samples() { return Object.keys(samples); },
     setOn(v) { on = v; },
     get on() { return on; },
     get state() { return ctx ? ctx.state : 'none'; },
@@ -160,6 +183,22 @@ export function createAudio({ AC = typeof window === 'undefined' ? null : (windo
     debugSuspend() { return ctx ? ctx.suspend() : null; },
     debugSetState(st) { if (ctx) ctx.state = st; },
   };
+}
+
+// 合成の効果音の名前（ファイルで差しかえられる名前）
+export const SOUND_NAMES = ['fire', 'heso', 'reach', 'hot', 'push', 'jackpot', 'payout', 'round', 'stop', 'meow', 'spin', 'paw', 'punch',
+  'drop', 'cutin', 'open', 'miss', 'jara', 'tick', 'pin', 'click', 'grab', 'stopBig', 'ending'];
+
+// 音のファイルを AudioBuffer にする。AudioContext がまだなくてもよいように、OfflineAudioContext で読む
+// rate を低くすると、ほどいた音が使うメモリが減る（曲は 24000）
+export function decodeAudio(arrayBuffer, rate) {
+  const OAC = typeof window === 'undefined' ? null : (window.OfflineAudioContext || window.webkitOfflineAudioContext);
+  if (!OAC) return Promise.reject(new Error('no audio'));
+  const oc = new OAC(2, 1, rate);
+  return new Promise((ok, ng) => {
+    const p = oc.decodeAudioData(arrayBuffer, ok, ng);
+    if (p && p.then) p.then(ok, ng);
+  });
 }
 
 export function vibrate(pattern) {

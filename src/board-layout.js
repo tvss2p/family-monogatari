@@ -46,7 +46,7 @@ const windmills = [{ x: 52, y: 308 }, { x: 268, y: 308 }];
 const roof = [[56, 59], [160, 30], [264, 59]];
 // 液晶の下からヘソへ向かうレール（穴から落ちた玉はヘソに届かない）
 const RAIL_GAPS = [0.4, 0.75];
-const RAIL_GAP_LEN = 10;
+const RAIL_GAP_LEN = 11;
 const rails = [
   { x1: 20, y1: 268, x2: 146, y2: 293 },
   { x1: 312, y1: 266, x2: 174, y2: 293 },
