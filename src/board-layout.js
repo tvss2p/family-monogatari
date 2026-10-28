@@ -39,7 +39,8 @@ function rail(x1, y1, x2, y2, gaps, gapLen) {
 const lcdFrame = { x: 36, y: 58, w: 248, h: 206, r: 28 };
 const heso = { x: 160, y: 300, w: 22 };
 const hesoPlate = { x: 122, y: 306, w: 76, h: 46 };
-const attacker = { x: 160, y: 366, w: 120 };
+// w はふたの幅、sensorW は開いているとき入ったとみなす幅（ガイドのはしまで）
+const attacker = { x: 160, y: 366, w: 120, sensorW: 140 };
 const windmills = [{ x: 52, y: 308 }, { x: 268, y: 308 }];
 // 液晶の上の屋根（玉が乗って止まらないように山形）
 const roof = [[56, 59], [160, 30], [264, 59]];
@@ -53,8 +54,8 @@ const rails = [
 
 // 盤面の下でアタッカーへ玉を集めるガイド（アタッカーとのすき間から外れ玉が落ちる）
 const guides = [
-  { x1: 20, y1: 326, x2: 88, y2: 368 },
-  { x1: 314, y1: 326, x2: 232, y2: 368 },
+  { x1: 20, y1: 326, x2: 93, y2: 368 },
+  { x1: 314, y1: 326, x2: 227, y2: 368 },
 ];
 
 // 外のレール（左上・右上は大きな丸）と、左の発射レーン
@@ -117,5 +118,5 @@ export const LAYOUT = {
   lcdFrame, roof, kicker, rails, guides, railGaps: RAIL_GAPS, railGapLen: RAIL_GAP_LEN,
   heso, hesoBoostW: 76, hesoPlate, attacker, windmills,
   out: { x: 160, y: 398, w: 44 },
-  launch: { x: 120, y: 13 },
+  launch: { x: 122, y: 13 },
 };

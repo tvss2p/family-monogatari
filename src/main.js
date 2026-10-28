@@ -3,7 +3,7 @@ import { LAYOUT } from './board-layout.js';
 import { createMachine } from './machine.js';
 import { createPhysics } from './physics.js';
 import { buildSpin } from './scenario.js';
-import { drawBoard } from './render/board.js';
+import { drawBoard, resetBoardCache } from './render/board.js';
 import { createLcd } from './render/lcd.js';
 import { createGimmicks } from './render/gimmicks.js';
 import { gems } from './render/parts.js';
@@ -12,6 +12,8 @@ import { createAudio, vibrate } from './audio.js';
 import { save, load, clear } from './storage.js';
 import { createTapGuard } from './render/gimmicks.js';
 import { createCueRunner } from './cues.js';
+import { isFiring, stepPower, powerLabel } from './lever.js';
+import { createBgm, trackFor } from './bgm.js';
 
 const $ = sel => document.querySelector(sel);
 const cab = $('#cab');
@@ -28,13 +30,17 @@ const ctx = canvas.getContext('2d');
 let drawScale = 1;
 function fit() {
   const box = $('#fit').getBoundingClientRect();
-  const s = Math.min(box.width / 360, box.height / 800);
+  const s = Math.min(box.width / 352, box.height / 784);
   cab.style.setProperty('--s', s);
+  cab.style.setProperty('--top', `${Math.max(0, (box.height - 800 * s) / 2)}px`);
   drawScale = Math.max(1, Math.min(3, s * (window.devicePixelRatio || 1)));
   canvas.width = Math.round(LAYOUT.w * drawScale);
   canvas.height = Math.round(LAYOUT.h * drawScale);
 }
 window.addEventListener('resize', fit);
+// 画面の Canvas が作りなおされたとき（GPU のリセット）も描きなおす
+canvas.addEventListener('contextrestored', () => resetBoardCache());
+window.addEventListener('pageshow', () => resetBoardCache());
 fit();
 
 // ゲーム
@@ -46,24 +52,47 @@ const lcd = createLcd($('#lcd'));
 const gimmicks = createGimmicks(cab);
 const audio = createAudio();
 audio.setOn(!saved || saved.sound !== false);
-let power = saved && Number.isFinite(saved.power) ? saved.power : 0.45;
+const bgm = createBgm(audio);
+let bgmOn = !saved || saved.bgm !== false;
+bgm.setOn(audio.on && bgmOn);
+let power = saved && Number.isFinite(saved.power) ? saved.power : 0.55;
+let locked = !!(saved && saved.locked);
+let holding = false;
 let firing = false;
 let fireAcc = 0;
 const runner = createCueRunner();
 let force = params.get('force');
 
-function setPower(p) {
+let labelTimer = null;
+function setPower(p, show = true) {
   power = p;
   $('#handleArc').style.setProperty('--pw', `${powerToDeg(p)}deg`);
+  if (!show) return;
+  const el = $('#powerLabel');
+  el.textContent = powerLabel(p);
+  el.classList.add('show');
+  clearTimeout(labelTimer);
+  labelTimer = setTimeout(() => el.classList.remove('show'), 1500);
 }
-setPower(power);
+function updateFiring() {
+  firing = isFiring({ locked, holding });
+  $('#handle').classList.toggle('on', firing);
+  $('#handle').classList.toggle('locked', locked);
+  $('#lock').classList.toggle('on', locked);
+  $('#lock').textContent = locked ? '固定中' : '固定';
+}
+setPower(power, false);
+updateFiring();
 
 bindInput({
   handleEl: $('#handle'), pushEl: $('#push'), rentEl: $('#rent'), menuEl: $('#menu'),
+  lockEl: $('#lock'), plusEl: $('#pPlus'), minusEl: $('#pMinus'),
   getPower: () => power,
   onPower: setPower,
-  onFire: on => { firing = on; $('#handle').classList.toggle('on', on); },
-  onPush: () => { if (gimmicks.push()) { audio.play('push'); vibrate(80); } },
+  onFire: on => { holding = on; updateFiring(); },
+  onLock: () => { locked = !locked; updateFiring(); persist(); },
+  onStep: dir => setPower(stepPower(power, dir)),
+  onPush: () => { if (gimmicks.push()) { audio.play('push'); audio.play('meow', 1.2, 0.25); vibrate(80); } },
   onRent: () => { machine.rent(); audio.play('payout'); },
   onMenu: () => openMenu(),
   onAnyTap: () => audio.unlock(),
@@ -73,7 +102,8 @@ bindInput({
 const menu = $('#menuPanel');
 const menuGuard = createTapGuard(500);
 function renderMenu() {
-  $('#mSound').textContent = audio.on ? '音：オン' : '音：オフ';
+  $('#mSound').textContent = audio.on ? '効果音：オン' : '効果音：オフ';
+  $('#mBgm').textContent = bgmOn ? 'BGM：オン' : 'BGM：オフ';
 }
 function openMenu() {
   menu.classList.add('show');
@@ -85,6 +115,7 @@ menu.addEventListener('click', e => {
   if (!menuGuard.allowed(performance.now())) return;
   const id = e.target.closest('button')?.id;
   if (id === 'mSound') { audio.setOn(!audio.on); renderMenu(); persist(); }
+  if (id === 'mBgm') { bgmOn = !bgmOn; bgm.setOn(bgmOn); renderMenu(); persist(); }
   if (id === 'mReset') { menu.classList.add('confirm'); menuGuard.arm(performance.now()); }
   if (id === 'mResetNo') menu.classList.remove('confirm');
   if (id === 'mResetYes') { resetting = true; clear(); location.reload(); }
@@ -95,12 +126,12 @@ menu.addEventListener('click', e => {
 let resetting = false;
 function persist() {
   if (resetting) return;
-  save({ machine: machine.toJSON(), sound: audio.on, power });
+  save({ machine: machine.toJSON(), sound: audio.on, bgm: bgmOn, power, locked });
 }
 setInterval(persist, 2000);
 document.addEventListener('visibilitychange', () => {
   if (document.hidden) { persist(); runner.pause(); }
-  else { runner.resume(performance.now()); audio.resume(); }
+  else { runner.resume(performance.now()); audio.resume(); resetBoardCache(); }
 });
 window.addEventListener('pagehide', persist);
 
@@ -128,14 +159,24 @@ function runCues(now) {
   for (const cue of runner.due(now)) {
     lcd.onCue(cue, spin);
     gimmicks.onCue(cue, spin);
-    playCue(cue);
+    playCue(cue, spin);
     if (cue === 'end') machine.finishSpin();
   }
 }
 
-const CUE_SOUND = { stopL: 'stop', stopR: 'stop', stopM: 'stop', reach: 'reach', hot: 'hot', jackpot: 'jackpot' };
-function playCue(cue) {
+const CUE_SOUND = { start: 'spin', stopL: 'stop', stopR: 'stop', reach: 'reach', hot: 'hot', jackpot: 'jackpot', 'notice:paw': 'paw', medalDrop: 'drop', cutin: 'cutin' };
+function playCue(cue, sp) {
   if (CUE_SOUND[cue]) audio.play(CUE_SOUND[cue]);
+  if (cue === 'notice:honey') audio.play('meow', 1, 0.3);
+  if (cue === 'armsIn') { audio.play('punch', null, 0.3); audio.play('punch', null, 0.65); }
+  if (cue === 'stopM') {
+    const hit = sp && sp.stops[0] === sp.stops[1] && sp.stops[1] === sp.stops[2];
+    audio.play(sp && sp.reach ? 'stopBig' : 'stop');
+    // リーチが外れたら「ざんねん…」
+    if (sp && sp.reach && !hit) audio.play('miss', null, 0.25);
+  }
+  if (cue === 'notice:parade') [1.25, 1, 1.4, 0.9, 1.15].forEach((p, i) => audio.play('meow', p, 0.25 + i * 0.32));
+  if (cue === 'jackpot') { audio.play('meow', 1.1, 0.9); audio.play('meow', 0.85, 1.3); }
   if (cue === 'hot') vibrate([60, 40, 60]);
   if (cue === 'jackpot') vibrate(250);
 }
@@ -144,8 +185,9 @@ function playCue(cue) {
 const shown = {};
 function show(key, value, fn) {
   if (shown[key] === value) return;
+  const prev = shown[key];
   shown[key] = value;
-  fn(value);
+  fn(value, prev);
 }
 function updateHud() {
   const s = machine.state;
@@ -159,9 +201,12 @@ function updateHud() {
     $('#hold').querySelectorAll('i').forEach((el, i) => { el.className = i < s.holds.length ? 'on' : ''; });
   });
   show('boost', machine.isHesoBoost(), v => cab.classList.toggle('boost', v));
-  show('atk', machine.isAttackerOpen(), v => $('#atk').classList.toggle('open', v));
-  show('round', s.phase === 'jackpot' ? `${s.round}/${s.roundsTotal}` : '', v => { if (v) { lcd.setRound(s.round, s.roundsTotal); if (s.round > 1) audio.play('round'); } });
-  show('phase', s.phase, v => { if (v === 'idle' && !runner.active) gimmicks.reset(); });
+  show('atk', machine.isAttackerOpen(), v => { $('#atk').classList.toggle('open', v); if (v) audio.play('open'); });
+  show('round', s.phase === 'jackpot' ? `${s.round}/${s.roundsTotal}` : '', v => { if (v) { lcd.setRound(s.round, s.roundsTotal); if (s.round > 1) { audio.play('round'); audio.play('meow', 0.9 + (s.round % 4) * 0.12, 0.2); } } });
+  show('phase', s.phase, (v, prev) => {
+    if (v === 'idle' && !runner.active) gimmicks.reset();
+    if (v === 'idle' && prev === 'jackpot') audio.play('ending');
+  });
 }
 
 let last = performance.now();
@@ -191,6 +236,10 @@ function frame(now) {
   lcd.update(now);
   drawBoard(ctx, LAYOUT, physics.balls, drawScale, opts);
   updateHud();
+  const scene = (cab.className.match(/ph-(\w+)/) || [])[1];
+  const st = machine.state;
+  const premium = (st.current && st.current.kind === 'premium') || (runner.spin && runner.spin.stops[1] === 'trio' && scene === 'jackpot');
+  bgm.play(trackFor({ phase: st.phase, mode: st.mode, scene, premium }));
   requestAnimationFrame(frame);
 }
 requestAnimationFrame(frame);
@@ -198,14 +247,15 @@ requestAnimationFrame(frame);
 // 確かめ用の自動プレイ（?bot=1）：ハンドルを押しっぱなし、玉がなくなったら玉貸、激アツでPUSH
 const stats = { frames: 0, maxFrameMs: 0, slowFrames: 0 };
 if (params.get('bot')) {
-  firing = true;
+  locked = true;
+  updateFiring();
   setInterval(() => {
     if (machine.state.balls <= 0) machine.rent();
     if ($('#pushwrap').classList.contains('up')) gimmicks.push();
   }, 500);
 }
 
-window.__fm = { machine, physics, audio, stats, setPower, persist, fire: on => { firing = on; }, force: f => { force = f; } };
+window.__fm = { machine, physics, audio, bgm, stats, setPower, persist, fire: on => { holding = on; updateFiring(); }, force: f => { force = f; } };
 
 // ホーム画面アプリ・オフライン用
 if ('serviceWorker' in navigator && (location.protocol === 'https:' || location.hostname === 'localhost')) {
