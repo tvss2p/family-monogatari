@@ -19,7 +19,6 @@
 .num{position:absolute;right:-6px;bottom:-4px;width:26px;height:26px;border-radius:50%;display:grid;place-items:center;font-weight:900;font-size:15px;color:#fff;background:var(--ring);box-shadow:0 0 0 2.5px #fff,0 2px 4px rgba(0,0,0,.2)}
 .sym.small .num{width:15px;height:15px;font-size:9px;right:-4px;bottom:-3px}
 .k{--ring:#ff7f9e}.n{--ring:#7dbbf0}.p{--ring:#f4b928}
-.spinning .sym{filter:blur(2.5px)}
 .reel.stopped .sym:not(.small){animation:stopBounce .25s ease-out}
 @keyframes stopBounce{40%{transform:translateY(6px)}}
 
@@ -60,3 +59,21 @@
 @keyframes pop2{from{transform:scale(0)}}
 .conf{position:absolute;width:7px;height:11px;border-radius:2px;animation:fall 1.6s linear infinite}
 @keyframes fall{from{transform:translateY(-200px) rotate(0)}to{transform:translateY(40px) rotate(540deg)}}
+
+/* 大当たり中のアニメーション */
+.movie .bob{position:absolute;inset:0;animation:bob 1.6s ease-in-out infinite}
+@keyframes bob{50%{transform:translateY(-5px) rotate(-1deg)}}
+.movie .march{position:absolute;left:0;right:0;bottom:-2px;height:34px;overflow:hidden;z-index:4}
+.movie .march .track{display:flex;gap:4px;width:max-content;animation:marchMove 9s linear infinite}
+.movie .march img{width:30px;height:30px;object-fit:contain;animation:hop .5s ease-in-out infinite alternate;filter:drop-shadow(0 2px 2px rgba(0,0,0,.25))}
+@keyframes marchMove{from{transform:translateX(234px)}to{transform:translateX(-50%)}}
+@keyframes hop{from{transform:translateY(4px)}to{transform:translateY(-4px) rotate(4deg)}}
+.movie .ttl{bottom:30px}
+.heartUp{position:absolute;bottom:-14px;font-size:14px;font-style:normal;color:#ff7f9e;text-shadow:0 0 4px #fff;animation:heartUp 2.6s linear infinite;z-index:3}
+@keyframes heartUp{from{transform:translateY(0) scale(.6);opacity:0}15%{opacity:1}to{transform:translateY(-200px) scale(1.2);opacity:0}}
+/* 顔をかくさないよう、いちばん下の行進の帯の上に出す */
+.roundCut{position:absolute;left:0;right:0;bottom:0;height:34px;display:flex;align-items:center;justify-content:center;gap:4px;z-index:8;opacity:0;pointer-events:none;
+  background:linear-gradient(90deg,transparent,rgba(255,90,130,.92) 15%,rgba(255,90,130,.92) 85%,transparent)}
+.roundCut img{width:28px;height:28px;border-radius:50%;background:#fff;box-shadow:0 0 0 2px #fff,0 0 0 4px #ffd34d}
+.roundCut.go{animation:roundCut 1.6s cubic-bezier(.2,1.4,.4,1) 1}
+@keyframes roundCut{0%{opacity:0;transform:scale(.3)}15%{opacity:1;transform:scale(1.1)}25%,80%{opacity:1;transform:scale(1)}100%{opacity:0;transform:scale(1.4)}}

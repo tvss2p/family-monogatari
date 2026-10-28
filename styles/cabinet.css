@@ -6,9 +6,11 @@ body{font-family:"M PLUS Rounded 1c",system-ui,sans-serif;color:var(--ink);user-
 button{font:inherit;border:0;background:none;color:inherit;cursor:pointer}
 
 /* 画面に合わせて筐体（360×800）を拡大縮小。背景は全面、筐体は safe-area の内側 */
-#app{position:fixed;inset:0;padding:env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left)}
+/* 下のホームバーの裏まで使う（そこにボタンは置かない） */
+#app{position:fixed;inset:0;padding:env(safe-area-inset-top) env(safe-area-inset-right) 0 env(safe-area-inset-left)}
 #fit{position:relative;width:100%;height:100%}
-.cab{position:absolute;left:50%;top:50%;width:360px;height:800px;transform-origin:50% 50%;transform:translate(-50%,-50%) scale(var(--s,1))}
+/* 画面いっぱいに。はしの透明な部分と、いちばん下の飾りの帯は少し画面の外に出てよい */
+.cab{position:absolute;left:50%;top:var(--top,0);width:360px;height:800px;transform-origin:50% 0;transform:translateX(-50%) scale(var(--s,1))}
 /* 筐体のまわりの光（動かない背景。フィルターは使わない） */
 .cab:before{content:"";position:absolute;inset:-30px -24px;z-index:0;border-radius:60px;pointer-events:none;
   background:radial-gradient(closest-side,var(--aura),transparent)}
@@ -185,3 +187,16 @@ button{font:inherit;border:0;background:none;color:inherit;cursor:pointer}
 .menu #mResetYes{background:linear-gradient(#ff8a8a,#e85a5a);box-shadow:0 3px 0 #b83a3a}
 .menu .confirmRows{display:none}
 .menu.confirm .confirmRows{display:block}.menu.confirm .normalRows{display:none}
+
+/* ハンドルの固定・強さ */
+.lock{position:absolute;left:236px;top:150px;width:50px;height:24px;border-radius:12px;font-size:11px;font-weight:900;color:#fff;
+  background:linear-gradient(#cfc4ca,#a99ca3);box-shadow:0 2px 0 #847880,0 0 0 1.5px #ffe48a;z-index:4}
+.lock.on{background:linear-gradient(#ffe48a,#f4b928);color:#7a4a00;box-shadow:0 2px 0 #b98410,0 0 10px #ffcc33}
+.pstep{position:absolute;top:150px;width:26px;height:24px;border-radius:12px;font-size:16px;font-weight:900;line-height:1;color:#fff;z-index:4;
+  background:linear-gradient(#ffb3c6,#ff7f9e);box-shadow:0 2px 0 #d0557a,0 0 0 1.5px #ffe48a}
+.pstep.minus{left:290px}.pstep.plus{left:320px}
+.pstep:active,.lock:active{transform:translateY(2px);box-shadow:none}
+.handle.locked .arc{filter:drop-shadow(0 0 4px #ffcc33)}
+.powerLabel{position:absolute;left:226px;top:52px;width:120px;text-align:center;font-size:13px;font-weight:900;color:#fff;
+  -webkit-text-stroke:3px #c2345c;paint-order:stroke fill;opacity:0;transition:opacity .2s;pointer-events:none;z-index:5}
+.powerLabel.show{opacity:1}
