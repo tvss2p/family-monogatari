@@ -1,0 +1,31 @@
+音楽・効果音：魔王魂 https://maou.audio/（CC BY 4.0、形式変換・音量調整・一部カットあり）
+作曲：森田交一（魔王魂）
+ライセンス：クリエイティブ・コモンズ 表示 4.0 国際（CC BY 4.0） https://creativecommons.org/licenses/by/4.0/deed.ja
+利用規約：https://maou.audio/rule/
+
+ゲームで使っているファイルと元の素材
+（元の m4a を AAC に変換し、音量をそろえました。_cut は先頭から切り出して最後をフェードアウトしたもの）
+
+曲
+- maou_loop_bgm_acoustic44.m4a … アコースティック44（Merry-go-round）ループ版 https://maou.audio/bgm_acoustic44/ （ふだん）
+- maou_loop_bgm_neorock34_cut.m4a … ネオロック34 ループ版の先頭24秒 https://maou.audio/bgm_neorock34/ （リーチ）
+- maou_loop_bgm_neorock33_cut.m4a … ネオロック33 ループ版の先頭24秒 https://maou.audio/bgm_neorock33/ （激アツ）
+- maou_loop_bgm_acoustic34.m4a … アコースティック34（サマータイムわんこ）ループ版 https://maou.audio/bgm_acoustic34/ （大当たり）
+- maou_bgm_healing07_cut.m4a … ヒーリング07 の先頭90秒 https://maou.audio/bgm_healing07/ （家族そろって大当たり）
+- maou_loop_bgm_ethnic09.m4a … 民族09（揺れる提灯）ループ版 https://maou.audio/bgm_ethnic09/ （確変）
+- maou_loop_bgm_acoustic50.m4a … アコースティック50（至福の隙間）ループ版 https://maou.audio/bgm_acoustic50/ （時短）
+
+効果音
+- maou_se_jingle05.m4a … ジングル05 https://maou.audio/se_jingle05/ （大当たり）
+- maou_se_jingle07.m4a … ジングル07 https://maou.audio/se_jingle07/ （大当たりのおわり・プレミア予告）
+- maou_se_onepoint03.m4a … ワンポイント03 https://maou.audio/se_onepoint03/ （リーチ）
+- maou_se_battle02.m4a … 戦闘02 https://maou.audio/se_battle02/ （激アツ）
+- maou_se_onepoint15.m4a … ワンポイント15 https://maou.audio/se_onepoint15/ （アタッカー開放）
+- maou_se_onepoint32.m4a … ワンポイント32 https://maou.audio/se_onepoint32/ （リーチはずれ）
+- maou_se_battle12.m4a … 戦闘12 https://maou.audio/se_battle12/ （PUSHボタン）
+- maou_se_battle07.m4a … 戦闘07 https://maou.audio/se_battle07/ （図柄が強く止まる）
+- maou_se_battle08.m4a … 戦闘08 https://maou.audio/se_battle08/ （猫パンチ）
+- maou_se_system37.m4a … システム37 https://maou.audio/se_system37/ （ラウンド）
+- maou_se_system21.m4a … システム21 https://maou.audio/se_system21/ （ボタン）
+
+猫の鳴き声・玉のジャラジャラ・くぎの音などは、ゲームの中で合成した音です。
