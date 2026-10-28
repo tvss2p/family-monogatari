@@ -1,0 +1,62 @@
+/* 液晶（234×192） */
+.lcd{position:absolute;inset:7px;border-radius:22px;overflow:hidden;background:linear-gradient(180deg,#bfe6ff,#fff1f6);transition:background .3s}
+.ph-reach .lcd{background:radial-gradient(circle at 50% 55%,#fff6c8 0%,#ffb7c9 55%,#ff8aa6 100%)}
+.ph-hot .lcd{background:radial-gradient(circle at 50% 55%,#fff1a8 0%,#ff7a5c 55%,#d6204a 100%)}
+.ph-jackpot .lcd{background:radial-gradient(circle at 50% 45%,#fffbe6 0%,#ffe08a 45%,#ffb3c4 100%)}
+.lcd .shine{position:absolute;inset:0;pointer-events:none;z-index:9;background:linear-gradient(160deg,rgba(255,255,255,.45) 0%,rgba(255,255,255,0) 35%)}
+.lcd .rays{position:absolute;inset:-50%;opacity:0;background:repeating-conic-gradient(from 0deg,rgba(255,255,255,.35) 0 8deg,transparent 8deg 20deg);animation:spin 6s linear infinite}
+.ph-reach .lcd .rays,.ph-hot .lcd .rays,.ph-jackpot .lcd .rays{opacity:1}
+
+.reels{position:absolute;inset:0;display:flex;justify-content:space-around;align-items:center;padding:6px 2px 0;transition:padding .3s}
+.ph-reach .reels,.ph-hot .reels{padding-top:24px}
+.ph-jackpot .reels{display:none}
+.reel{width:32%;display:flex;flex-direction:column;align-items:center;gap:5px}
+.sym{width:68px;height:68px;border-radius:50%;background:#fff;position:relative;box-shadow:0 0 0 3px #fff,0 0 0 5px var(--ring,#ffb3c4),0 6px 10px rgba(0,0,0,.15)}
+.sym img{width:100%;height:100%;object-fit:contain;border-radius:50%}
+.sym img.wide{object-fit:cover;object-position:50% 20%}
+.sym.small{width:38px;height:38px;opacity:.5;filter:saturate(.7);box-shadow:0 0 0 2px #fff,0 0 0 3px var(--ring,#ffb3c4)}
+.ph-reach .sym.small,.ph-hot .sym.small{visibility:hidden;height:0}
+.num{position:absolute;right:-6px;bottom:-4px;width:26px;height:26px;border-radius:50%;display:grid;place-items:center;font-weight:900;font-size:15px;color:#fff;background:var(--ring);box-shadow:0 0 0 2.5px #fff,0 2px 4px rgba(0,0,0,.2)}
+.sym.small .num{width:15px;height:15px;font-size:9px;right:-4px;bottom:-3px}
+.k{--ring:#ff7f9e}.n{--ring:#7dbbf0}.p{--ring:#f4b928}
+.spinning .sym{filter:blur(2.5px)}
+.reel.stopped .sym:not(.small){animation:stopBounce .25s ease-out}
+@keyframes stopBounce{40%{transform:translateY(6px)}}
+
+.bn{position:absolute;left:0;right:0;top:16px;text-align:center;z-index:6;opacity:0;transform:scale(.6);transition:all .25s;pointer-events:none}
+.ph-reach .bn.reach,.ph-hot .bn.hot{opacity:1;transform:scale(1)}
+.bn.hot{top:auto;bottom:8px;animation:shake .12s infinite}
+@keyframes shake{50%{transform:translateX(2px) rotate(1deg)}}
+.bn.family{top:4px}
+.lcd .famcast{position:absolute;left:0;right:0;bottom:2px;display:flex;justify-content:center;gap:4px;opacity:0;transform:translateY(30px);transition:all .4s;z-index:5}
+.lcd .famcast img{width:32px;height:32px;border-radius:50%;background:#fff;box-shadow:0 0 0 2px #fff,0 0 0 4px #f4b928}
+.famreach .lcd .famcast{opacity:1;transform:none}
+.ph-hot .lcd .famcast{opacity:0}
+
+/* 予告 */
+.parade{position:absolute;bottom:4px;left:0;height:36px;display:flex;gap:1px;z-index:7;opacity:0;pointer-events:none}
+.parade.go{opacity:1;animation:parade 2.4s linear 1 both}
+@keyframes parade{from{transform:translateX(240px)}to{transform:translateX(-320px)}}
+.parade img{height:36px;width:36px;object-fit:contain;filter:drop-shadow(0 2px 2px rgba(0,0,0,.25))}
+.paws{position:absolute;inset:0;z-index:7;pointer-events:none}
+.paws i{position:absolute;width:30px;height:30px;opacity:0}
+.paws.go i{animation:pawPop 1.2s ease-out both}
+@keyframes pawPop{0%{opacity:0;transform:scale(.3)}20%{opacity:.9;transform:scale(1.1)}70%{opacity:.9}100%{opacity:0;transform:scale(1)}}
+.honeyRun{position:absolute;left:0;top:30%;width:70px;z-index:7;opacity:0;pointer-events:none}
+.honeyRun.go{animation:honeyRun 1.4s ease-in-out 1 both}
+@keyframes honeyRun{0%{opacity:1;transform:translateX(-80px) rotate(-8deg)}50%{transform:translateX(90px) rotate(8deg)}100%{opacity:1;transform:translateX(260px) rotate(-8deg)}}
+
+/* 大当たりムービー */
+.movie{position:absolute;inset:0;display:none}
+.ph-jackpot .movie{display:block}
+.movie .trio{position:absolute;left:50%;top:0;width:204px;transform:translateX(-50%);filter:drop-shadow(0 6px 8px rgba(120,60,40,.35));animation:pop .5s cubic-bezier(.3,1.6,.5,1)}
+.movie .big{position:absolute;left:50%;top:14px;width:120px;height:120px;margin-left:-60px;border-radius:50%;background:#fff;box-shadow:0 0 0 5px #fff,0 0 0 9px var(--ring,#f4b928);animation:pop2 .5s cubic-bezier(.3,1.6,.5,1)}
+.movie .big img{width:100%;height:100%;object-fit:contain;border-radius:50%}
+@keyframes pop{from{transform:translateX(-50%) scale(.3)}}
+.movie .stars{position:absolute;top:6px;left:0;right:0;display:flex;justify-content:center;gap:66px;z-index:5}
+.movie .stars span{font-size:20px;color:#fff;-webkit-text-stroke:3px #e8a01c;paint-order:stroke fill}
+.movie .ttl{position:absolute;left:0;right:0;bottom:2px;text-align:center;line-height:1.05;z-index:6;animation:pop2 .6s .2s both cubic-bezier(.3,1.6,.5,1)}
+.movie .round{position:absolute;right:8px;top:6px;z-index:7;font-size:12px;font-weight:900;color:#fff;background:rgba(90,58,46,.75);border-radius:10px;padding:2px 8px}
+@keyframes pop2{from{transform:scale(0)}}
+.conf{position:absolute;width:7px;height:11px;border-radius:2px;animation:fall 1.6s linear infinite}
+@keyframes fall{from{transform:translateY(-200px) rotate(0)}to{transform:translateY(40px) rotate(540deg)}}
