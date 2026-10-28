@@ -77,3 +77,204 @@
 .roundCut img{width:28px;height:28px;border-radius:50%;background:#fff;box-shadow:0 0 0 2px #fff,0 0 0 4px #ffd34d}
 .roundCut.go{animation:roundCut 1.6s cubic-bezier(.2,1.4,.4,1) 1}
 @keyframes roundCut{0%{opacity:0;transform:scale(.3)}15%{opacity:1;transform:scale(1.1)}25%,80%{opacity:1;transform:scale(1)}100%{opacity:0;transform:scale(1.4)}}
+
+/* 大当たり中の表示（本物の台のように：ラウンド・入賞数・獲得玉・案内） */
+.ph-jackpot .lcd{filter:hue-rotate(var(--hue,0deg))}
+.ph-jackpot .lcd .movie img,.ph-jackpot .lcd .movie .st{filter:hue-rotate(calc(var(--hue,0deg) * -1))}
+.jpTop{position:absolute;left:6px;right:6px;top:4px;display:flex;align-items:center;justify-content:space-between;z-index:9;
+  background:rgba(60,20,40,.72);border-radius:10px;padding:3px 8px}
+.jpR{font-size:13px;font-weight:900;color:#ffe14d;letter-spacing:.04em}
+.pips{display:flex;gap:3px}
+.pips i{width:9px;height:9px;border-radius:50%;background:rgba(255,255,255,.25);box-shadow:inset 0 0 0 1px rgba(255,255,255,.5)}
+.pips i.on{background:radial-gradient(circle at 35% 35%,#fff,#ffd34d 60%);box-shadow:0 0 6px #ffcc33}
+.jpGain{position:absolute;left:50%;bottom:36px;transform:translateX(-50%);z-index:9;white-space:nowrap;
+  font-size:13px;font-weight:900;color:#fff;background:rgba(60,20,40,.72);border-radius:10px;padding:2px 10px}
+.jpGain b{font-size:17px;color:#7dffb0;text-shadow:0 0 6px #33ff88;font-family:"Courier New",monospace}
+.movie .round{display:none}
+.movie .ttl{bottom:58px}
+.guide{position:absolute;inset:0;z-index:12;display:flex;flex-direction:column;align-items:center;justify-content:center;opacity:0;pointer-events:none;
+  background:rgba(40,10,25,.78)}
+.guide p{margin-top:6px;font-size:12.5px;font-weight:900;line-height:1.5;color:#fff;text-align:center}
+.movie.guiding .guide{animation:guide 3.4s ease 1}
+@keyframes guide{0%{opacity:0}10%,82%{opacity:1}100%{opacity:0}}
+.dancer{position:absolute;right:-10px;top:30px;width:92px;height:92px;z-index:7;opacity:0;pointer-events:none}
+.dancer img{width:100%;height:100%;object-fit:contain;filter:drop-shadow(0 4px 6px rgba(0,0,0,.3))}
+.dancer.go{animation:dancer 3.2s ease-in-out 1}
+@keyframes dancer{0%{opacity:0;transform:translateX(60px) rotate(20deg)}12%{opacity:1;transform:none}25%{transform:translateY(-10px) rotate(-8deg)}
+  38%{transform:translateY(0) rotate(8deg)}51%{transform:translateY(-10px) rotate(-8deg)}64%{transform:translateY(0) rotate(8deg)}85%{opacity:1}100%{opacity:0;transform:translateX(60px)}}
+/* アタッカーに入ると「+15」 */
+.plus15{position:absolute;z-index:15;font-size:13px;font-weight:900;color:#ffe14d;-webkit-text-stroke:3px #c2345c;paint-order:stroke fill;pointer-events:none;animation:plus15 .9s ease-out 1 forwards}
+@keyframes plus15{from{opacity:1;transform:translateY(0)}to{opacity:0;transform:translateY(-34px)}}
+
+/* 色の変化は液晶ごと。ムービー中は止めて、家族の顔色が変わらないようにする */
+.ph-jackpot .lcd .talk img{filter:hue-rotate(calc(var(--hue,0deg) * -1))}
+.ph-jackpot .lcd.movieOn,.ph-jackpot .lcd.movieOn .movie img,.ph-jackpot .lcd.movieOn .movie .st,.ph-jackpot .lcd.movieOn .talk img{filter:none}
+.reels{z-index:1}
+
+/* 保留変化・にゃん連・ステップアップ・キャラ・泡・プレミア・発展 */
+.nyan{position:absolute;left:0;right:0;top:50%;margin-top:-26px;text-align:center;z-index:8;opacity:0;pointer-events:none}
+.nyan.go{animation:nyan 1.3s cubic-bezier(.3,1.5,.5,1) 1}
+.nyanN{display:block;font-size:16px;font-weight:900;color:#fff;-webkit-text-stroke:3px #ff5c8a;paint-order:stroke fill}
+@keyframes nyan{0%{opacity:0;transform:scale(2.2) rotate(-8deg)}18%{opacity:1;transform:none}80%{opacity:1}100%{opacity:0;transform:scale(.9)}}
+.stepup{position:absolute;left:6px;top:6px;z-index:8;display:flex;flex-direction:column;align-items:center;opacity:0;pointer-events:none;--sc:#9ad0ff}
+.stepup .stamp{width:40px;height:40px;display:block}
+.stepup .stamp svg{width:100%;height:100%;fill:var(--sc);filter:drop-shadow(0 0 4px var(--sc))}
+.stepN{font-size:10px;font-weight:900;color:#fff;background:var(--sc);border-radius:8px;padding:1px 6px;white-space:nowrap}
+.stepup.lv2{--sc:#5fd47a}.stepup.lv3{--sc:#ff6f95}.stepup.lv4{--sc:#ffad00}.stepup.lv5{--sc:#b45cff}
+.stepup.go{animation:stepIn 1.4s cubic-bezier(.3,1.6,.5,1) 1}
+@keyframes stepIn{0%{opacity:0;transform:scale(2.5)}20%{opacity:1;transform:none}85%{opacity:1}100%{opacity:0}}
+.chara{position:absolute;left:-62px;bottom:8px;z-index:8;display:flex;align-items:flex-start;gap:2px;opacity:0;pointer-events:none}
+.chara img{width:56px;height:56px;object-fit:contain;filter:drop-shadow(0 2px 3px rgba(0,0,0,.3))}
+.chara .say{background:#fff;border-radius:10px;padding:2px 7px;font-size:12px;font-weight:900;color:#4a2a2a;box-shadow:0 0 0 2px #7dbbf0;white-space:nowrap}
+.chara.hot .say{box-shadow:0 0 0 2px #ff5c8a;color:#d6204a}
+.chara.hot img{filter:drop-shadow(0 0 6px #ffd34d) drop-shadow(0 0 3px #ffd34d)}
+.chara.go{animation:chara 1.9s ease 1}
+@keyframes chara{0%{opacity:1;transform:none}20%,80%{opacity:1;transform:translateX(70px)}100%{opacity:0;transform:none}}
+.bubbles{position:absolute;inset:0;z-index:7;pointer-events:none;opacity:0;overflow:hidden}
+.bubbles i{position:absolute;bottom:-30px;border-radius:50%;background:radial-gradient(circle at 30% 30%,#fff,rgba(190,230,255,.55) 60%,rgba(150,210,255,.3));box-shadow:inset 0 0 0 1px rgba(255,255,255,.8)}
+.bubbles.pink i{background:radial-gradient(circle at 30% 30%,#fff,rgba(255,150,190,.8) 60%,rgba(255,90,140,.55))}
+.bubbles.go{opacity:1}
+.bubbles.go i{animation:bubbleUp 1.8s ease-in 1 both}
+@keyframes bubbleUp{to{transform:translate(10px,-250px)}}
+.premiumNote{position:absolute;inset:0;z-index:11;display:flex;flex-direction:column;align-items:center;justify-content:center;opacity:0;pointer-events:none;background:radial-gradient(circle,rgba(255,244,210,.95),rgba(255,196,120,.7))}
+.premiumNote img{width:120px;max-height:110px;object-fit:contain}
+.premiumNote.yawn img{width:76px}
+.premiumNote b{margin-top:4px;font-size:13px;color:#7a3a1a}
+.premiumNote.go{animation:premiumNote 2.2s ease 1}
+.premiumNote.go img{animation:noteSway .5s ease-in-out 4 alternate}
+@keyframes premiumNote{0%{opacity:0}10%,85%{opacity:1}100%{opacity:0}}
+@keyframes noteSway{from{transform:rotate(-4deg)}to{transform:rotate(4deg) scale(1.05)}}
+.develop{position:absolute;inset:0;z-index:9;display:flex;align-items:center;justify-content:center;opacity:0;pointer-events:none;background:radial-gradient(circle,rgba(255,255,255,.92),rgba(255,110,160,.65))}
+.develop.go{animation:develop 1.2s ease 1}
+@keyframes develop{0%{opacity:0;transform:scale(1.4)}15%{opacity:1;transform:none}80%{opacity:1}100%{opacity:0}}
+.ph-reach .lcd.sp,.ph-hot .lcd.sp{background:radial-gradient(circle at 50% 55%,#fff 0%,#ffb0e0 45%,#a35cff 100%)}
+
+/* リーチの種類ごとの飾り */
+.rtDeco{position:absolute;inset:0;z-index:4;pointer-events:none}
+.rtDeco>*{position:absolute;opacity:0;transition:opacity .4s}
+.rtDeco .toy{width:60px;left:-6px;bottom:6px;transform-origin:20% 90%}
+.rt-jarashi .rtDeco .toy{opacity:1;animation:jarashi .6s ease-in-out infinite alternate}
+@keyframes jarashi{from{transform:rotate(-18deg)}to{transform:rotate(18deg)}}
+.rtDeco .napper{width:58px;right:4px;bottom:4px}
+.rt-nap .rtDeco .napper{opacity:1;animation:nap 2.4s ease-in-out infinite}
+@keyframes nap{50%{transform:translateY(2px) scale(1.03,.97)}}
+.rtDeco .zzz{right:14px;bottom:58px;font-size:14px;font-weight:900;color:#7a6ad6}
+.rt-nap .rtDeco .zzz{opacity:1;animation:zzz 2s linear infinite}
+@keyframes zzz{from{transform:translate(0,6px);opacity:0}30%{opacity:1}to{transform:translate(10px,-14px);opacity:0}}
+.rtDeco .allspinTxt{left:0;right:0;top:2px;text-align:center;font-size:22px;color:#fff;-webkit-text-stroke:4px #e8a01c;paint-order:stroke fill}
+.rt-allspin .rtDeco .allspinTxt{opacity:1;animation:shake .15s infinite}
+.rt-allspin .reels{animation:allspin 1.2s linear infinite}
+@keyframes allspin{to{filter:hue-rotate(360deg)}}
+
+/* 確変中「夜のねこ祭り」・時短中「お昼のおさんぽ」 */
+.world-kakuhen:not(.ph-reach):not(.ph-hot):not(.ph-jackpot) .lcd{background:linear-gradient(180deg,#1c2257,#4b2a78 70%,#7a3a7a)}
+.world-jitan:not(.ph-reach):not(.ph-hot):not(.ph-jackpot) .lcd{background:linear-gradient(180deg,#8fd8ff,#e9fbff 70%,#c8f0b0)}
+.worldDeco{position:absolute;inset:0;z-index:0;pointer-events:none;opacity:0;transition:opacity .6s}
+.world-kakuhen .worldDeco,.world-jitan .worldDeco{opacity:1}
+.ph-jackpot .worldDeco{opacity:0}
+.worldDeco i{position:absolute;display:none}
+.world-kakuhen .worldDeco .lantern{display:block;top:-2px;width:14px;height:20px;border-radius:7px;background:radial-gradient(circle at 50% 40%,#ffe9a8,#ff6a4d 70%);box-shadow:0 0 10px #ff8a5c;transform-origin:50% -10px;animation:lantern 2s ease-in-out infinite alternate}
+.worldDeco .lantern:nth-child(1){left:14px}.worldDeco .lantern:nth-child(2){left:72px}.worldDeco .lantern:nth-child(3){left:148px}.worldDeco .lantern:nth-child(4){left:206px}
+@keyframes lantern{from{transform:rotate(-6deg)}to{transform:rotate(6deg)}}
+.fwk,.world-kakuhen .worldDeco .fw{display:block;width:56px;height:56px;border-radius:50%;opacity:0;
+  background:repeating-conic-gradient(var(--c) 0 5deg,transparent 5deg 30deg);
+  -webkit-mask:radial-gradient(circle,transparent 30%,#000 32% 68%,transparent 70%);mask:radial-gradient(circle,transparent 30%,#000 32% 68%,transparent 70%);animation:fw 2.4s ease-out infinite}
+.worldDeco .fw.a{left:20px;top:26px;--c:#ffd34d}.worldDeco .fw.b{left:150px;top:18px;--c:#ff8aa6;animation-delay:.8s}.worldDeco .fw.c{left:96px;top:118px;--c:#7dc6ff;animation-delay:1.6s}
+@keyframes fw{0%{opacity:0;transform:scale(.2)}15%{opacity:1}70%{opacity:.8}100%{opacity:0;transform:scale(1.3)}}
+.world-jitan .worldDeco .cloud{display:block;width:56px;height:18px;border-radius:10px;background:#fff;box-shadow:14px -8px 0 2px #fff;opacity:.85;animation:cloud 14s linear infinite}
+.worldDeco .cloud.a{top:22px;left:0}.worldDeco .cloud.b{top:140px;left:0;animation-delay:-7s}
+@keyframes cloud{from{transform:translateX(-80px)}to{transform:translateX(260px)}}
+.modeCut{position:absolute;inset:0;z-index:12;display:flex;flex-direction:column;align-items:center;justify-content:center;opacity:0;pointer-events:none}
+.modeCut.kakuhen{background:radial-gradient(circle,rgba(255,240,160,.95),rgba(200,40,110,.88))}
+.modeCut.jitan{background:radial-gradient(circle,rgba(255,255,255,.95),rgba(90,170,255,.88))}
+.modeCut p{margin-top:6px;font-size:12px;font-weight:900;color:#fff;text-shadow:0 1px 3px rgba(0,0,0,.5)}
+.modeCut.go{animation:modeCut 2.8s ease 1}
+@keyframes modeCut{0%{opacity:0;transform:scale(1.5)}12%{opacity:1;transform:none}85%{opacity:1}100%{opacity:0}}
+.chain{position:absolute;right:4px;top:4px;z-index:9;display:none;font-size:11px;font-weight:900;color:#fff;background:linear-gradient(#ff6a8e,#d6204a);border-radius:9px;padding:1px 8px;box-shadow:0 0 0 1.5px #fff}
+.chain.show{display:block}
+.ph-jackpot .chain{top:28px;right:auto;left:6px;z-index:10}
+.promo{position:absolute;inset:0;z-index:13;display:flex;flex-direction:column;align-items:center;justify-content:center;opacity:0;pointer-events:none;transition:opacity .3s;background:rgba(40,10,25,.72)}
+.promo.show{opacity:1}
+.promo.win{background:radial-gradient(circle,rgba(255,240,160,.95),rgba(220,40,110,.88));animation:shake .12s 8}
+.promo p{font-size:14px;font-weight:900;color:#fff;text-align:center;line-height:1.5}
+
+/* 家族のひとこと（顔とふきだし） */
+.talk{position:absolute;left:4px;bottom:4px;z-index:10;display:flex;align-items:center;gap:3px;opacity:0;transform:translateX(-30px);pointer-events:none;transition:opacity .2s,transform .3s cubic-bezier(.3,1.5,.5,1)}
+.talk.top{bottom:auto;top:4px}
+.talk.show{opacity:1;transform:none}
+.talk img{width:34px;height:34px;border-radius:50%;background:#fff;object-fit:contain;box-shadow:0 0 0 2px #fff,0 0 0 4px #ff8aa6}
+.talk.show img{animation:talkHead .3s ease-in-out 6 alternate}
+.talk span{max-width:185px;background:#fff;border-radius:10px;padding:3px 8px;font-size:11.5px;font-weight:900;line-height:1.3;color:#4a2a2a;box-shadow:0 0 0 2px #ff8aa6,0 2px 4px rgba(0,0,0,.2)}
+@keyframes talkHead{from{transform:rotate(-4deg)}to{transform:rotate(4deg) translateY(-1px)}}
+
+/* 大当たりムービー：家族と猫が歩いて話す舞台 */
+.stage{position:absolute;inset:0;z-index:1;overflow:hidden;opacity:0;transition:opacity .4s}
+.movie.playing .stage{opacity:1}
+.movie.playing .bob,.movie.playing .ttl,.movie.playing .march,.movie.playing .conf,.movie.playing .heartUp,.movie.playing .dancer{display:none}
+.movie.playing .jpGain{top:27px;bottom:auto;left:auto;right:6px;transform:none;font-size:11px;padding:1px 8px}
+.movie.playing .jpGain b{font-size:14px}
+.bgArt,.bgArt i{position:absolute}
+.bgArt{inset:0}
+.bgArt i{display:none}
+.bg-home{background:linear-gradient(#fff3df 0 72%,#d9a46c 72%)}
+.bg-home .bgArt i:nth-child(1){display:block;left:22px;top:52px;width:66px;height:46px;border-radius:4px;background:linear-gradient(#a9dcff,#e9f7ff);border:4px solid #fff;box-shadow:0 0 0 2px #c9925c}
+.bg-home .bgArt i:nth-child(2){display:block;left:0;right:0;bottom:0;height:28%;background:repeating-linear-gradient(90deg,transparent 0 38px,rgba(120,70,30,.25) 38px 40px)}
+.bg-home .bgArt i:nth-child(3){display:block;left:150px;top:54px;width:40px;height:32px;border:3px solid #c9925c;background:radial-gradient(circle at 50% 55%,#ff9fb6 0 28%,#fff 30%)}
+.bg-park{background:linear-gradient(#8fd3ff,#dff4ff 68%,#8fd17a 68%,#6bbf5a)}
+.bg-park .bgArt i:nth-child(1){display:block;right:18px;top:48px;width:28px;height:28px;border-radius:50%;background:radial-gradient(#fff6a8,#ffd34d);box-shadow:0 0 16px #ffe680}
+.bg-park .bgArt i:nth-child(2),.bg-park .bgArt i:nth-child(3){display:block;width:50px;height:15px;border-radius:9px;background:#fff;box-shadow:12px -7px 0 2px #fff;animation:cloud 16s linear infinite}
+.bg-park .bgArt i:nth-child(2){top:58px}.bg-park .bgArt i:nth-child(3){top:84px;animation-delay:-8s}
+.bg-park .bgArt i:nth-child(4){display:block;left:0;right:0;bottom:0;height:30%;background-image:radial-gradient(circle,#ff8aa6 2px,transparent 3px),radial-gradient(circle,#fff 2px,transparent 3px),radial-gradient(circle,#ffd34d 2px,transparent 3px);background-size:26px 14px,32px 18px,22px 16px;background-position:0 4px,12px 10px,6px 2px}
+.bg-night{background:linear-gradient(#141a46,#3b2a6e 70%,#2a2240 70%)}
+.bg-night .bgArt i:nth-child(-n+3){display:block;width:60px;height:60px;border-radius:50%;opacity:0;background:repeating-conic-gradient(var(--c) 0 5deg,transparent 5deg 30deg);
+  -webkit-mask:radial-gradient(circle,transparent 30%,#000 32% 68%,transparent 70%);mask:radial-gradient(circle,transparent 30%,#000 32% 68%,transparent 70%);animation:fw 2.2s ease-out infinite}
+.bg-night .bgArt i:nth-child(1){left:24px;top:48px;--c:#ffd34d}.bg-night .bgArt i:nth-child(2){left:150px;top:40px;--c:#ff8aa6;animation-delay:.7s}.bg-night .bgArt i:nth-child(3){left:90px;top:62px;--c:#7dc6ff;animation-delay:1.4s}
+.bg-night .bgArt i:nth-child(4){display:block;left:0;right:0;top:26px;height:16px;background:radial-gradient(circle,#ff6a4d 0 5px,transparent 6px) 0 0/26px 16px repeat-x;filter:drop-shadow(0 0 4px #ff8a5c)}
+.bg-party{background:radial-gradient(circle at 50% 100%,#fff0f6,#ff8aa6 60%,#c2345c)}
+.bg-party .bgArt i:nth-child(1),.bg-party .bgArt i:nth-child(2){display:block;top:0;bottom:0;width:20px;background:repeating-linear-gradient(90deg,#c21f3a 0 6px,#e0354f 6px 11px)}
+.bg-party .bgArt i:nth-child(1){left:0}.bg-party .bgArt i:nth-child(2){right:0}
+.bg-party .bgArt i:nth-child(3),.bg-party .bgArt i:nth-child(4){display:block;top:-10px;width:70px;height:220px;transform-origin:50% 0;background:linear-gradient(rgba(255,255,220,.6),transparent);clip-path:polygon(44% 0,56% 0,100% 100%,0 100%);animation:spot 2.4s ease-in-out infinite alternate}
+.bg-party .bgArt i:nth-child(3){left:30px}.bg-party .bgArt i:nth-child(4){right:30px;animation-direction:alternate-reverse}
+.bg-party .bgArt i:nth-child(5){display:block;left:0;right:0;bottom:0;height:16px;background:linear-gradient(#ffd98a,#b8743a 30%,#8a4a2a)}
+@keyframes spot{from{transform:rotate(-18deg)}to{transform:rotate(18deg)}}
+.actor{position:absolute;bottom:6px;width:46px;z-index:2}
+.actor.isCat{width:44px;bottom:4px}
+.fig{position:relative}
+.person{width:46px;height:86px}
+.person .head{position:absolute;left:0;top:0;width:46px;height:46px;object-fit:contain;z-index:3}
+.ph-jackpot .lcd.movieOn .stage .head{filter:drop-shadow(0 2px 2px rgba(0,0,0,.25))}
+.person i{position:absolute;display:block}
+.person .body{left:12px;top:40px;width:22px;height:26px;z-index:2;border-radius:9px 9px 5px 5px;background:var(--shirt);box-shadow:inset 0 0 0 1.5px rgba(0,0,0,.18)}
+.person.floral .body{background:radial-gradient(circle,#ff9fbf 0 1.6px,transparent 2px) 0 0/8px 8px,radial-gradient(circle,#9cc7ff 0 1.3px,transparent 1.8px) 4px 4px/8px 8px,var(--shirt)}
+.person .arm{top:42px;width:7px;height:22px;z-index:1;border-radius:4px;background:var(--shirt);box-shadow:inset 0 -6px 0 #f6d2bd,inset 0 0 0 1.5px rgba(0,0,0,.15);transform-origin:50% 3px}
+.person .arm.l{left:7px;transform:rotate(14deg)}.person .arm.r{right:7px;transform:rotate(-14deg)}
+.person .leg{top:62px;width:8px;height:22px;border-radius:3px 3px 4px 4px;background:var(--pants);box-shadow:inset 0 -5px 0 #6b4a3a;transform-origin:50% 2px}
+.person .leg.l{left:14px}.person .leg.r{left:24px}
+.walking .person .leg.l,.walking .person .arm.r{animation:swingA .5s ease-in-out infinite alternate}
+.walking .person .leg.r,.walking .person .arm.l{animation:swingB .5s ease-in-out infinite alternate}
+@keyframes swingA{from{transform:rotate(24deg)}to{transform:rotate(-24deg)}}
+@keyframes swingB{from{transform:rotate(-24deg)}to{transform:rotate(24deg)}}
+.walking .fig{animation:walkBob .25s ease-in-out infinite alternate}
+@keyframes walkBob{to{transform:translateY(-2px)}}
+.idle .fig{animation:idleBob 1.6s ease-in-out infinite}
+@keyframes idleBob{50%{transform:translateY(-2px)}}
+.talking .person .head{animation:talkHead .3s ease-in-out infinite alternate}
+.talking .person .arm.r{animation:wave .35s ease-in-out infinite alternate}
+@keyframes wave{from{transform:rotate(-140deg)}to{transform:rotate(-175deg)}}
+.cat .head{width:44px;height:44px;object-fit:contain}
+.isCat.walking .fig{animation:catHop .3s ease-in-out infinite alternate}
+.isCat.idle .fig{animation:catHop .6s ease-in-out infinite alternate}
+.isCat.talking .fig{animation:catHop .18s ease-in-out infinite alternate}
+@keyframes catHop{to{transform:translateY(-6px) rotate(5deg)}}
+.star .fig{animation:starJump .6s ease-in-out infinite alternate}
+.star::after{content:'';position:absolute;left:-14px;right:-14px;bottom:-6px;height:14px;border-radius:50%;background:radial-gradient(rgba(255,255,200,.9),transparent 70%);z-index:-1}
+.star::before{content:'★';position:absolute;left:50%;top:-18px;transform:translateX(-50%);font-size:16px;color:#ffe14d;-webkit-text-stroke:2px #e8a01c;paint-order:stroke fill;animation:shake .4s infinite}
+@keyframes starJump{to{transform:translateY(-6px)}}
+.speech{position:absolute;z-index:6;padding:4px 7px;border-radius:10px;background:#fff;color:#4a2a2a;font-size:11px;font-weight:900;line-height:1.3;text-align:center;opacity:0;pointer-events:none;
+  box-shadow:0 0 0 2px #ff8aa6,0 3px 6px rgba(0,0,0,.25);transform-origin:var(--tail,50%) 100%}
+.speech::after{content:'';position:absolute;bottom:-6px;left:calc(var(--tail,50%) - 6px);border:6px solid transparent;border-top-color:#fff;border-bottom:0}
+.speech.show{animation:speech 1.9s ease 1 forwards}
+@keyframes speech{0%{opacity:0;transform:scale(.5)}10%{opacity:1;transform:scale(1.05)}16%,88%{opacity:1;transform:none}100%{opacity:0}}
+.stage .cap{position:absolute;left:0;right:0;bottom:0;z-index:7;padding:3px 0;text-align:center;font-size:12px;font-weight:900;color:#fff;
+  background:linear-gradient(90deg,transparent,rgba(90,30,60,.82) 20%,rgba(90,30,60,.82) 80%,transparent);animation:cap 2s ease 1 forwards}
+@keyframes cap{0%{opacity:0;transform:translateY(10px)}12%,75%{opacity:1;transform:none}100%{opacity:0}}
