@@ -61,3 +61,12 @@ if (existsSync('gpt/parts/cut/nafan.png')) {
   }
   console.log('icons');
 }
+
+// ハンドルのつまみ：台の下の絵から丸く切り出す（回して強さを見せる）
+if (existsSync(`${OUT}/cab-bottom.webp`)) {
+  const C = { x: 988, y: 359, r: 58 };
+  const mask = Buffer.from(`<svg xmlns="http://www.w3.org/2000/svg" width="${C.r * 2}" height="${C.r * 2}"><circle cx="${C.r}" cy="${C.r}" r="${C.r}" fill="#fff"/></svg>`);
+  await sharp(`${OUT}/cab-bottom.webp`).extract({ left: C.x - C.r, top: C.y - C.r, width: C.r * 2, height: C.r * 2 })
+    .composite([{ input: mask, blend: 'dest-in' }]).webp({ quality: 90 }).toFile(`${OUT}/part-knob.webp`);
+  console.log('part-knob');
+}
