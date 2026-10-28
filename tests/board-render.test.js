@@ -1,6 +1,6 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { drawBoard } from '../src/render/board.js';
+import { drawBoard, resetBoardCache } from '../src/render/board.js';
 import { LAYOUT } from '../src/board-layout.js';
 
 // Canvas のかわり（何でも受けつける 2D コンテキスト）
@@ -23,4 +23,17 @@ test('board background is built once for a fractional scale', () => {
   assert.equal(made, 2);
   drawBoard(target, LAYOUT, [], 1.667);
   assert.equal(made, 4);
+});
+
+test('background is rebuilt after the page comes back (Android drops canvas memory)', () => {
+  let made = 0;
+  globalThis.document = { createElement: () => { made++; return fakeCanvas(); } };
+  const target = fakeCanvas().getContext();
+  drawBoard(target, LAYOUT, [], 2.5);
+  const before = made;
+  drawBoard(target, LAYOUT, [], 2.5);
+  assert.equal(made, before);
+  resetBoardCache();
+  drawBoard(target, LAYOUT, [], 2.5);
+  assert.equal(made, before + 2);
 });

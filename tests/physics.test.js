@@ -110,3 +110,26 @@ test('every pin leaves room for a ball to pass walls and other pins', () => {
     for (const q of LAYOUT.pins) if (q !== p) assert.ok(Math.hypot(p.x - q.x, p.y - q.y) >= p.r + q.r + BALL_R * 2 + 1, `pins ${p.x},${p.y} and ${q.x},${q.y} too close`);
   }
 });
+
+test('launched ball rides up the left lane before entering the board', () => {
+  const p = createPhysics(LAYOUT, mulberry32(3));
+  p.launch(0.6);
+  const b = p.balls[0];
+  assert.ok(b.x < 20 && b.y > 380, `starts bottom-left at ${b.x},${b.y}`);
+  const ys = [];
+  for (let i = 0; i < 12; i++) { p.step(1 / 60, CLOSED); ys.push(p.balls[0].y); }
+  assert.ok(ys.every((y, i) => i === 0 || y <= ys[i - 1]), `moves up: ${ys.map(v => v.toFixed(0))}`);
+  for (let i = 0; i < 60 && p.balls[0] && p.balls[0].ride; i++) p.step(1 / 60, CLOSED);
+  const top = p.balls[0];
+  assert.ok(top && !top.ride && top.y <= 30 && top.x > 100, `reaches the top lane: ${top && top.x},${top && top.y}`);
+});
+
+test('a too-weak shot goes partway up the lane and falls back out', () => {
+  const p = createPhysics(LAYOUT, mulberry32(4));
+  p.launch(0.02);
+  let minY = 999;
+  let ev = [];
+  for (let i = 0; i < 120 && !ev.length; i++) { ev = p.step(1 / 60, CLOSED); if (p.balls[0]) minY = Math.min(minY, p.balls[0].y); }
+  assert.equal(ev[0].type, 'out');
+  assert.ok(minY < 360 && minY > 100, `rose to ${minY}`);
+});
