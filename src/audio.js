@@ -55,6 +55,14 @@ export function createAudio({ AC = typeof window === 'undefined' ? null : (windo
       [NOTES.G5, NOTES.E5, NOTES.C5].forEach((f, i) => tone(f, t + i * 0.18, 0.22, { type: 'square', gain: 0.07, slide: 0.97 }));
       tone(NOTES.C5 / 2, t + 0.54, 0.7, { type: 'sawtooth', gain: 0.06, slide: 0.8 });
     },
+    // ジャラジャラ：玉どうしが当たる金属の音をたくさん重ねる
+    jara: (t, n = 14) => {
+      for (let i = 0; i < n; i++) {
+        const at = t + Math.random() * 0.55;
+        tone(2800 + Math.random() * 3200, at, 0.03, { type: 'triangle', gain: 0.035 });
+        if (i % 3 === 0) noiseHit(at, 0.04, 5000, 0.12);
+      }
+    },
     tick: (t, pitch = 1) => tone(1400 * pitch, t, 0.025, { type: 'square', gain: 0.025 }),
     pin: (t, pitch = 1) => tone(2600 * pitch, t, 0.03, { type: 'sine', gain: 0.03 }),
     click: t => tone(1200, t, 0.04, { type: 'triangle', gain: 0.12, slide: 0.7 }),
@@ -134,6 +142,10 @@ export function createAudio({ AC = typeof window === 'undefined' ? null : (windo
     },
     resume() {
       if (ctx && ctx.state !== 'running') ctx.resume().catch(() => {});
+    },
+    // バックグラウンドでは音を止める（BGM の予約も止まる）
+    suspend() {
+      if (ctx && ctx.state === 'running') ctx.suspend().catch(() => {});
     },
     play(name, opt, delay = 0) {
       if (!on || !ctx || ctx.state !== 'running' || !SOUNDS[name]) return;

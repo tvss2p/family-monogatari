@@ -104,6 +104,8 @@ export function createPhysics(layout, rng = Math.random) {
     if (py < h.y && b.y >= h.y && Math.abs(b.x - h.x) <= hw) return 'heso';
     const a = layout.attacker;
     if (opts.attackerOpen && py < a.y && b.y >= a.y && Math.abs(b.x - a.x) <= (a.sensorW || a.w) / 2) return 'attacker';
+    const o = layout.out;
+    if (o && b.y >= o.y && Math.abs(b.x - o.x) <= o.w / 2) return 'out';
     if (b.y > layout.h + BALL_R) return 'out';
 
     const list = grid.get(Math.floor(b.x / CELL) + ',' + Math.floor(b.y / CELL));
@@ -164,7 +166,7 @@ export function createPhysics(layout, rng = Math.random) {
             continue;
           }
           const ev = substep(b, opts);
-          if (ev) { balls.splice(i, 1); events.push({ type: ev, id: b.id }); }
+          if (ev) { balls.splice(i, 1); events.push({ type: ev, id: b.id, x: b.x, y: b.y }); }
         }
       }
       return events;

@@ -2,10 +2,12 @@ import { CONFIG } from './config.js';
 import { LAYOUT } from './board-layout.js';
 import { createMachine } from './machine.js';
 import { createPhysics } from './physics.js';
-import { buildSpin } from './scenario.js';
+import { buildSpin, holdColor } from './scenario.js';
+import { pickLine } from './story.js';
 import { drawBoard, resetBoardCache } from './render/board.js';
 import { createLcd } from './render/lcd.js';
 import { createGimmicks } from './render/gimmicks.js';
+import { createTray } from './render/tray.js';
 import { gems } from './render/parts.js';
 import { bindInput, powerToDeg } from './input.js';
 import { createAudio, vibrate } from './audio.js';
@@ -33,9 +35,10 @@ const ctx = canvas.getContext('2d');
 let drawScale = 1;
 function fit() {
   const box = $('#fit').getBoundingClientRect();
-  const s = Math.min(box.width / 352, box.height / 784);
+  // 盤面がほぼ横幅いっぱいになるよう、左右の柱の外側（12px ずつ）と下のスピーカーの段（約80px）は画面の外に出してよい
+  const s = Math.min(box.width / 336, box.height / 722);
   cab.style.setProperty('--s', s);
-  cab.style.setProperty('--top', `${Math.max(0, (box.height - 800 * s) / 2)}px`);
+  cab.style.setProperty('--top', `${Math.max(0, (box.height - 722 * s) / 2)}px`);
   drawScale = Math.max(1, Math.min(3, s * (window.devicePixelRatio || 1)));
   canvas.width = Math.round(LAYOUT.w * drawScale);
   canvas.height = Math.round(LAYOUT.h * drawScale);
@@ -53,6 +56,14 @@ const machine = createMachine({ saved: saved && saved.machine });
 const physics = createPhysics(LAYOUT);
 const lcd = createLcd($('#lcd'));
 const gimmicks = createGimmicks(cab);
+const tray = createTray($('.bottom'));
+let trayBoxes = -1;
+// 確変昇格チャンスの音
+lcd.onEvent = e => {
+  if (e === 'promoChance') audio.play('reach');
+  if (e === 'promoWin') { audio.play('jackpot'); audio.play('meow', 1.2, 0.4); }
+  if (e === 'promoLose') audio.play('miss');
+};
 const audio = createAudio();
 audio.setOn(!saved || saved.sound !== false);
 const bgm = createBgm(audio);
@@ -60,6 +71,9 @@ let bgmOn = !saved || saved.bgm !== false;
 bgm.setOn(audio.on && bgmOn);
 let power = saved && Number.isFinite(saved.power) ? saved.power : 0.55;
 let locked = !!(saved && saved.locked);
+// 連チャン数（確変・時短のあいだに続けて当たった回数）
+let chain = saved && Number.isFinite(saved.chain) ? saved.chain : 0;
+lcd.setChain(chain);
 let holding = false;
 let firing = false;
 let fireAcc = 0;
@@ -132,14 +146,32 @@ menu.addEventListener('click', e => {
 let resetting = false;
 function persist() {
   if (resetting) return;
-  save({ machine: machine.toJSON(), sound: audio.on, bgm: bgmOn, power, locked });
+  save({ machine: machine.toJSON(), sound: audio.on, bgm: bgmOn, power, locked, chain });
 }
 setInterval(persist, 2000);
-document.addEventListener('visibilitychange', () => {
-  if (document.hidden) { persist(); runner.pause(); }
-  else { runner.resume(performance.now()); audio.resume(); resetBoardCache(); wake.lost(); wake.visible(); }
-});
-window.addEventListener('pagehide', persist);
+// バックグラウンドに行ったら、ゲームの時計・玉・演出・音をすべて止める。戻ったら続きから
+let paused = document.hidden;
+function pauseGame() {
+  if (paused) return;
+  paused = true;
+  persist();
+  runner.pause();
+  audio.suspend();
+}
+function resumeGame() {
+  if (!paused || document.hidden) return;
+  paused = false;
+  last = performance.now();
+  runner.resume(last);
+  audio.resume();
+  resetBoardCache();
+  wake.lost();
+  wake.visible();
+}
+document.addEventListener('visibilitychange', () => (document.hidden ? pauseGame() : resumeGame()));
+window.addEventListener('pagehide', pauseGame);
+window.addEventListener('pageshow', resumeGame);
+window.addEventListener('blur', () => { if (document.hidden) pauseGame(); });
 
 // 1回転を始める（?force=premium|hot|reach|miss で次の1回を決められる。確かめ用）
 function startSpin(now) {
@@ -183,6 +215,18 @@ function playCue(cue, sp) {
   }
   if (cue === 'notice:parade') [1.25, 1, 1.4, 0.9, 1.15].forEach((p, i) => audio.play('meow', p, 0.25 + i * 0.32));
   if (cue === 'jackpot') { audio.play('meow', 1.1, 0.9); audio.play('meow', 0.85, 1.3); }
+  // 新しい予告の音
+  if (cue === 'nyan') { audio.play('stopBig'); audio.play('meow', 1.3, 0.15); }
+  if (cue.startsWith('step:')) audio.play('paw', 0.8 + Number(cue.slice(5)) * 0.15);
+  if (cue.startsWith('chara:')) audio.play('meow', cue === 'chara:honey' ? 0.8 : 1.2);
+  if (cue.startsWith('bubble:')) [0, 0.1, 0.2, 0.32, 0.45].forEach((d, i) => audio.play('pin', cue === 'bubble:pink' ? 1.4 + i * 0.1 : 1 + i * 0.1, d));
+  if (cue.startsWith('premium:')) audio.play('ending');
+  if (cue === 'develop') audio.play('cutin');
+  if (cue === 'rt:allspin') audio.play('jackpot');
+  // 家族のひとこと（ばあちゃんに話しかける）
+  if (cue === 'reach' && sp && sp.reach !== 'family') lcd.say(pickLine('reach', Math.random));
+  if (cue === 'hot') lcd.say(pickLine('hot', Math.random), true);
+  if (cue === 'stopM' && sp && sp.reach && !(sp.stops[0] === sp.stops[1] && sp.stops[1] === sp.stops[2])) lcd.say(pickLine('miss', Math.random));
   if (cue === 'hot') vibrate([60, 40, 60]);
   if (cue === 'jackpot') vibrate(250);
 }
@@ -203,21 +247,55 @@ function updateHud() {
   show('balls', s.balls, v => {
     $('#cBalls').textContent = v;
   });
-  show('hold', s.holds.map(h => (h.hit ? 2 : 1)).join(''), () => {
-    $('#hold').querySelectorAll('i').forEach((el, i) => { el.className = i < s.holds.length ? 'on' : ''; });
+  show('hold', s.holds.map(h => h.color || 'white').join(','), () => {
+    $('#hold').querySelectorAll('i').forEach((el, i) => { el.className = i < s.holds.length ? `on c-${s.holds[i].color || 'white'}` : ''; });
+  });
+  // 確変中は「夜のねこ祭り」、時短中は「お昼のおさんぽ」の画面
+  show('mode', s.mode, v => {
+    cab.classList.toggle('world-kakuhen', v === 'kakuhen');
+    cab.classList.toggle('world-jitan', v === 'jitan');
+    if (v === 'normal') { chain = 0; lcd.setChain(0); }
   });
   show('boost', machine.isHesoBoost(), v => cab.classList.toggle('boost', v));
   show('atk', machine.isAttackerOpen(), v => { $('#atk').classList.toggle('open', v); if (v) audio.play('open'); });
   show('round', s.phase === 'jackpot' ? `${s.round}/${s.roundsTotal}` : '', v => { if (v) { lcd.setRound(s.round, s.roundsTotal); if (s.round > 1) { audio.play('round'); audio.play('meow', 0.9 + (s.round % 4) * 0.12, 0.2); } } });
+  if (s.phase === 'jackpot') {
+    show('jp', `${s.round}/${s.roundsTotal}/${s.roundCount}/${jackpotGain}`, () =>
+      lcd.setJackpotStats({ round: s.round, total: s.roundsTotal, count: s.roundCount, gain: jackpotGain }));
+  }
   show('phase', s.phase, (v, prev) => {
+    if (v === 'jackpot') {
+      jackpotGain = 0;
+      chain = s.mode === 'normal' ? 1 : chain + 1;
+      lcd.setChain(chain);
+    }
     if (v === 'idle' && !runner.active) gimmicks.reset();
-    if (v === 'idle' && prev === 'jackpot') audio.play('ending');
+    if (v === 'idle' && prev === 'jackpot') {
+      audio.play('ending');
+      lcd.endJackpot();
+      lcd.showMode(s.mode);
+      lcd.say(pickLine('end', Math.random));
+      setTimeout(() => lcd.say(pickLine(s.mode, Math.random)), 2600);
+      audio.play('meow', 1.2, 0.5);
+    }
   });
 }
 
 let last = performance.now();
 let lastTick = 0, lastPin = 0, lastHits = 0;
+let jackpotGain = 0;
+// アタッカーに入った玉の上に「+15」
+function popPlus(x) {
+  const el = document.createElement('div');
+  el.className = 'plus15';
+  el.textContent = `+${CONFIG.attackerPayout}`;
+  el.style.left = `${(x ?? LAYOUT.attacker.x) - 12}px`;
+  el.style.top = `${LAYOUT.attacker.y - 22}px`;
+  $('#board').appendChild(el);
+  setTimeout(() => el.remove(), 950);
+}
 function frame(now) {
+  if (paused) { last = now; requestAnimationFrame(frame); return; }
   const ms = now - last;
   stats.frames++;
   if (stats.frames > 30) { stats.maxFrameMs = Math.max(stats.maxFrameMs, ms); if (ms > 34) stats.slowFrames++; }
@@ -234,13 +312,29 @@ function frame(now) {
 
   const opts = { attackerOpen: machine.isAttackerOpen(), hesoBoost: machine.isHesoBoost() };
   for (const e of physics.step(dt, opts)) {
-    if (e.type === 'heso') { machine.onHeso(); audio.play('heso'); }
-    else if (e.type === 'attacker' && machine.onAttacker()) audio.play('payout');
+    if (e.type === 'heso') {
+      const h = machine.onHeso();
+      if (h) h.color = holdColor(h, Math.random);
+      audio.play('heso');
+      tray.pour(CONFIG.hesoPayout);
+      audio.play('jara', 3, 0.15);
+    }
+    else if (e.type === 'attacker' && machine.onAttacker()) {
+      audio.play('payout');
+      audio.play('jara', 12, 0.1);
+      tray.pour(CONFIG.attackerPayout);
+      jackpotGain += CONFIG.attackerPayout;
+      popPlus(e.x);
+    }
   }
   machine.tick(dt * 1000);
   if (!runner.active && machine.state.phase === 'idle') startSpin(now);
   runCues(now);
   lcd.update(now);
+  // 上皿とドル箱（箱が満タンになったらファンファーレ）
+  const boxes = tray.update(now, machine.state.balls);
+  if (trayBoxes >= 0 && boxes > trayBoxes) { audio.play('open'); audio.play('meow', 1.3, 0.3); vibrate(60); }
+  trayBoxes = boxes;
   // リールが回っている音（カタカタ）と、玉が釘に当たる音（チン。鳴らしすぎない）
   if (lcd.spinning && now - lastTick > 85) { lastTick = now; audio.play('tick', 0.9 + lcd.spinning * 0.08); }
   if (physics.pinHits !== lastHits) {
@@ -263,12 +357,13 @@ if (params.get('bot')) {
   locked = true;
   updateFiring();
   setInterval(() => {
+    if (paused) return;
     if (machine.state.balls <= 0) machine.rent();
     if ($('#pushwrap').classList.contains('up')) gimmicks.push();
   }, 500);
 }
 
-window.__fm = { machine, physics, audio, bgm, stats, setPower, persist, fire: on => { holding = on; updateFiring(); }, force: f => { force = f; } };
+window.__fm = { machine, physics, audio, bgm, lcd, stats, setPower, persist, fire: on => { holding = on; updateFiring(); }, force: f => { force = f; } };
 
 // ホーム画面アプリ・オフライン用
 if ('serviceWorker' in navigator && (location.protocol === 'https:' || location.hostname === 'localhost')) {

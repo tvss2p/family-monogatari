@@ -37,7 +37,7 @@ function rail(x1, y1, x2, y2, gaps, gapLen) {
 }
 
 const lcdFrame = { x: 36, y: 58, w: 248, h: 206, r: 28 };
-const heso = { x: 160, y: 300, w: 22 };
+const heso = { x: 160, y: 300, w: 26 };
 const hesoPlate = { x: 122, y: 306, w: 76, h: 46 };
 // w はふたの幅、sensorW は開いているとき入ったとみなす幅（ガイドのはしまで）
 const attacker = { x: 160, y: 366, w: 120, sensorW: 140 };
@@ -46,7 +46,7 @@ const windmills = [{ x: 52, y: 308 }, { x: 268, y: 308 }];
 const roof = [[56, 59], [160, 30], [264, 59]];
 // 液晶の下からヘソへ向かうレール（穴から落ちた玉はヘソに届かない）
 const RAIL_GAPS = [0.4, 0.75];
-const RAIL_GAP_LEN = 12;
+const RAIL_GAP_LEN = 10;
 const rails = [
   { x1: 20, y1: 268, x2: 146, y2: 293 },
   { x1: 312, y1: 266, x2: 174, y2: 293 },
@@ -64,8 +64,16 @@ const lane = poly([[20, 404], ...arc(108, 108, 88, 180, 270), [130, 25]]);
 // 右上の返しゴム：右の壁ぞいに落ちる玉を内側へはね返す
 const kicker = { x1: 314, y1: 112, x2: 296, y2: 134 };
 
+// アタッカーの下の床：外れ玉は中央のアウト口へ転がって吸いこまれる
+// （左はしの発射レーンの下はファウル玉の通り道なので、床はレーンの内側から）
+const OUT = { x: 160, y: 400, w: 40 };
+const floor = [
+  { x1: 21, y1: 386, x2: OUT.x - OUT.w / 2, y2: OUT.y },
+  { x1: OUT.x + OUT.w / 2, y1: OUT.y, x2: 314, y2: 386 },
+];
+
 const walls = [
-  ...outer, ...lane, kicker,
+  ...outer, ...lane, kicker, ...floor,
   ...roundRect(lcdFrame.x, lcdFrame.y, lcdFrame.w, lcdFrame.h, lcdFrame.r),
   ...poly(roof),
   ...guides,
@@ -117,6 +125,6 @@ export const LAYOUT = {
   }),
   lcdFrame, roof, kicker, rails, guides, railGaps: RAIL_GAPS, railGapLen: RAIL_GAP_LEN,
   heso, hesoBoostW: 76, hesoPlate, attacker, windmills,
-  out: { x: 160, y: 398, w: 44 },
+  out: OUT, floor,
   launch: { x: 122, y: 13 },
 };

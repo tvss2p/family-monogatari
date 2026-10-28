@@ -2,7 +2,7 @@
 const LIST = [
   ['jill', 'ジル'], ['lee', 'リー'], ['berry', 'ベリー'], ['nafan', 'なーふぁん'],
   ['lucky', 'ラッキー'], ['kira', 'キラ'], ['glen', 'グレン'], ['daisuke', 'だいすけ'],
-  ['hiroko', 'ひろこ'], ['nanae', 'ななえ'], ['honey', 'ハニー'],
+  ['hiroko', 'ばあちゃん'], ['nanae', 'ななえ'], ['honey', 'ハニー'],
 ];
 
 export const PREMIUM_ID = 'trio';
