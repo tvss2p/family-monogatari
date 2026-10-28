@@ -14,6 +14,9 @@ import { createTapGuard } from './render/gimmicks.js';
 import { createCueRunner } from './cues.js';
 import { isFiring, stepPower, powerLabel } from './lever.js';
 import { createBgm, trackFor } from './bgm.js';
+import { createWakeLock } from './wakelock.js';
+
+const wake = createWakeLock();
 
 const $ = sel => document.querySelector(sel);
 const cab = $('#cab');
@@ -81,6 +84,7 @@ function updateFiring() {
   $('#handle').classList.toggle('locked', locked);
   $('#lock').classList.toggle('on', locked);
   $('#lock').textContent = locked ? '固定中' : '固定';
+  wake.set(locked);
 }
 setPower(power, false);
 updateFiring();
@@ -96,7 +100,7 @@ bindInput({
   onPush: () => { if (gimmicks.push()) { audio.play('push'); audio.play('meow', 1.2, 0.25); vibrate(80); } },
   onRent: () => { machine.rent(); audio.play('payout'); },
   onMenu: () => { audio.play('click'); openMenu(); },
-  onAnyTap: () => audio.unlock(),
+  onAnyTap: () => { audio.unlock(); wake.visible(); },
 });
 
 // 設定（音・データのリセット）
@@ -133,7 +137,7 @@ function persist() {
 setInterval(persist, 2000);
 document.addEventListener('visibilitychange', () => {
   if (document.hidden) { persist(); runner.pause(); }
-  else { runner.resume(performance.now()); audio.resume(); resetBoardCache(); }
+  else { runner.resume(performance.now()); audio.resume(); resetBoardCache(); wake.lost(); wake.visible(); }
 });
 window.addEventListener('pagehide', persist);
 
