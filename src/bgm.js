@@ -104,9 +104,20 @@ export function noteFreq(name) {
   return 440 * 2 ** ((semi - 69) / 12);
 }
 
+// 家族の歌（sounds.js の SONG_FILES）：何回目の大当たりか（jackpotNo）で、2回に1回だいすけの歌（With U と Paradise を交互）
+// おかあさん（ななえ）の図柄のリーチは、リーチから激アツまでおかあさんの歌
+export const MOM_REACH = 'nanae';
+export function songFor(jackpotNo) {
+  if (jackpotNo % 2 === 0) return null;
+  return jackpotNo % 4 === 1 ? 'withU' : 'paradise';
+}
+// 歌のファイルが読めるまで代わりに鳴らす合成の曲
+const SONG_STANDIN = { withU: 'jackpot', paradise: 'jackpot', mom: 'hot' };
+
 // 場面から曲を選ぶ（大当たり中・大当たりの瞬間 → 大当たり曲、激アツ・リーチ → その曲、ふだんはモードの曲）
-export function trackFor({ phase, mode, scene, premium }) {
-  if (phase === 'jackpot' || scene === 'jackpot') return premium ? 'family' : 'jackpot';
+export function trackFor({ phase, mode, scene, premium, jackpotNo = 0, reachOn = null }) {
+  if (phase === 'jackpot' || scene === 'jackpot') return premium ? 'family' : (songFor(jackpotNo) || 'jackpot');
+  if ((scene === 'hot' || scene === 'reach') && reachOn === MOM_REACH) return 'mom';
   if (scene === 'hot') return 'hot';
   if (scene === 'reach') return 'reach';
   if (mode === 'kakuhen') return 'kakuhen';
@@ -121,6 +132,8 @@ const PARSED = Object.fromEntries(Object.entries(TRACKS).map(([k, tr]) => [k, {
 // 曲のファイルを読む：ほどいた音はメモリを使うので、24000Hz で読み、持っておくのは MAX_KEEP 曲まで
 const FILE_RATE = 24000;
 const MAX_KEEP = 4;
+// いつも持っておく曲（おかあさんの歌はリーチですぐ鳴らすので、はじめから読んでおく）
+const KEEP = ['normal', 'mom'];
 
 // 鳴らす部分（audio の AudioContext と出口を使う）。files：{ 曲の名前: URL }
 export function createBgm(audio, { files = {}, fetchFn = typeof fetch === 'undefined' ? null : fetch, decode = null } = {}) {
@@ -139,8 +152,8 @@ export function createBgm(audio, { files = {}, fetchFn = typeof fetch === 'undef
       loading.set(n, fetchFn(files[n]).then(r => r.arrayBuffer()).then(b => decode(b, FILE_RATE)).then(buf => {
         const d = buf.getChannelData(0);
         buffers.set(n, { buf, ...loopBounds(d, buf.sampleRate) });
-        // 古いものから手放す（いま鳴っている曲と、ふだんの曲はのこす）
-        for (const k of buffers.keys()) if (buffers.size > MAX_KEEP && k !== name && k !== n && k !== 'normal') buffers.delete(k);
+        // 古いものから手放す（いま鳴っている曲と、ふだんの曲・おかあさんの歌はのこす）
+        for (const k of buffers.keys()) if (buffers.size > MAX_KEEP && k !== name && k !== n && !KEEP.includes(k)) buffers.delete(k);
         return buffers.get(n);
       }).catch(() => null).finally(() => loading.delete(n)));
     }
@@ -230,7 +243,7 @@ export function createBgm(audio, { files = {}, fetchFn = typeof fetch === 'undef
   // 少し先（0.25 秒）までの音を予約する
   function tick() {
     if (!name || !setup() || ctx.state !== 'running' || !lane || fileSrc) return;
-    const tr = PARSED[name];
+    const tr = PARSED[name] || PARSED[SONG_STANDIN[name]];
     const beat = 60 / tr.bpm, loopLen = tr.beats * beat;
     const from = Math.max(until, ctx.currentTime), to = ctx.currentTime + 0.25;
     if (to <= from) return;
@@ -249,7 +262,7 @@ export function createBgm(audio, { files = {}, fetchFn = typeof fetch === 'undef
   }
   setInterval(tick, 60);
   // ふだんの曲と、すぐ使う曲は最初に読んでおく
-  ['normal', ...prefetchFor('normal')].forEach(want);
+  [...KEEP, ...prefetchFor('normal')].forEach(want);
 
   return {
     play(n) {
@@ -257,6 +270,8 @@ export function createBgm(audio, { files = {}, fetchFn = typeof fetch === 'undef
       name = n;
       if (setup()) start(n);
     },
+    // 次に使いそうな曲を読んでおく（次の大当たりで流す歌など）
+    prefetch(n) { if (n) want(n); },
     setOn(v) {
       on = v;
       if (out) out.gain.setTargetAtTime(v ? 0.6 : 0, ctx.currentTime, 0.05);

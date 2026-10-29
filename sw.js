@@ -1,6 +1,6 @@
 // オフラインでも開けるように、ゲームのファイルを先に保存しておく。
 // このファイルは tools/build-sw.mjs が作る（手で直さない）
-const VERSION = 'fm-5d792106c010';
+const VERSION = 'fm-589aa1a39bed';
 const FILES = [
   './',
   './index.html',
@@ -24,6 +24,9 @@ const FILES = [
   './assets/audio/maou_se_onepoint32.m4a',
   './assets/audio/maou_se_system21.m4a',
   './assets/audio/maou_se_system37.m4a',
+  './assets/audio/song_mom.m4a',
+  './assets/audio/song_paradise.m4a',
+  './assets/audio/song_withu.m4a',
   './assets/audio/voice_family.m4a',
   './assets/audio/voice_hot.m4a',
   './assets/audio/voice_jackpot1.m4a',

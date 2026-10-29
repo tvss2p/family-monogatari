@@ -15,10 +15,10 @@ import { save, load, clear } from './storage.js';
 import { createTapGuard } from './render/gimmicks.js';
 import { createCueRunner } from './cues.js';
 import { isFiring, stepPower, powerLabel } from './lever.js';
-import { createBgm, trackFor } from './bgm.js';
+import { createBgm, trackFor, songFor } from './bgm.js';
 import { fitCabinet } from './fit.js';
 import { modeDisplay } from './hud.js';
-import { BGM_FILES, SE_FILES, AUDIO_DIR } from './sounds.js';
+import { BGM_FILES, SONG_FILES, SE_FILES, AUDIO_DIR } from './sounds.js';
 import { VOICE_SAMPLES, voiceSample, pickVoice } from './voices.js';
 import { createWakeLock } from './wakelock.js';
 import { reloadDecision } from './update.js';
@@ -78,7 +78,7 @@ const filesIn = map => Object.fromEntries(Object.entries(map).map(([k, f]) => [k
 audio.loadSamples(filesIn(SE_FILES));
 audio.loadSamples(filesIn(VOICE_SAMPLES));
 const speak = (event, opt, delay = 0) => { const v = pickVoice(event, opt); if (v) audio.voice(voiceSample(v), delay); };
-const bgm = createBgm(audio, { files: filesIn(BGM_FILES), decode: decodeAudio });
+const bgm = createBgm(audio, { files: filesIn({ ...BGM_FILES, ...SONG_FILES }), decode: decodeAudio });
 let bgmOn = !saved || saved.bgm !== false;
 bgm.setOn(audio.on && bgmOn);
 let power = saved && Number.isFinite(saved.power) ? saved.power : 0.55;
@@ -202,7 +202,7 @@ window.addEventListener('pagehide', pauseGame);
 window.addEventListener('pageshow', resumeGame);
 window.addEventListener('blur', () => { if (document.hidden) pauseGame(); });
 
-// 1回転を始める（?force=premium|hot|reach|miss で次の1回を決められる。確かめ用）
+// 1回転を始める（?force=premium|hot|reach|mom|miss で次の1回を決められる。確かめ用。mom はおかあさんの図柄で当たり）
 function startSpin(now) {
   let hold = machine.startNextSpin();
   if (!hold) return;
@@ -210,6 +210,7 @@ function startSpin(now) {
   if (force) {
     if (force === 'premium') hold = { hit: true, symbolId: 'trio', kind: 'premium' };
     if (force === 'hot' || force === 'reach') hold = { hit: true, symbolId: 'kira', kind: 'normal' };
+    if (force === 'mom') hold = { hit: true, symbolId: 'nanae', kind: 'normal' };
     if (force === 'miss') hold = { hit: false, symbolId: null, kind: null };
     machine.state.current = hold;
     for (let i = 0; i < 200; i++) {
@@ -257,6 +258,8 @@ function playCue(cue, sp) {
   if (cue === 'rt:allspin') audio.play('jackpot');
   // ボイス：リーチ・激アツ・大当たり（家族そろいは専用の声）
   if (cue === 'reach' || cue === 'hot') speak(cue);
+  // 次の大当たりが家族の歌なら、リーチのあいだに読んでおく
+  if (cue === 'reach') bgm.prefetch(songFor(machine.state.hits + 1));
   if (cue === 'jackpot') speak('jackpot', { premium: !!(sp && sp.stops[1] === 'trio') }, 0.6);
   // 家族のひとこと（ばあちゃんに話しかける）
   if (cue === 'reach' && sp && sp.reach !== 'family') lcd.say(pickLine('reach', Math.random));
@@ -397,7 +400,10 @@ function frame(now) {
   const scene = (cab.className.match(/ph-(\w+)/) || [])[1];
   const st = machine.state;
   const premium = (st.current && st.current.kind === 'premium') || (runner.spin && runner.spin.stops[1] === 'trio' && scene === 'jackpot');
-  bgm.play(trackFor({ phase: st.phase, mode: st.mode, scene, premium }));
+  // 何回目の大当たりか（大当たりの瞬間はまだ数が増えていないので +1）
+  const jackpotNo = st.phase === 'jackpot' ? st.hits : st.hits + 1;
+  const reachOn = runner.spin && runner.spin.reach ? runner.spin.stops[0] : null;
+  bgm.play(trackFor({ phase: st.phase, mode: st.mode, scene, premium, jackpotNo, reachOn }));
   requestAnimationFrame(frame);
 }
 requestAnimationFrame(frame);

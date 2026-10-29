@@ -1,6 +1,6 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { trackFor, parseLine, noteFreq, TRACKS } from '../src/bgm.js';
+import { trackFor, songFor, parseLine, noteFreq, TRACKS } from '../src/bgm.js';
 
 test('track follows the scene', () => {
   assert.equal(trackFor({ phase: 'idle', mode: 'normal', scene: 'normal' }), 'normal');
@@ -11,6 +11,22 @@ test('track follows the scene', () => {
   assert.equal(trackFor({ phase: 'idle', mode: 'kakuhen', scene: 'normal' }), 'kakuhen');
   assert.equal(trackFor({ phase: 'idle', mode: 'jitan', scene: 'normal' }), 'jitan');
   assert.equal(trackFor({ phase: 'spinning', mode: 'kakuhen', scene: 'reach' }), 'reach');
+});
+
+test('家族の歌：大当たりの2回に1回、だいすけの歌を交互に。プレミアは家族の曲のまま', () => {
+  assert.deepEqual([1, 2, 3, 4, 5, 6].map(songFor), ['withU', null, 'paradise', null, 'withU', null]);
+  const jp = (n, premium = false) => trackFor({ phase: 'jackpot', mode: 'normal', scene: 'jackpot', premium, jackpotNo: n });
+  assert.equal(jp(1), 'withU');
+  assert.equal(jp(2), 'jackpot');
+  assert.equal(jp(3), 'paradise');
+  assert.equal(jp(1, true), 'family');
+});
+
+test('おかあさんの図柄のリーチは、リーチから激アツまでおかあさんの歌', () => {
+  assert.equal(trackFor({ phase: 'spinning', mode: 'normal', scene: 'reach', reachOn: 'nanae' }), 'mom');
+  assert.equal(trackFor({ phase: 'spinning', mode: 'kakuhen', scene: 'hot', reachOn: 'nanae' }), 'mom');
+  assert.equal(trackFor({ phase: 'spinning', mode: 'normal', scene: 'reach', reachOn: 'kira' }), 'reach');
+  assert.equal(trackFor({ phase: 'spinning', mode: 'normal', scene: 'normal', reachOn: 'nanae' }), 'normal');
 });
 
 test('a line of notes is read into timed events', () => {

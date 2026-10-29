@@ -14,6 +14,14 @@ export const BGM_FILES = {
   jitan: 'maou_loop_bgm_acoustic50.m4a', // 至福の隙間
 };
 
+// 家族が歌った曲（個人の録音。tools/prepare-songs.mjs が作る）。bgm.js の songFor で使う
+// withU・paradise はだいすけ（大当たりの2回に1回、交互に）、mom はおかあさん（おかあさんの図柄のリーチ）
+export const SONG_FILES = {
+  withU: 'song_withu.m4a', // NiziU の歌（だいすけ）
+  paradise: 'song_paradise.m4a', // NiziU の歌（だいすけ）
+  mom: 'song_mom.m4a', // おかあさんの歌
+};
+
 // 差しかえる効果音（audio.js の合成の音と同じ名前）。ないものは合成の音のまま
 export const SE_FILES = {
   jackpot: 'maou_se_jingle05.m4a', // 当たり
@@ -40,7 +48,7 @@ export function loopBounds(data, sampleRate, threshold = 1e-3) {
 
 // この曲が鳴っているあいだに、次に使いそうな曲を用意しておく
 export function prefetchFor(name) {
-  if (name === 'reach' || name === 'hot') return ['jackpot', 'family', 'hot'].filter(n => n !== name);
-  if (name === 'jackpot' || name === 'family') return ['kakuhen', 'jitan'];
+  if (name === 'reach' || name === 'hot' || name === 'mom') return ['jackpot', 'family', 'hot'].filter(n => n !== name);
+  if (name === 'jackpot' || name === 'family' || name === 'withU' || name === 'paradise') return ['kakuhen', 'jitan'];
   return ['reach', 'hot'];
 }

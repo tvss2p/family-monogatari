@@ -17,4 +17,5 @@
 - テスト：`npm test`
 - 手元で動かす：`node tools/serve.mjs 8770`
 - 音のファイルを作りなおす（macOS）：`node tools/prepare-audio.mjs`（元の素材は assets/original/audio、git には入れない）
+- 家族の歌を作りなおす（ffmpeg）：`node tools/prepare-songs.mjs`（元の録音は assets/original/songs、git には入れない）
 - ファイルを変えたら：`node tools/build-sw.mjs`

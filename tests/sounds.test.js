@@ -1,7 +1,7 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { existsSync, readFileSync, statSync } from 'node:fs';
-import { BGM_FILES, SE_FILES, AUDIO_DIR, CREDIT, loopBounds, prefetchFor } from '../src/sounds.js';
+import { BGM_FILES, SONG_FILES, SE_FILES, AUDIO_DIR, CREDIT, loopBounds, prefetchFor } from '../src/sounds.js';
 import { TRACKS } from '../src/bgm.js';
 import { SOUND_NAMES } from '../src/audio.js';
 import { gainFor } from '../tools/prepare-audio.mjs';
@@ -25,6 +25,18 @@ test('差しかえる効果音は、合成の効果音と同じ名前で、フ�
 test('スマホで重くならない大きさ（曲ぜんぶで 4MB まで）', () => {
   const total = Object.values(BGM_FILES).reduce((s, f) => s + statSync(`${AUDIO_DIR}/${f}`).size, 0);
   assert.ok(total < 4 * 1024 * 1024, `${total}`);
+});
+
+test('家族の歌：ファイルがあり、軽い（3曲で 2MB まで）。クレジットにも書く', () => {
+  assert.deepEqual(Object.keys(SONG_FILES).sort(), ['mom', 'paradise', 'withU']);
+  let total = 0;
+  const credits = readFileSync(`${AUDIO_DIR}/CREDITS.txt`, 'utf8');
+  for (const f of Object.values(SONG_FILES)) {
+    assert.ok(existsSync(`${AUDIO_DIR}/${f}`), f);
+    total += statSync(`${AUDIO_DIR}/${f}`).size;
+    assert.ok(credits.includes(f), f);
+  }
+  assert.ok(total < 2 * 1024 * 1024, `${total}`);
 });
 
 test('クレジット：ゲームの設定画面・README・CREDITS.txt に魔王魂と CC BY 4.0', () => {
@@ -53,6 +65,8 @@ test('先に用意しておく曲：リーチ中に大当たり曲、大当た�
   assert.ok(prefetchFor('reach').includes('jackpot'));
   assert.ok(prefetchFor('hot').includes('family'));
   assert.deepEqual(prefetchFor('jackpot').sort(), ['jitan', 'kakuhen']);
+  assert.deepEqual(prefetchFor('withU').sort(), ['jitan', 'kakuhen']);
+  assert.ok(prefetchFor('mom').includes('jackpot'));
   assert.deepEqual(prefetchFor('kakuhen').sort(), ['hot', 'reach']);
 });
 
