@@ -1,6 +1,7 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { decideSync, createUploader } from '../src/cloud.js';
+import { decideSync, createUploader, loginMethod } from '../src/cloud.js';
+import { FIREBASE_CONFIG } from '../src/firebase-config.js';
 
 const at = t => ({ savedAt: t, machine: { balls: t } });
 
@@ -38,4 +39,13 @@ test('クラウドへの保存は、遊んでいるあいだは間をあけ、�
   assert.deepEqual(sent.map(d => d.savedAt), [1, 4, 5]);
   up.flush();
   assert.equal(sent.length, 3);
+});
+
+test('iPhoneのホーム画面アプリは、小窓ではなくページごとGoogleへ移ってログインする（小窓は戻ってこられず固まる）', () => {
+  assert.equal(loginMethod({ standalone: true }), 'redirect');
+  assert.equal(loginMethod({ standalone: false }), 'popup');
+});
+
+test('ログイン用の置き場所はゲームと同じドメイン（別ドメインだとSafariが保存を読めず、ログインが戻ってこない）', () => {
+  assert.equal(FIREBASE_CONFIG.authDomain, 'tvss2p.github.io');
 });
