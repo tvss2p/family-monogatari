@@ -13,7 +13,7 @@ for (const f of files.sort()) {
   const id = f.replace(/\.\w+$/, '').replace(/^\d+[-_.]?/, '');
   if (!ids.has(id)) { console.log(`skip ${f}（話の名前ではない）`); continue; }
   const out = `board-${id}.webp`;
-  await sharp(`${SRC}/${f}`).resize(640, 808, { fit: 'cover' }).webp({ quality: 78 }).toFile(`assets/img/${out}`);
+  await sharp(`${SRC}/${f}`).resize(640, 808, { fit: 'cover' }).webp({ quality: 70 }).toFile(`assets/img/${out}`);
   map[id] = out;
 }
 writeFileSync('src/board-images.js', `// tools/prepare-boards.mjs が作る（手で直さない）。大当たり中の盤面の背景の絵

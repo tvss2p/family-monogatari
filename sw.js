@@ -1,6 +1,6 @@
 // オフラインでも開けるように、ゲームのファイルを先に保存しておく。
 // このファイルは tools/build-sw.mjs が作る（手で直さない）
-const VERSION = 'fm-302dc612365a';
+const VERSION = 'fm-1d69d2b42f05';
 const FILES = [
   './',
   './index.html',
@@ -37,6 +37,23 @@ const FILES = [
   './assets/audio/voice_reach1.m4a',
   './assets/audio/voice_reach2.m4a',
   './assets/img/apple-touch-icon.png',
+  './assets/img/board-burger.webp',
+  './assets/img/board-catfish.webp',
+  './assets/img/board-catnap.webp',
+  './assets/img/board-catnight.webp',
+  './assets/img/board-catrun.webp',
+  './assets/img/board-chicken.webp',
+  './assets/img/board-drive.webp',
+  './assets/img/board-flower.webp',
+  './assets/img/board-hamburg.webp',
+  './assets/img/board-hyakkin.webp',
+  './assets/img/board-icecream.webp',
+  './assets/img/board-karaoke.webp',
+  './assets/img/board-market.webp',
+  './assets/img/board-museum.webp',
+  './assets/img/board-oe.webp',
+  './assets/img/board-sushi.webp',
+  './assets/img/board-village.webp',
   './assets/img/cab-bottom.webp',
   './assets/img/cab-crown.webp',
   './assets/img/icon-192.png',
