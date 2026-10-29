@@ -592,3 +592,9 @@
 .fx-bloom .flPic img{position:absolute;inset:0;width:100%;height:100%;object-fit:contain;filter:drop-shadow(0 2px 2px rgba(60,80,40,.25))}
 .fx-bloom .flPic .spk{left:-20%;top:-10%;bottom:auto;width:140%;height:auto;aspect-ratio:1;animation:spk .9s ease-out calc(var(--dl) + .8s) both}
 @keyframes flGrow{0%{transform:scale(.1,.0);opacity:0}30%{opacity:1}60%{transform:scale(.6,1.05)}100%{transform:none}}
+/* 顔の絵ごとのずれ（あごの中心を首に合わせる。sym-○○.png の顔は真ん中から少しずれている） */
+.person.art.p-daisuke .head{left:-3.5px}
+.person.art.p-nanae .head{left:-3px;top:1px}
+.person.art.p-hiroko .head{left:3px}
+/* 大江さんの顔の絵は肩まで入っているので、顔のまわりだけ丸く切りぬいて胴体の服につなげる */
+.person.art.p-oe .head{left:3px;top:4px;clip-path:ellipse(37% 42% at 47% 40%)}

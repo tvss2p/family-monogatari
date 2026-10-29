@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { CAST, LINES, MOVIE, EPISODES, MENUS, ORDER_LINES, BOARD_IMAGES, SCENE_MS, pickLine, pickEpisode } from '../src/story.js';
+import { CAST, LINES, MOVIE, EPISODES, FILLER, MENUS, ORDER_LINES, BOARD_IMAGES, SCENE_MS, pickLine, pickEpisode } from '../src/story.js';
 import { existsSync } from 'node:fs';
 import { readFileSync } from 'node:fs';
 import { mulberry32 } from './helpers.js';
@@ -135,6 +135,18 @@ test('注文アニメのひとこと：どのお店・注文にもあり、チ�
       const lines = ORDER_LINES[shop][tier];
       assert.ok(lines && lines.length >= 1, `${shop} ${tier}`);
       if (lines.some(l => l.text.includes('チーズ'))) assert.ok(MENUS[shop][tier].includes('チーズ'), `${shop} ${tier}`);
+    }
+  }
+});
+
+test('場面とセリフが合う：話す人はその場面にいる。ばあちゃん・大江さんに呼びかけるときは、その人もいる', () => {
+  const all = [...EPISODES.flatMap(e => e.scenes), ...FILLER];
+  for (const sc of all) {
+    const who = sc.actors.map(a => a.who);
+    for (const l of sc.lines) {
+      assert.ok(who.includes(l.who), `${sc.cap}: ${l.who} がいない`);
+      if (/ばあちゃん|おかあさん/.test(l.text)) assert.ok(who.includes('hiroko'), `${sc.cap}: ${l.text}`);
+      if (/大江さん/.test(l.text)) assert.ok(who.includes('oe'), `${sc.cap}: ${l.text}`);
     }
   }
 });

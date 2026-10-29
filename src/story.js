@@ -98,7 +98,7 @@ const inR = (who, x, delay = 0) => ({ who, from: 260, to: x, delay });
 export const FILLER = [
   {
     bg: 'home', cap: 'ばあちゃんのお家',
-    actors: [{ who: 'daisuke', from: 260, to: 140 }, { who: 'nanae', from: -70, to: 30 }, { who: 'honey', from: 260, to: 196, delay: 900 }],
+    actors: [{ who: 'hiroko', from: 86, to: 86 }, { who: 'daisuke', from: 260, to: 146 }, { who: 'nanae', from: -70, to: 26 }, { who: 'honey', from: 260, to: 200, delay: 900 }],
     lines: [
       { at: 1200, who: 'daisuke', text: 'ばあちゃん、おめでとう！' },
       { at: 3400, who: 'nanae', text: 'おかあさん、ツイてるね〜' },
@@ -119,8 +119,8 @@ export const FILLER = [
     ],
   },
   {
-    bg: 'night', cap: '夏祭りの花火', fx: 'fireworks', fxAt: 0,
-    actors: [{ who: 'nanae', from: -70, to: 40 }, { who: 'daisuke', from: 260, to: 130 }, { who: 'kira', from: 260, to: 192, delay: 600 }],
+    bg: 'night', cap: 'みんなで花火', fx: 'fireworks', fxAt: 0,
+    actors: [{ who: 'nanae', from: -70, to: 20 }, { who: 'hiroko', from: -130, to: 80, delay: 300 }, { who: 'daisuke', from: 260, to: 140 }, { who: 'kira', from: 260, to: 198, delay: 600 }],
     lines: [
       { at: 1200, who: 'nanae', text: 'おかあさん、花火きれい〜' },
       { at: 3300, who: 'daisuke', text: 'たーまやー！' },
@@ -130,8 +130,8 @@ export const FILLER = [
   {
     bg: 'party', cap: '主役はばあちゃん！', fx: 'confetti', fxAt: 700,
     actors: [
-      { who: 'hiroko', from: 80, to: 80, star: true }, { who: 'daisuke', from: 260, to: 160, delay: 400 },
-      { who: 'nanae', from: -70, to: 4, delay: 400 }, { who: 'oe', from: 260, to: 196, delay: 800 }, { who: 'berry', from: -40, to: 52, delay: 1200 },
+      { who: 'hiroko', from: 80, to: 80, star: true }, { who: 'daisuke', from: 260, to: 134, delay: 400 },
+      { who: 'nanae', from: -70, to: 4, delay: 400 }, { who: 'oe', from: 260, to: 184, delay: 800 }, { who: 'berry', from: -40, to: 52, delay: 1200 },
     ],
     lines: [
       { at: 900, who: 'daisuke', text: '主役のばあちゃん登場〜！' },
@@ -306,8 +306,8 @@ export const EPISODES = [
         [['daisuke', 'ばあちゃん、カート押すよ'], ['nanae', 'おかあさん、何買うんだっけ？'], ['hiroko', 'メモ持ってきたよ']]),
       sc('market', 'お野菜コーナー', [at('nanae', 22), at('hiroko', 86), at('daisuke', 150)],
         [['hiroko', 'このトマト安いねえ'], ['nanae', 'おかあさん、きゅうりも！'], ['daisuke', 'ばあちゃん、カゴ入れるね']]),
-      sc('market', 'お惣菜コーナー', [at('daisuke', 22), at('hiroko', 86), at('nanae', 150)],
-        [['daisuke', 'ばあちゃん、おはぎある！'], ['hiroko', 'それも買っていこうかね'], ['nanae', 'おかあさん、半額だって！']]),
+      sc('market', '果物コーナー', [at('daisuke', 22), at('hiroko', 86), at('nanae', 150)],
+        [['daisuke', 'ばあちゃん、いちごある！'], ['hiroko', 'それも買っていこうかね'], ['nanae', 'おかあさん、安いって！']]),
       sc('market', 'お会計', [at('nanae', 22), at('hiroko', 86), at('daisuke', 150)],
         [['nanae', 'おかあさん、ポイントカード'], ['hiroko', 'はいはい、あったよ'], ['daisuke', 'ばあちゃん、荷物持つね！']]),
     ],
