@@ -565,3 +565,17 @@
 .order.hasPic{background:center 60%/cover no-repeat}
 .order.hasPic .bgArt{display:none}
 .order.hasPic::before{content:'';position:absolute;inset:0;background:radial-gradient(ellipse at 50% 40%,transparent 40%,rgba(40,20,30,.3))}
+
+/* ===== 体の部品の絵（tools/prepare-parts.mjs）。腕と足は今までどおり肩と腰を中心に回す ===== */
+.person.art{width:46px;height:90px;--tw:27px;--clip:0%;--ax:11px}
+.person.art i{display:none}
+.person.art img.body,.person.art img.arm,.person.art img.leg{position:absolute;display:block;background:none;box-shadow:none;border-radius:0;height:auto}
+.person.art .body{left:50%;top:37px;width:var(--tw);margin-left:calc(var(--tw) / -2);z-index:2;clip-path:inset(0 var(--clip) 0 var(--clip))}
+.person.art .arm{top:38px;width:9px;z-index:3;transform-origin:50% 7%}
+.person.art .arm.l{left:calc(23px - var(--ax) - 4.5px);transform:rotate(10deg)}
+.person.art .arm.r{left:calc(23px + var(--ax) - 4.5px);right:auto;transform:rotate(-10deg)}
+.person.art .leg{top:59px;width:10px;z-index:1;transform-origin:50% 4%;box-shadow:none}
+.person.art .leg.l{left:13px}.person.art .leg.r{left:23px}
+/* 長そでの服は、胴体に描かれたそでを切って、動く腕で肩をおおう */
+.person.art.p-hiroko{--tw:29px;--clip:17%;--ax:8px}
+.person.art.p-oe{--tw:30px;--clip:17%;--ax:8px}

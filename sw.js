@@ -1,6 +1,6 @@
 // オフラインでも開けるように、ゲームのファイルを先に保存しておく。
 // このファイルは tools/build-sw.mjs が作る（手で直さない）
-const VERSION = 'fm-329c58c8e707';
+const VERSION = 'fm-91220c377da3';
 const FILES = [
   './',
   './index.html',
@@ -66,6 +66,26 @@ const FILES = [
   './assets/img/part-push.webp',
   './assets/img/part-windmill.webp',
   './assets/img/part-wing.webp',
+  './assets/img/parts/daisuke-armL.webp',
+  './assets/img/parts/daisuke-armR.webp',
+  './assets/img/parts/daisuke-legL.webp',
+  './assets/img/parts/daisuke-legR.webp',
+  './assets/img/parts/daisuke-torso.webp',
+  './assets/img/parts/hiroko-armL.webp',
+  './assets/img/parts/hiroko-armR.webp',
+  './assets/img/parts/hiroko-legL.webp',
+  './assets/img/parts/hiroko-legR.webp',
+  './assets/img/parts/hiroko-torso.webp',
+  './assets/img/parts/nanae-armL.webp',
+  './assets/img/parts/nanae-armR.webp',
+  './assets/img/parts/nanae-legL.webp',
+  './assets/img/parts/nanae-legR.webp',
+  './assets/img/parts/nanae-torso.webp',
+  './assets/img/parts/oe-armL.webp',
+  './assets/img/parts/oe-armR.webp',
+  './assets/img/parts/oe-legL.webp',
+  './assets/img/parts/oe-legR.webp',
+  './assets/img/parts/oe-torso.webp',
   './assets/img/sym-berry.png',
   './assets/img/sym-daisuke.png',
   './assets/img/sym-glen.png',
@@ -94,6 +114,7 @@ const FILES = [
   './src/lottery.js',
   './src/machine.js',
   './src/main.js',
+  './src/parts.js',
   './src/payout.js',
   './src/physics.js',
   './src/render/board.js',

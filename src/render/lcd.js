@@ -1,12 +1,22 @@
 import { SYMBOLS, PREMIUM_ID, symbolById } from '../symbols.js';
 import { pawPath } from './parts.js';
+import { PARTS } from '../parts.js';
 import { CAST, EPISODES, FILLER, MENUS, ORDER_LINES, BOARD_IMAGES, SCENE_MS, pickLine } from '../story.js';
 import { ORDER_MS } from '../scenario.js';
 
 // 顔イラストに体をつける（人は服・腕・足、猫はそのまま）
+// 体の部品の絵（tools/prepare-parts.mjs）がある人は、絵の胴体・腕・足を組み立てる（腕と足は今までどおり回して動かす）
 export function figureHTML(who) {
   const c = CAST[who];
   if (!c.human) return `<div class="fig cat"><img class="head" src="${c.img}" alt=""></div>`;
+  if (PARTS.includes(who)) {
+    const p = n => `assets/img/parts/${who}-${n}.webp`;
+    return `<div class="fig person art p-${who}">`
+      + `<img class="leg l" src="${p('legR')}" alt=""><img class="leg r" src="${p('legL')}" alt="">`
+      + `<img class="body" src="${p('torso')}" alt="">`
+      + `<img class="arm l" src="${p('armR')}" alt=""><img class="arm r" src="${p('armL')}" alt="">`
+      + `<img class="head" src="${c.img}" alt=""></div>`;
+  }
   return `<div class="fig person${c.floral ? ' floral' : ''}" style="--shirt:${c.shirt};--pants:${c.pants}">`
     + '<i class="leg l"></i><i class="leg r"></i><i class="arm l"></i><i class="arm r"></i><i class="body"></i>'
     + `<img class="head" src="${c.img}" alt=""></div>`;
