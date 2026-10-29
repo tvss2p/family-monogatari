@@ -130,6 +130,14 @@
 .chara.hot img{filter:drop-shadow(0 0 6px #ffd34d) drop-shadow(0 0 3px #ffd34d)}
 .chara.go{animation:chara 1.9s ease 1}
 @keyframes chara{0%{opacity:1;transform:none}20%,80%{opacity:1;transform:translateX(70px)}100%{opacity:0;transform:none}}
+.famNote{position:absolute;right:-66px;bottom:8px;z-index:8;display:flex;flex-direction:row-reverse;align-items:flex-end;gap:2px;opacity:0;pointer-events:none;--fc:#cfd5dd}
+.famNote img{width:60px;height:60px;object-fit:contain;filter:drop-shadow(0 2px 3px rgba(0,0,0,.3))}
+.famNote span{margin-bottom:30px;max-width:140px;background:#fff;border-radius:12px;padding:4px 9px;font-size:12px;line-height:1.3;font-weight:900;color:#4a2a2a;box-shadow:0 0 0 3px var(--fc),0 2px 6px rgba(0,0,0,.2)}
+.famNote.blue{--fc:#4aa3ff}.famNote.green{--fc:#34c368}
+.famNote.red{--fc:#ffd34d}.famNote.red span{background:#ff3b5c;color:#fff;animation:shake .3s infinite}
+.famNote.red img{filter:drop-shadow(0 0 6px #ffd34d) drop-shadow(0 0 3px #ff3b5c)}
+.famNote.go{animation:famNote 2.4s ease 1}
+@keyframes famNote{0%{opacity:1;transform:none}14%,84%{opacity:1;transform:translateX(-72px)}100%{opacity:0;transform:translateX(-72px)}}
 .bubbles{position:absolute;inset:0;z-index:7;pointer-events:none;opacity:0;overflow:hidden}
 .bubbles i{position:absolute;bottom:-30px;border-radius:50%;background:radial-gradient(circle at 30% 30%,#fff,rgba(190,230,255,.55) 60%,rgba(150,210,255,.3));box-shadow:inset 0 0 0 1px rgba(255,255,255,.8)}
 .bubbles.pink i{background:radial-gradient(circle at 30% 30%,#fff,rgba(255,150,190,.8) 60%,rgba(255,90,140,.55))}
@@ -236,6 +244,68 @@
 .bg-party .bgArt i:nth-child(3),.bg-party .bgArt i:nth-child(4){display:block;top:-10px;width:70px;height:220px;transform-origin:50% 0;background:linear-gradient(rgba(255,255,220,.6),transparent);clip-path:polygon(44% 0,56% 0,100% 100%,0 100%);animation:spot 2.4s ease-in-out infinite alternate}
 .bg-party .bgArt i:nth-child(3){left:30px}.bg-party .bgArt i:nth-child(4){right:30px;animation-direction:alternate-reverse}
 .bg-party .bgArt i:nth-child(5){display:block;left:0;right:0;bottom:0;height:16px;background:linear-gradient(#ffd98a,#b8743a 30%,#8a4a2a)}
+/* 家族のおでかけ：回転寿司（お皿がレーンを流れる） */
+.bg-sushi{background:linear-gradient(#ffeccc 0 54%,#b97c4c 54% 57%,#eef0f2 57% 68%,#c99464 68%)}
+.bg-sushi .bgArt i:nth-child(1){display:block;left:0;right:0;top:0;height:22px;background:repeating-linear-gradient(90deg,#2b4a8a 0 37px,#fff 37px 39px)}
+.bg-sushi .bgArt i:nth-child(2){display:block;left:-68px;width:340px;top:104px;height:22px;animation:belt 3s linear infinite;
+  background:radial-gradient(ellipse 9px 4px at 50% 46%,#e8473a 0 98%,transparent) 0 0/68px 22px,radial-gradient(ellipse 9px 4px at 50% 46%,#ffd34d 0 98%,transparent) 34px 0/68px 22px,
+  radial-gradient(ellipse 15px 7px at 50% 62%,#fff 0 80%,#c9d3dc 82% 98%,transparent) 0 0/34px 22px}
+.bg-sushi .bgArt i:nth-child(3){display:block;left:96px;top:30px;width:46px;height:24px;border-radius:4px;background:#b97c4c;box-shadow:0 0 0 2px #7a4a2a}
+.bg-sushi .bgArt i:nth-child(3)::after{content:'すし';position:absolute;inset:0;text-align:center;font:900 14px/24px sans-serif;color:#fff}
+@keyframes belt{to{transform:translateX(68px)}}
+/* ジブリ美術館（つたの絡まる丸窓の建物） */
+.bg-museum{background:linear-gradient(#9fd8ff,#e6f6ff 62%,#7cc46a 62%,#5aa94e)}
+.bg-museum .bgArt i:nth-child(1){display:block;left:44px;top:36px;width:150px;height:86px;border-radius:20px 44px 6px 6px;
+  background:radial-gradient(circle at 26% 38%,#7dc6ff 0 8px,#fff 9px 11px,transparent 12px),radial-gradient(circle at 74% 34%,#ffd34d 0 7px,#fff 8px 10px,transparent 11px),linear-gradient(#f9d2a8,#f0b487)}
+.bg-museum .bgArt i:nth-child(2){display:block;left:38px;top:32px;width:46px;height:92px;border-radius:20px 8px 4px 4px;background:radial-gradient(circle,#4f9c3c 0 5px,transparent 6px) 0 0/12px 12px,radial-gradient(circle,#6bbf5a 0 4px,transparent 5px) 6px 6px/12px 12px}
+.bg-museum .bgArt i:nth-child(3){display:block;left:160px;top:16px;width:30px;height:28px;border-radius:50% 50% 3px 3px;background:#3f8f9a;box-shadow:inset -4px -3px 0 rgba(0,0,0,.15)}
+.bg-museum .bgArt i:nth-child(4){display:block;left:108px;top:72px;width:22px;height:50px;border-radius:11px 11px 0 0;background:linear-gradient(#ff8aa6,#ffd34d,#9be08a,#7dc6ff);border:2px solid #fff}
+.bg-museum .bgArt i:nth-child(5){display:block;top:24px;width:44px;height:13px;border-radius:9px;background:#fff;box-shadow:10px -6px 0 2px #fff;animation:cloud 18s linear infinite}
+/* びっくりドンキー（木のお店と、木のお皿のハンバーグ） */
+.bg-hamburg{background:linear-gradient(#7a4a2a 0 7%,#f3dcb8 7% 64%,#6b3f22 64% 67%,#b97c4c 67%)}
+.bg-hamburg .bgArt i:nth-child(1){display:block;left:0;right:0;top:7%;height:57%;background:repeating-linear-gradient(90deg,transparent 0 30px,rgba(120,70,30,.22) 30px 32px)}
+.bg-hamburg .bgArt i:nth-child(2){display:block;left:150px;top:110px;width:70px;height:26px;border-radius:50%;box-shadow:0 2px 0 #7a4a2a;
+  background:radial-gradient(ellipse at 42% 46%,#6b3416 0 24%,#8a4a22 26% 31%,transparent 33%),radial-gradient(ellipse at 74% 50%,#7bc35a 0 10%,transparent 12%),radial-gradient(ellipse at 22% 56%,#ffd34d 0 9%,transparent 11%),#d9a86c}
+.bg-hamburg .bgArt i:nth-child(3){display:block;left:164px;top:84px;width:30px;height:24px;background:repeating-linear-gradient(90deg,transparent 0 7px,rgba(255,255,255,.85) 7px 9px);border-radius:40%;animation:steam 1.6s ease-in-out infinite}
+.bg-hamburg .bgArt i:nth-child(4){display:block;left:44px;top:13px;width:30px;height:18px;background:#e8a23a;clip-path:polygon(30% 0,70% 0,100% 100%,0 100%);box-shadow:0 0 18px #ffd98a}
+.bg-hamburg .bgArt i:nth-child(5){display:block;left:150px;top:13px;width:30px;height:18px;background:#e8a23a;clip-path:polygon(30% 0,70% 0,100% 100%,0 100%)}
+@keyframes steam{0%{opacity:0;transform:translateY(6px)}50%{opacity:.9}100%{opacity:0;transform:translateY(-8px)}}
+/* 百均（色とりどりの棚と、100円の札） */
+.bg-hyakkin{background:linear-gradient(#fbfbfd 0 66%,#e9e2d6 66%)}
+.bg-hyakkin .bgArt i:nth-child(1),.bg-hyakkin .bgArt i:nth-child(2){display:block;top:32px;width:96px;height:96px;
+  background:repeating-linear-gradient(transparent 0 29px,#9aa4ae 29px 32px),repeating-linear-gradient(90deg,#ff8aa6 0 9px,#ffd34d 9px 17px,#7dc6ff 17px 26px,#9be08a 26px 33px,#c79bff 33px 40px)}
+.bg-hyakkin .bgArt i:nth-child(1){left:8px}.bg-hyakkin .bgArt i:nth-child(2){right:8px}
+.bg-hyakkin .bgArt i:nth-child(3){display:block;left:84px;top:6px;width:66px;height:22px;border-radius:6px;background:#e8473a}
+.bg-hyakkin .bgArt i:nth-child(3)::after{content:'100円';position:absolute;inset:0;text-align:center;font:900 14px/22px sans-serif;color:#fff}
+/* マクドナルド（メニューの看板と、カウンターのバーガー・ポテト・ドリンク） */
+.bg-burger{background:linear-gradient(#fff4d6 0 60%,#d63a2e 60% 63%,#f7f1e6 63%)}
+.bg-burger .bgArt i:nth-child(1){display:block;left:18px;top:10px;width:198px;height:34px;border-radius:4px;
+  background:radial-gradient(ellipse 12px 8px at 50% 50%,#e9a64a 0 40%,#6b3416 42% 60%,#e9a64a 62% 98%,transparent) 8px 0/48px 34px,#3a2a24}
+.bg-burger .bgArt i:nth-child(2){display:block;left:156px;top:96px;width:32px;height:22px;border-radius:15px 15px 6px 6px;background:linear-gradient(#e9a64a 0 38%,#6b3416 38% 56%,#7bc35a 56% 66%,#e9a64a 66%)}
+.bg-burger .bgArt i:nth-child(3){display:block;left:194px;top:90px;width:20px;height:28px;clip-path:polygon(0 0,100% 0,100% 40%,86% 100%,14% 100%,0 40%);
+  background:linear-gradient(90deg,#ffd34d 0 3px,#f5c030 3px 6px,#ffd34d 6px 9px,#f5c030 9px 12px,#ffd34d 12px 15px,#f5c030 15px) top/100% 40% no-repeat,#d63a2e}
+.bg-burger .bgArt i:nth-child(4){display:block;left:132px;top:94px;width:16px;height:24px;border-radius:2px 2px 4px 4px;background:linear-gradient(#fff 0 22%,#d63a2e 22%)}
+.bg-burger .bgArt i:nth-child(4)::after{content:'';position:absolute;left:8px;top:-9px;width:3px;height:12px;background:#fff;transform:rotate(12deg)}
+/* ホームセンターのお花売り場（温室と、鉢植えの棚） */
+.bg-flower{background:linear-gradient(#eaf7ff 0 50%,#d4ecc8 50% 66%,#bfae94 66%)}
+.bg-flower .bgArt i:nth-child(1){display:block;left:0;right:0;top:0;height:50%;background:repeating-linear-gradient(90deg,transparent 0 37px,rgba(255,255,255,.95) 37px 40px),linear-gradient(transparent 92%,#fff 92%)}
+.bg-flower .bgArt i:nth-child(2){display:block;left:0;right:0;top:94px;height:34px;
+  background:radial-gradient(circle at 50% 28%,#ff6f91 0 5px,transparent 6px) 0 0/24px 34px,radial-gradient(circle at 50% 28%,#ffd34d 0 2px,transparent 3px) 0 0/24px 34px,
+  radial-gradient(circle at 50% 22%,#c79bff 0 5px,transparent 6px) 12px 4px/24px 34px,radial-gradient(ellipse 5px 8px at 50% 48%,#5aa94e 0 98%,transparent) 0 0/12px 34px,
+  linear-gradient(transparent 58%,#c56a3a 58% 88%,transparent 88%) 0 0/12px 34px}
+.bg-flower .bgArt i:nth-child(3){display:block;left:150px;top:56px;width:62px;height:22px;border-radius:5px;background:#5aa94e}
+.bg-flower .bgArt i:nth-child(3)::after{content:'お花';position:absolute;inset:0;text-align:center;font:900 13px/22px sans-serif;color:#fff}
+.bg-flower .bgArt i:nth-child(4){display:block;left:24px;top:60px;width:20px;height:20px;border-radius:50%;background:radial-gradient(#ffe14d 0 30%,#ff8aa6 32%);animation:sway 2s ease-in-out infinite alternate}
+@keyframes sway{from{transform:rotate(-8deg)}to{transform:rotate(8deg)}}
+/* ビレッジバンガード（ぎっしりの棚と、黄色い手書きPOP） */
+.bg-village{background:linear-gradient(#3a2e2a 0 66%,#6b4a32 66%)}
+.bg-village .bgArt i:nth-child(1),.bg-village .bgArt i:nth-child(2){display:block;top:14px;width:104px;height:112px;
+  background:repeating-linear-gradient(transparent 0 24px,#8a5a3a 24px 28px),repeating-linear-gradient(90deg,#d94b4b 0 6px,#f2c14e 6px 11px,#4b8bd9 11px 17px,#5bb36a 17px 21px,#e9e2d6 21px 26px,#c79bff 26px 31px)}
+.bg-village .bgArt i:nth-child(1){left:4px}.bg-village .bgArt i:nth-child(2){right:4px}
+.bg-village .bgArt i:nth-child(3),.bg-village .bgArt i:nth-child(4){display:block;width:44px;height:22px;background:#ffe14d;box-shadow:1px 2px 0 rgba(0,0,0,.35);font:900 9px/22px sans-serif;color:#d0021b;text-align:center}
+.bg-village .bgArt i:nth-child(3){left:40px;top:44px;transform:rotate(-8deg)}.bg-village .bgArt i:nth-child(4){right:36px;top:70px;transform:rotate(7deg)}
+.bg-village .bgArt i:nth-child(3)::after{content:'おすすめ!'}.bg-village .bgArt i:nth-child(4)::after{content:'ヤバい!!'}
+.bg-village .bgArt i:nth-child(5){display:block;left:104px;top:0;width:26px;height:26px;border-radius:50%;background:conic-gradient(#ff8aa6,#ffd34d,#7dc6ff,#9be08a,#ff8aa6);animation:spin 4s linear infinite}
 @keyframes spot{from{transform:rotate(-18deg)}to{transform:rotate(18deg)}}
 .actor{position:absolute;bottom:6px;width:46px;z-index:2}
 .actor.isCat{width:44px;bottom:4px}
