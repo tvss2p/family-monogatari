@@ -98,12 +98,8 @@ export function createMachine({ config = CONFIG, rng = Math.random, saved = null
 
   if (isValidSaved(saved)) {
     Object.assign(state, fresh(config), saved);
-    if (state.phase === 'jackpot') {
-      // 大当たり中に閉じたら、残りのラウンドの玉をまとめてもどす
-      const left = (state.roundsTotal - state.round + 1) * config.attackerMaxPerRound - state.roundCount;
-      state.balls += Math.max(0, left) * config.attackerPayout;
-      endJackpot();
-    } else if (state.phase === 'spinning') {
+    // 大当たり中は、そのラウンドの続きから（アタッカーが開いたまま）
+    if (state.phase === 'spinning') {
       if (state.current) state.holds.unshift(state.current);
       if (state.mode === 'jitan') state.jitanLeft++;
       state.spins = Math.max(0, state.spins - 1);

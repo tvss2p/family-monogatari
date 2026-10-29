@@ -36,6 +36,19 @@ function rail(x1, y1, x2, y2, gaps, gapLen) {
   return segs;
 }
 
+// 道クギの見た目：レールの線のすぐ下に、玉が通れない間かく（step 以下）で釘を並べる。
+// 玉は釘の頭をなぞる見えない線（レール）の上を転がる
+function roadPins(segs, step, r) {
+  const pins = [];
+  for (const s of segs) {
+    const dx = s.x2 - s.x1, dy = s.y2 - s.y1, len = Math.hypot(dx, dy);
+    const nx = -dy / len * Math.sign(dx), ny = Math.abs(dx) / len;
+    const n = Math.max(1, Math.ceil(len / step));
+    for (let k = 0; k <= n; k++) pins.push({ x: s.x1 + dx * k / n + nx * r, y: s.y1 + dy * k / n + ny * r, r });
+  }
+  return pins;
+}
+
 const lcdFrame = { x: 36, y: 58, w: 248, h: 206, r: 28 };
 const heso = { x: 160, y: 300, w: 26 };
 const hesoPlate = { x: 122, y: 306, w: 76, h: 46 };
@@ -44,9 +57,9 @@ const attacker = { x: 160, y: 366, w: 120, sensorW: 140 };
 const windmills = [{ x: 52, y: 308 }, { x: 268, y: 308 }];
 // 液晶の上の屋根（玉が乗って止まらないように山形）
 const roof = [[56, 59], [160, 30], [264, 59]];
-// 液晶の下からヘソへ向かうレール（穴から落ちた玉はヘソに届かない）
+// 液晶の下からヘソへ向かう道クギ（穴から落ちた玉はヘソに届かない）
 const RAIL_GAPS = [0.4, 0.75];
-const RAIL_GAP_LEN = 11;
+const RAIL_GAP_LEN = 10.5;
 const rails = [
   { x1: 20, y1: 268, x2: 146, y2: 293 },
   { x1: 312, y1: 266, x2: 174, y2: 293 },
@@ -72,12 +85,12 @@ const floor = [
   { x1: OUT.x + OUT.w / 2, y1: OUT.y, x2: 314, y2: 386 },
 ];
 
+const roadWalls = rails.flatMap(r => rail(r.x1, r.y1, r.x2, r.y2, RAIL_GAPS, RAIL_GAP_LEN));
 const walls = [
   ...outer, ...lane, kicker, ...floor,
   ...roundRect(lcdFrame.x, lcdFrame.y, lcdFrame.w, lcdFrame.h, lcdFrame.r),
   ...poly(roof),
   ...guides,
-  ...rails.flatMap(r => rail(r.x1, r.y1, r.x2, r.y2, RAIL_GAPS, RAIL_GAP_LEN)),
   ...poly([[hesoPlate.x, hesoPlate.y + hesoPlate.h], [hesoPlate.x, hesoPlate.y + 8], [heso.x - 11, hesoPlate.y - 2]]),
   ...poly([[heso.x + 11, hesoPlate.y - 2], [hesoPlate.x + hesoPlate.w, hesoPlate.y + 8], [hesoPlate.x + hesoPlate.w, hesoPlate.y + hesoPlate.h]]),
 ];
@@ -108,7 +121,7 @@ for (let r = 0; r < 40; r++) {
     if (Math.abs(x - heso.x) < 30 && y > 262 && y < 360) continue;
     if (Math.abs(x - attacker.x) < attacker.w / 2 + 8 && y > 340) continue;
     if (windmills.some(w => Math.hypot(x - w.x, y - w.y) < 20)) continue;
-    if (walls.some(w => segDist(x, y, w) < PIN_CLEAR)) continue;
+    if ([...walls, ...roadWalls].some(w => segDist(x, y, w) < PIN_CLEAR)) continue;
     pins.push({ x, y, r: 1.5 });
   }
 }
@@ -118,6 +131,9 @@ export const LAYOUT = {
   w: W, h: H,
   pins,
   walls,
+  // 道クギ：roadPins は描くだけ、roadWalls は描かずに玉が転がる線
+  roadPins: roadPins(roadWalls, 4, 1.5),
+  roadWalls,
   // 時短・確変中はヘソに近い穴がふさがる（電サポ）
   boostWalls: rails.map(r => {
     const t = RAIL_GAPS[RAIL_GAPS.length - 1], g = RAIL_GAP_LEN / Math.hypot(r.x2 - r.x1, r.y2 - r.y1) / 2 + 0.01;

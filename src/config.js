@@ -12,5 +12,5 @@ export const CONFIG = {
   attackerPayout: 15,
   roundTimeoutMs: 30000,
   fireRatePerSec: 1.6,
-  simBallsPerSpin: 11,
+  simBallsPerSpin: 10,
 };

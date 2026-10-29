@@ -1,4 +1,5 @@
 import { SYMBOLS, PREMIUM_ID } from './symbols.js';
+import { pickLine } from './story.js';
 
 // 出やすさ（当たりのとき／外れのとき）。出たらアツいものほど外れでは出にくい
 export const RATES = {
@@ -15,6 +16,9 @@ export const RATES = {
   chara: { hit: 0.35, miss: 0.06 },
   bubble: { hit: 0.35, miss: 0.08, pinkHit: 0.5, pinkMiss: 0.01 },
   premiumNotice: { premium: 0.3, hit: 0.04 },
+  // 家族予告：外れでも 3 回に 1 回くらい。ふきだしの色は白→青→緑→赤の順にアツい
+  famNote: { hit: 0.7, miss: 0.33 },
+  famColor: { hit: { white: 0.15, blue: 0.25, green: 0.25, red: 0.35 }, miss: { white: 0.72, blue: 0.2, green: 0.07, red: 0.01 } },
   promoKakuhen: 0.35,
   promoNormal: 0.3,
   hold: { hit: { white: 0.3, blue: 0.25, green: 0.2, red: 0.2, gold: 0.05 }, miss: { white: 0.993, blue: 0.005, green: 0.0015, red: 0.0005, gold: 0 } },
@@ -65,6 +69,11 @@ export function buildSpin(hold, mode, rng) {
     ? (rng() < (hold.hit ? 0.4 : 0.02) ? 'honey' : pick(rng, CATS.filter(c => c !== 'honey')))
     : null;
   const bubble = chance(RATES.bubble) ? (rng() < (hold.hit ? RATES.bubble.pinkHit : RATES.bubble.pinkMiss) ? 'pink' : 'white') : null;
+  let famNote = null;
+  if (chance(RATES.famNote)) {
+    const color = weighted(rng, RATES.famColor[side]);
+    famNote = { color, ...pickLine(`notice_${color}`, rng) };
+  }
   const premiumNotice = hold.hit && rng() < (premium ? RATES.premiumNotice.premium : RATES.premiumNotice.hit) ? (rng() < 0.5 ? 'wave' : 'yawn') : null;
 
   // 確変昇格：確変の当たりを、いったん偶数（通常）の図柄で見せて大当たり中に昇格させる
@@ -91,6 +100,7 @@ export function buildSpin(hold, mode, rng) {
   if (chara) add(Math.round(900 / k), `chara:${chara}`);
   if (bubble) add(Math.round(500 / k), `bubble:${bubble}`);
   if (premiumNotice) add(Math.round(400 / k), `premium:${premiumNotice}`);
+  if (famNote) add(Math.round(600 / k), `fam:${famNote.color}`);
 
   // にゃん連：いったん止まって「にゃん連」のあと、また回る（1回 1.6 秒）
   const nyanCount = fast ? Math.min(1, nyanren) : nyanren;
@@ -132,5 +142,5 @@ export function buildSpin(hold, mode, rng) {
   add(end, 'end');
 
   cues.sort((a, b) => a.t - b.t);
-  return { stops, reach, develop, notices, step, chara, bubble, nyanren: nyanCount, premiumNotice, promo, hot, durationMs: end, cues };
+  return { stops, reach, develop, notices, step, chara, bubble, famNote, nyanren: nyanCount, premiumNotice, promo, hot, durationMs: end, cues };
 }

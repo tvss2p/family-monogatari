@@ -54,7 +54,7 @@ export function createPhysics(layout, rng = Math.random) {
       }
     }
   }
-  const walls = layout.walls.map(w => {
+  const walls = [...layout.walls, ...(layout.roadWalls || [])].map(w => {
     const dx = w.x2 - w.x1, dy = w.y2 - w.y1;
     return { ...w, dx, dy, len2: dx * dx + dy * dy };
   });

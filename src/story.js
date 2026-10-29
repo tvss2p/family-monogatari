@@ -51,6 +51,30 @@ export const LINES = {
     { who: 'daisuke', text: 'ばあちゃん、おつかれさま！' },
     { who: 'nanae', text: 'おかあさん、またやろうね' },
   ],
+  // 家族予告（回転のはじめに液晶の右下から顔を出す）。白→青→緑→赤の順にアツい
+  notice_white: [
+    { who: 'daisuke', text: 'ばあちゃん、お茶いる？' },
+    { who: 'nanae', text: 'おかあさん、肩ももうか？' },
+    { who: 'hiroko', text: 'いいお天気だねえ' },
+    { who: 'daisuke', text: 'ばあちゃん、調子どう？' },
+    { who: 'nanae', text: 'おかあさん、のんびりね〜' },
+    { who: 'hiroko', text: 'お腹すいたねえ' },
+  ],
+  notice_blue: [
+    { who: 'daisuke', text: 'ん？ なんか来そう…' },
+    { who: 'nanae', text: 'おかあさん、ちょっと見て！' },
+    { who: 'hiroko', text: 'あら、なんだろうねえ' },
+  ],
+  notice_green: [
+    { who: 'daisuke', text: 'ばあちゃん、そろそろ来るよ！' },
+    { who: 'nanae', text: 'おかあさん、チャンスかも！' },
+    { who: 'hiroko', text: '今日はツイてる気がするねえ' },
+  ],
+  notice_red: [
+    { who: 'daisuke', text: 'ばあちゃん、これは来る！！' },
+    { who: 'nanae', text: 'おかあさん、ぜったい当たる！' },
+    { who: 'hiroko', text: 'みんな、見ててね！' },
+  ],
 };
 
 export function pickLine(kind, rng) {
@@ -103,6 +127,70 @@ export const MOVIE = [
       { at: 900, who: 'daisuke', text: '主役のばあちゃん登場〜！' },
       { at: 3000, who: 'nanae', text: 'おかあさん、ばんざーい！' },
       { at: 5000, who: 'daisuke', text: 'まだまだ打ってね！' },
+    ],
+  },
+  // 家族のおでかけ（だいすけ・ななえ・ばあちゃんの 3 人）
+  {
+    bg: 'sushi', cap: '3人で回転寿司',
+    actors: [{ who: 'hiroko', from: 94, to: 94 }, { who: 'nanae', from: -70, to: 30, delay: 300 }, { who: 'daisuke', from: 260, to: 158, delay: 300 }],
+    lines: [
+      { at: 1200, who: 'daisuke', text: 'ばあちゃん、何皿いく？' },
+      { at: 3200, who: 'nanae', text: 'おかあさん、まぐろ来たよ！' },
+      { at: 5000, who: 'hiroko', text: 'おいしいねえ' },
+    ],
+  },
+  {
+    bg: 'museum', cap: '3人でジブリ美術館',
+    actors: [{ who: 'nanae', from: -70, to: 20 }, { who: 'hiroko', from: -130, to: 80, delay: 400 }, { who: 'daisuke', from: 260, to: 168, delay: 200 }],
+    lines: [
+      { at: 1300, who: 'nanae', text: 'おかあさん、かわいいね〜' },
+      { at: 3300, who: 'daisuke', text: 'ばあちゃん、こっちこっち！' },
+      { at: 5100, who: 'hiroko', text: 'ふしぎな建物だねえ' },
+    ],
+  },
+  {
+    bg: 'hamburg', cap: '3人でびっくりドンキー',
+    actors: [{ who: 'daisuke', from: 260, to: 104 }, { who: 'nanae', from: -70, to: 6, delay: 300 }, { who: 'hiroko', from: -120, to: 54, delay: 600 }],
+    lines: [
+      { at: 1300, who: 'daisuke', text: 'ハンバーグ、でっかい！' },
+      { at: 3200, who: 'nanae', text: 'おかあさん、熱いから気をつけて' },
+      { at: 5100, who: 'hiroko', text: 'やわらかいねえ' },
+    ],
+  },
+  {
+    bg: 'hyakkin', cap: '3人で百均へ',
+    actors: [{ who: 'nanae', from: 260, to: 150 }, { who: 'hiroko', from: 300, to: 92, delay: 300 }, { who: 'daisuke', from: -70, to: 24, delay: 500 }],
+    lines: [
+      { at: 1300, who: 'nanae', text: 'おかあさん、これ全部100円！' },
+      { at: 3300, who: 'daisuke', text: 'ばあちゃん、カゴ持つよ' },
+      { at: 5100, who: 'hiroko', text: 'あれもこれも欲しいねえ' },
+    ],
+  },
+  {
+    bg: 'burger', cap: '3人でマクドナルド',
+    actors: [{ who: 'daisuke', from: -70, to: 10 }, { who: 'hiroko', from: -130, to: 58, delay: 300 }, { who: 'nanae', from: -190, to: 102, delay: 600 }],
+    lines: [
+      { at: 1400, who: 'daisuke', text: 'ばあちゃん、ポテト食べる？' },
+      { at: 3300, who: 'nanae', text: 'おかあさん、何にする？' },
+      { at: 5100, who: 'hiroko', text: 'たまにはいいねえ' },
+    ],
+  },
+  {
+    bg: 'flower', cap: 'おかあさんとお花を見に',
+    actors: [{ who: 'nanae', from: -70, to: 60 }, { who: 'hiroko', from: -130, to: 116, delay: 200 }, { who: 'honey', from: 260, to: 190, delay: 2400 }],
+    lines: [
+      { at: 1300, who: 'nanae', text: 'おかあさん、この花きれい！' },
+      { at: 3200, who: 'hiroko', text: 'うちの庭に植えようかね' },
+      { at: 5100, who: 'nanae', text: 'これ買っていこう〜' },
+    ],
+  },
+  {
+    bg: 'village', cap: '3人でビレッジバンガード',
+    actors: [{ who: 'daisuke', from: 260, to: 150 }, { who: 'hiroko', from: -120, to: 82, delay: 300 }, { who: 'nanae', from: -70, to: 22, delay: 500 }],
+    lines: [
+      { at: 1300, who: 'daisuke', text: 'ばあちゃん、これ見て！' },
+      { at: 3200, who: 'nanae', text: 'おかあさん、へんなのある〜' },
+      { at: 5100, who: 'hiroko', text: 'おもしろい店だねえ' },
     ],
   },
 ];

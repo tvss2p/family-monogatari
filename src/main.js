@@ -20,6 +20,7 @@ import { fitCabinet } from './fit.js';
 import { modeDisplay } from './hud.js';
 import { BGM_FILES, SE_FILES, AUDIO_DIR } from './sounds.js';
 import { createWakeLock } from './wakelock.js';
+import { reloadDecision } from './update.js';
 
 const wake = createWakeLock();
 
@@ -152,7 +153,7 @@ menu.addEventListener('click', e => {
 let resetting = false;
 function persist() {
   if (resetting) return;
-  save({ machine: machine.toJSON(), sound: audio.on, bgm: bgmOn, power, locked, chain });
+  save({ machine: machine.toJSON(), sound: audio.on, bgm: bgmOn, power, locked, chain, jackpotGain });
 }
 setInterval(persist, 2000);
 // バックグラウンドに行ったら、ゲームの時計・玉・演出・音をすべて止める。戻ったら続きから
@@ -227,6 +228,9 @@ function playCue(cue, sp) {
   if (cue.startsWith('chara:')) audio.play('meow', cue === 'chara:honey' ? 0.8 : 1.2);
   if (cue.startsWith('bubble:')) [0, 0.1, 0.2, 0.32, 0.45].forEach((d, i) => audio.play('pin', cue === 'bubble:pink' ? 1.4 + i * 0.1 : 1 + i * 0.1, d));
   if (cue.startsWith('premium:')) audio.play('ending');
+  // 家族予告：赤はアツい音とふるえ、緑はカットイン、白・青は軽い音
+  if (cue.startsWith('fam:')) audio.play({ red: 'hot', green: 'cutin' }[cue.slice(4)] || 'paw');
+  if (cue === 'fam:red') vibrate([40, 30, 40]);
   if (cue === 'develop') audio.play('cutin');
   if (cue === 'rt:allspin') audio.play('jackpot');
   // 家族のひとこと（ばあちゃんに話しかける）
@@ -275,7 +279,8 @@ function updateHud() {
       lcd.setJackpotStats({ round: s.round, total: s.roundsTotal, count: s.roundCount, gain: jackpotGain }));
   }
   show('phase', s.phase, (v, prev) => {
-    if (v === 'jackpot') {
+    // prev がないのは、大当たり中に開きなおしたとき（獲得玉・連チャンは保存したものを使う）
+    if (v === 'jackpot' && prev !== undefined) {
       jackpotGain = 0;
       chain = s.mode === 'normal' ? 1 : chain + 1;
       lcd.setChain(chain);
@@ -294,7 +299,14 @@ function updateHud() {
 
 let last = performance.now();
 let lastTick = 0, lastPin = 0, lastHits = 0;
-let jackpotGain = 0;
+let jackpotGain = saved && Number.isFinite(saved.jackpotGain) ? saved.jackpotGain : 0;
+// 大当たり中に開きなおしたら、大当たりの画面から続ける
+if (machine.state.phase === 'jackpot' && machine.state.current) {
+  const id = machine.state.current.symbolId;
+  cab.className = cab.className.replace(/\bph-\w+/, 'ph-jackpot');
+  lcd.setChain(chain);
+  lcd.showJackpot(id, { stops: [id, id, id] });
+}
 // アタッカーに入った玉の上に「+15」
 function popPlus(x) {
   const el = document.createElement('div');
@@ -312,7 +324,9 @@ function frame(now) {
   if (stats.frames > 30) { stats.maxFrameMs = Math.max(stats.maxFrameMs, ms); if (ms > 34) stats.slowFrames++; }
   const dt = Math.min(0.05, ms / 1000);
   last = now;
-  if (firing) {
+  const upd = reloadDecision({ pending: updatePending, ballsOnBoard: physics.balls.length, hidden: document.hidden, waitedMs: now - updateSince });
+  if (upd.reload) reloadForUpdate();
+  if (firing && !upd.holdFire) {
     fireAcc += dt;
     const interval = 1 / CONFIG.fireRatePerSec;
     while (fireAcc >= interval) {
@@ -376,7 +390,30 @@ if (params.get('bot')) {
 
 window.__fm = { machine, physics, audio, bgm, lcd, stats, setPower, persist, fire: on => { holding = on; updateFiring(); }, force: f => { force = f; } };
 
-// ホーム画面アプリ・オフライン用
+// ホーム画面アプリ・オフライン用。新しい版が届いたら、保存してから自動で再読み込み（update.js）
+let updatePending = false, updateSince = 0, reloading = false;
+function reloadForUpdate() {
+  if (reloading) return;
+  reloading = true;
+  persist();
+  location.reload();
+}
 if ('serviceWorker' in navigator && (location.protocol === 'https:' || location.hostname === 'localhost')) {
-  window.addEventListener('load', () => navigator.serviceWorker.register('./sw.js').catch(() => {}));
+  const sw = navigator.serviceWorker;
+  // はじめて開いたときに保存のしくみが動きだすのは、新しい版ではないので数えない
+  let controlled = !!sw.controller;
+  sw.addEventListener('controllerchange', () => {
+    if (!controlled) { controlled = true; return; }
+    if (updatePending) return;
+    updatePending = true;
+    updateSince = performance.now();
+    lcd.say('新しい版にするね。ちょっと待ってね');
+    if (document.hidden) reloadForUpdate();
+  });
+  // 開いたままでも、5分ごとと画面に戻ったときに新しい版を確かめる
+  window.addEventListener('load', () => sw.register('./sw.js').then(reg => {
+    const check = () => reg.update().catch(() => {});
+    setInterval(check, 5 * 60 * 1000);
+    document.addEventListener('visibilitychange', () => { if (!document.hidden) check(); });
+  }).catch(() => {}));
 }
