@@ -68,7 +68,7 @@ function drawStatic(layout, scale) {
     ctx.fillText('OUT', o.x, o.y + 2);
   }
 
-  for (const p of layout.pins) {
+  for (const p of [...layout.pins, ...(layout.roadPins || [])]) {
     if (p.r > 4) continue;
     ctx.fillStyle = '#b8862e';
     ctx.beginPath(); ctx.arc(p.x, p.y, p.r + 0.3, 0, Math.PI * 2); ctx.fill();

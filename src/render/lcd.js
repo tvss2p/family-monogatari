@@ -35,6 +35,7 @@ export function createLcd(root) {
     <div class="nyan">${st(['に', 'ゃ', 'ん', '連'], 24, ['#fff', '#ffe14d', '#fff', '#ff8aa6'], [-4, 3, -2, 5])}<b class="nyanN"></b></div>
     <div class="stepup"><i class="stamp"><svg viewBox="0 0 24 24">${pawPath}</svg></i><b class="stepN"></b></div>
     <div class="chara"><img alt=""><span class="say"></span></div>
+    <div class="famNote"><img alt=""><span></span></div>
     <div class="bubbles">${Array.from({ length: 14 }, (_, i) => `<i style="left:${8 + (i * 37) % 210}px;width:${10 + (i % 4) * 6}px;height:${10 + (i % 4) * 6}px;animation-delay:${(i % 7) * 0.12}s"></i>`).join('')}</div>
     <div class="premiumNote"><img alt=""><b></b></div>
     <div class="develop">${st(['リ', 'ー', 'チ', '!', '!'], 38, ['#fff', '#fff', '#fff', '#ffe14d', '#ffe14d'], [-6, 4, -3, 6, 10])}</div>
@@ -180,6 +181,14 @@ export function createLcd(root) {
         el.classList.toggle('hot', arg === 'honey');
         replay('.chara');
       }
+      // 家族予告：右下から顔を出してひとこと（ふきだしの色でアツさがわかる）
+      else if (kind === 'fam' && spin && spin.famNote) {
+        const el = root.querySelector('.famNote');
+        el.querySelector('img').src = CAST[spin.famNote.who].img;
+        el.querySelector('span').textContent = spin.famNote.text;
+        el.className = `famNote ${arg}`;
+        replay('.famNote');
+      }
       else if (kind === 'bubble') {
         root.querySelector('.bubbles').classList.toggle('pink', arg === 'pink');
         replay('.bubbles');
@@ -251,10 +260,11 @@ export function createLcd(root) {
         });
         at(8400, () => { box.className = 'promo'; });
       }
-      // 案内のあと、家族のひとこと。そのあとは家族と猫のムービーが流れる（7 秒ごとに場面が変わる）
+      // 案内のあと、家族のひとこと。そのあとは家族と猫・おでかけのムービーが流れる（7 秒ごとに場面が変わる）
       at(3500, () => this.say(pickLine(id === PREMIUM_ID ? 'family' : 'jackpot', Math.random)));
       const stage = movie.querySelector('.stage');
-      let n = 0;
+      // 大当たりのたびに、ちがう場面から始まる（spin.scene は確かめ用に場面を決めるとき）
+      let n = Number.isInteger(spin && spin.scene) ? spin.scene : Math.floor(Math.random() * MOVIE.length);
       const next = () => {
         movie.classList.add('playing');
         root.classList.add('movieOn');
