@@ -467,7 +467,10 @@ async function loginOrOut() {
     $('#mAccount').textContent = 'ログインできませんでした。もう一度ためしてね';
   }
 }
-connectCloud({ sdk: FIREBASE_SDK, config: FIREBASE_CONFIG }).then(c => {
+connectCloud({
+  sdk: FIREBASE_SDK, config: FIREBASE_CONFIG,
+  standalone: navigator.standalone === true || matchMedia('(display-mode: standalone)').matches,
+}).then(c => {
   cloud = c;
   if (!cloud) return;
   cloud.onUser(user => {

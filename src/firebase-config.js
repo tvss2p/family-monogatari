@@ -4,7 +4,8 @@ export const FIREBASE_SDK = 'https://www.gstatic.com/firebasejs/13.1.0';
 
 export const FIREBASE_CONFIG = {
   apiKey: 'AIzaSyBtniHsVUT7kLNFft0f2QL7CMc1MbXB1nM',
-  authDomain: 'family-monogatari.firebaseapp.com',
+  // ログイン用の置き場所はゲームと同じドメイン（tvss2p.github.io/__/auth/）。別ドメインだとSafariが保存を読めずログインが戻ってこない
+  authDomain: 'tvss2p.github.io',
   projectId: 'family-monogatari',
   storageBucket: 'family-monogatari.firebasestorage.app',
   messagingSenderId: '1087378337572',

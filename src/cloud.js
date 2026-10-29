@@ -31,8 +31,13 @@ export function createUploader({ send, minGapMs = 15000, now = () => Date.now() 
   };
 }
 
+// ログインのしかた：iPhoneのホーム画面アプリは、小窓を開くと結果が戻らず固まるので、ページごとGoogleへ移って戻ってくる
+export function loginMethod({ standalone }) {
+  return standalone ? 'redirect' : 'popup';
+}
+
 // Firebase をつなぐ（読みこめなければ null。ゲームはそのまま遊べる）
-export async function connectCloud({ sdk, config }) {
+export async function connectCloud({ sdk, config, standalone = false }) {
   try {
     const [{ initializeApp }, A, F] = await Promise.all([
       import(`${sdk}/firebase-app.js`), import(`${sdk}/firebase-auth.js`), import(`${sdk}/firebase-firestore.js`),
@@ -41,11 +46,14 @@ export async function connectCloud({ sdk, config }) {
     const auth = A.getAuth(app);
     const db = F.getFirestore(app);
     const ref = uid => F.doc(db, 'saves', uid);
+    // Googleから戻ってきたときのログインを仕上げる（失敗してもゲームはそのまま）
+    A.getRedirectResult(auth).catch(() => {});
     return {
       onUser(fn) { return A.onAuthStateChanged(auth, fn); },
       async signIn() {
         const provider = new A.GoogleAuthProvider();
         provider.setCustomParameters({ prompt: 'select_account' });
+        if (loginMethod({ standalone }) === 'redirect') return A.signInWithRedirect(auth, provider);
         try { await A.signInWithPopup(auth, provider); }
         catch (e) {
           // ポップアップが使えない端末は、ページごとGoogleへ移ってもどってくる
