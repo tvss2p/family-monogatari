@@ -596,5 +596,5 @@
 .person.art.p-daisuke .head{left:-3.5px}
 .person.art.p-nanae .head{left:-3px;top:1px}
 .person.art.p-hiroko .head{left:3px}
-/* 大江さんの顔の絵は肩まで入っているので、顔のまわりだけ丸く切りぬいて胴体の服につなげる */
-.person.art.p-oe .head{left:3px;top:4px;clip-path:ellipse(37% 42% at 47% 40%)}
+/* 大江さんの顔の絵は首と肩まで入っているので、あご（絵の上から 78%）の下を丸く切って、体の絵の首につなげる */
+.person.art.p-oe .head{left:3px;top:3px;clip-path:ellipse(39% 38.5% at 45.5% 39.5%)}
