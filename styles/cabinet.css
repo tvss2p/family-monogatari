@@ -194,6 +194,8 @@ button{font:inherit;border:0;background:none;color:inherit;cursor:pointer}
 .menu button{display:block;width:100%;margin-top:8px;padding:12px 0;border-radius:14px;font-size:15px;font-weight:900;color:#fff;background:linear-gradient(#ffb3c6,#ff7f9e);box-shadow:0 3px 0 #d0557a}
 .menu #mReset,.menu #mResetYes{background:linear-gradient(#cfc4ca,#a99ca3);box-shadow:0 3px 0 #847880}
 .menu #mResetYes{background:linear-gradient(#ff8a8a,#e85a5a);box-shadow:0 3px 0 #b83a3a}
+.menu .card p.account{margin:12px 0 0;font-size:12px;line-height:1.5;color:#6a4a56;white-space:pre-line}
+.menu #mLogin{margin-top:6px;background:linear-gradient(#fff,#eef3ff);color:#3a4a6a;box-shadow:0 0 0 2px #c9d4ec,0 3px 0 #9aa8c8}
 .menu .card p.credit{margin:14px 0 0;font-size:10px;font-weight:700;line-height:1.5;color:#8a6a76;word-break:break-all}
 .menu .confirmRows{display:none}
 .menu.confirm .confirmRows{display:block}.menu.confirm .normalRows{display:none}
