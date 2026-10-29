@@ -567,18 +567,22 @@
 .order.hasPic::before{content:'';position:absolute;inset:0;background:radial-gradient(ellipse at 50% 40%,transparent 40%,rgba(40,20,30,.3))}
 
 /* ===== 体の部品の絵（tools/prepare-parts.mjs）。腕と足は今までどおり肩と腰を中心に回す ===== */
-.person.art{width:46px;height:90px;--tw:27px;--clip:0%;--ax:11px}
+.person.art{width:46px;height:90px;--tw:27px;--clip:0%;--ax:9px}
+/* 腕は胴体の後ろ。胴体の絵のそで口（半そで）や肩のはし（長そで）から出ているように見せる */
 .person.art i{display:none}
 .person.art img.body,.person.art img.arm,.person.art img.leg{position:absolute;display:block;background:none;box-shadow:none;border-radius:0;height:auto}
 .person.art .body{left:50%;top:37px;width:var(--tw);margin-left:calc(var(--tw) / -2);z-index:2;clip-path:inset(0 var(--clip) 0 var(--clip))}
-.person.art .arm{top:38px;width:9px;z-index:3;transform-origin:50% 7%}
+.person.art .arm{top:var(--at,39px);width:9px;z-index:1;transform-origin:50% 8%}
 .person.art .arm.l{left:calc(23px - var(--ax) - 4.5px);transform:rotate(10deg)}
 .person.art .arm.r{left:calc(23px + var(--ax) - 4.5px);right:auto;transform:rotate(-10deg)}
-.person.art .leg{top:59px;width:10px;z-index:1;transform-origin:50% 4%;box-shadow:none}
+.person.art .leg{top:59px;width:10px;z-index:0;transform-origin:50% 4%;box-shadow:none}
 .person.art .leg.l{left:13px}.person.art .leg.r{left:23px}
 /* 長そでの服は、胴体に描かれたそでを切って、動く腕で肩をおおう */
-.person.art.p-hiroko{--tw:29px;--clip:17%;--ax:8px}
-.person.art.p-oe{--tw:30px;--clip:17%;--ax:8px}
+.person.art.p-hiroko{--tw:29px;--clip:17%;--ax:10.5px;--at:38px}
+.person.art.p-oe{--tw:30px;--clip:17%;--ax:11px;--at:38px}
+/* 長そでの2人は、そでを切った胴体の横（肩のはし）に腕を前から重ねる。腕の絵の上のはだ色の切り口は見せない */
+.person.art.p-hiroko .arm,.person.art.p-oe .arm{z-index:3;clip-path:inset(7% 0 0 0)}
+.person.art.p-hiroko .body,.person.art.p-oe .body{clip-path:inset(0 var(--clip) 0 var(--clip) round 9px 9px 0 0)}
 
 /* 料理の絵：お盆ごと運ばれてくる */
 .food .foodPic{width:auto;height:auto;max-width:124px;max-height:78px;filter:drop-shadow(0 4px 4px rgba(60,30,20,.35))}
@@ -597,4 +601,4 @@
 .person.art.p-nanae .head{left:-3px;top:1px}
 .person.art.p-hiroko .head{left:3px}
 /* 大江さんの顔の絵は首と肩まで入っているので、あご（絵の上から 78%）の下を丸く切って、体の絵の首につなげる */
-.person.art.p-oe .head{left:3px;top:3px;clip-path:ellipse(39% 38.5% at 45.5% 39.5%)}
+.person.art.p-oe .head{left:3px;top:3px;clip-path:ellipse(35.5% 38.5% at 43.5% 39.5%)}
