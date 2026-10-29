@@ -87,7 +87,8 @@ export function pickLine(kind, rng) {
 // actors：from から to まで歩いてきて止まる（x は液晶の左からの px）。walk:true は止まらず歩きぬける
 export const SCENE_MS = 8000;
 const AT = [1000, 3300, 5600];
-const sc = (bg, cap, actors, lines) => ({ bg, cap, actors, lines: lines.map(([who, text], i) => ({ at: AT[i], who, text })) });
+// extra：場面だけの演出 { fx: 'bloom'（花が咲く）| 'confetti'（紙吹雪）| 'fireworks'（花火）, fxAt: 始まる時刻 ms }
+const sc = (bg, cap, actors, lines, extra = {}) => ({ bg, cap, actors, lines: lines.map(([who, text], i) => ({ at: AT[i], who, text })), ...extra });
 // その場に立っている人・左右から歩いてくる人
 const at = (who, x, extra = {}) => ({ who, from: x, to: x, ...extra });
 const inL = (who, x, delay = 0) => ({ who, from: -70, to: x, delay });
@@ -118,7 +119,7 @@ export const FILLER = [
     ],
   },
   {
-    bg: 'night', cap: '夏祭りの花火',
+    bg: 'night', cap: '夏祭りの花火', fx: 'fireworks', fxAt: 0,
     actors: [{ who: 'nanae', from: -70, to: 40 }, { who: 'daisuke', from: 260, to: 130 }, { who: 'kira', from: 260, to: 192, delay: 600 }],
     lines: [
       { at: 1200, who: 'nanae', text: 'おかあさん、花火きれい〜' },
@@ -127,7 +128,7 @@ export const FILLER = [
     ],
   },
   {
-    bg: 'party', cap: '主役はばあちゃん！',
+    bg: 'party', cap: '主役はばあちゃん！', fx: 'confetti', fxAt: 700,
     actors: [
       { who: 'hiroko', from: 80, to: 80, star: true }, { who: 'daisuke', from: 260, to: 160, delay: 400 },
       { who: 'nanae', from: -70, to: 4, delay: 400 }, { who: 'oe', from: 260, to: 196, delay: 800 }, { who: 'berry', from: -40, to: 52, delay: 1200 },
@@ -162,8 +163,8 @@ export const EPISODES = [
         [['nanae', 'おかあさん、かわいいね〜'], ['daisuke', 'ばあちゃん、こっちこっち！'], ['hiroko', 'ふしぎな建物だねえ']]),
       sc('museum', 'ステンドグラスがきれい', [at('hiroko', 20), at('nanae', 80), at('daisuke', 168)],
         [['nanae', 'おかあさん、窓がきれい！'], ['hiroko', '光がきらきらだねえ'], ['daisuke', 'ばあちゃん、写真とろう！']]),
-      sc('museum', '屋上のロボット兵', [at('daisuke', 20), at('hiroko', 90), at('nanae', 160)],
-        [['daisuke', 'ばあちゃん、ロボットだよ'], ['hiroko', '大きいねえ'], ['nanae', 'おかあさん、階段気をつけて']]),
+      sc('museum', '屋上の庭園', [at('daisuke', 20), at('hiroko', 90), at('nanae', 160)],
+        [['daisuke', 'ばあちゃん、屋上に庭がある！'], ['hiroko', '緑がいっぱいだねえ'], ['nanae', 'おかあさん、階段気をつけて']]),
       sc('museum', 'おみやげ選び', [at('nanae', 20), at('hiroko', 90), at('daisuke', 160)],
         [['nanae', 'おかあさん、どれにする？'], ['hiroko', 'みんなにあげようかね'], ['daisuke', '袋はおれが持つよ！']]),
     ],
@@ -215,9 +216,9 @@ export const EPISODES = [
       sc('flower', 'どの色にする？', [at('hiroko', 40), at('nanae', 116)],
         [['nanae', 'おかあさん、赤と黄色どっち？'], ['hiroko', '両方にしようかね'], ['nanae', 'ぜいたく〜！']]),
       sc('flower', 'お庭に植えよう', [at('nanae', 40), at('hiroko', 110), inR('honey', 188, 1200)],
-        [['hiroko', 'ここに植えようかね'], ['nanae', 'おかあさん、土やわらかいよ'], ['honey', 'にゃ？']]),
+        [['hiroko', 'ここに植えようかね'], ['nanae', 'おかあさん、土やわらかいよ'], ['honey', 'にゃ？']], { fx: 'bloom', fxAt: 3600 }),
       sc('flower', 'きれいに咲いた！', [at('nanae', 40), at('hiroko', 110), at('honey', 188)],
-        [['nanae', 'おかあさん、咲いたね！'], ['hiroko', '毎日水やりしたからねえ'], ['honey', 'にゃ〜ん♪']]),
+        [['nanae', 'おかあさん、咲いたね！'], ['hiroko', '毎日水やりしたからねえ'], ['honey', 'にゃ〜ん♪']], { fx: 'bloom', fxAt: 0 }),
     ],
   },
   {
@@ -256,7 +257,7 @@ export const EPISODES = [
       sc('karaoke', 'だいすけの番', [at('nanae', 6), at('hiroko', 62), at('oe', 118), at('daisuke', 178, { star: true })],
         [['daisuke', 'NiziU歌います！'], ['hiroko', '上手だねえ'], ['oe', '若いのはいいなあ']]),
       sc('karaoke', 'ばあちゃんも一曲', [at('nanae', 6), at('hiroko', 62, { star: true }), at('oe', 118), at('daisuke', 178)],
-        [['daisuke', 'ばあちゃん、演歌入れたよ！'], ['hiroko', 'じゃあ一曲だけね'], ['oe', '100点だなあ！']]),
+        [['daisuke', 'ばあちゃん、演歌入れたよ！'], ['hiroko', 'じゃあ一曲だけね'], ['oe', '100点だなあ！']], { fx: 'confetti', fxAt: 5600 }),
     ],
   },
   {
@@ -333,7 +334,7 @@ export const EPISODES = [
       sc('park', 'ちょうちょを追いかけ', [{ who: 'lee', from: -50, to: 300, walk: true }, { who: 'jill', from: -110, to: 300, walk: true, delay: 300 }, { who: 'nafan', from: -170, to: 300, walk: true, delay: 600 }],
         [['lee', 'にゃっ（ちょうちょ！）'], ['jill', 'にゃにゃっ'], ['nafan', 'にゃ〜ん']]),
       sc('park', 'ゴール！', [at('jill', 30), at('lee', 100), at('nafan', 170)],
-        [['jill', 'にゃーっ！（いちばん）'], ['lee', 'にゃふ（くやしい）'], ['nafan', 'みんなえらいにゃ']]),
+        [['jill', 'にゃーっ！（いちばん）'], ['lee', 'にゃふ（くやしい）'], ['nafan', 'みんなえらいにゃ']], { fx: 'confetti', fxAt: 600 }),
       sc('park', 'だいすけからごほうび', [at('jill', 20), at('nafan', 80), inR('daisuke', 130), at('lee', 196)],
         [['daisuke', 'みんな、おやつだよ！'], ['jill', 'にゃ〜ん♪'], ['nafan', 'にゃむにゃむ']]),
     ],
@@ -348,7 +349,7 @@ export const EPISODES = [
       sc('party', 'おなかいっぱい', [at('glen', 30), at('berry', 100), at('honey', 170)],
         [['glen', 'にゃふ〜（まんぷく）'], ['berry', 'ごろごろ…'], ['honey', 'にゃ〜（しあわせ）']]),
       sc('party', 'みんなで記念写真', [at('berry', 20), at('nanae', 80), at('glen', 140), at('honey', 196)],
-        [['nanae', 'はい、チーズ！'], ['berry', 'にゃっ！'], ['glen', 'にゃ〜ん♪']]),
+        [['nanae', 'はい、チーズ！'], ['berry', 'にゃっ！'], ['glen', 'にゃ〜ん♪']], { fx: 'confetti', fxAt: 1000 }),
     ],
   },
   {
@@ -359,7 +360,7 @@ export const EPISODES = [
       sc('night', 'お月さまきれい', [at('lee', 30), at('nafan', 100), at('kira', 170)],
         [['nafan', 'にゃ〜（まんまる）'], ['kira', 'にゃふ'], ['lee', 'にゃっ（星もある）']]),
       sc('night', '花火があがった！', [at('kira', 30), at('lee', 100), at('nafan', 170)],
-        [['kira', 'にゃにゃっ！？'], ['lee', 'にゃーっ！'], ['nafan', 'きれいだにゃ〜']]),
+        [['kira', 'にゃにゃっ！？'], ['lee', 'にゃーっ！'], ['nafan', 'きれいだにゃ〜']], { fx: 'fireworks', fxAt: 300 }),
       sc('night', 'おうちに帰ろう', [at('kira', 20), at('nafan', 80), inR('daisuke', 140), at('lee', 196)],
         [['daisuke', 'みんな、おかえり！'], ['kira', 'にゃ〜ん'], ['nafan', 'にゃっ（ただいま）']]),
     ],

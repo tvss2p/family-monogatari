@@ -1,6 +1,6 @@
 import { SYMBOLS, PREMIUM_ID, symbolById } from '../symbols.js';
 import { pawPath } from './parts.js';
-import { CAST, EPISODES, FILLER, MENUS, ORDER_LINES, SCENE_MS, pickLine } from '../story.js';
+import { CAST, EPISODES, FILLER, MENUS, ORDER_LINES, BOARD_IMAGES, SCENE_MS, pickLine } from '../story.js';
 import { ORDER_MS } from '../scenario.js';
 
 // 顔イラストに体をつける（人は服・腕・足、猫はそのまま）
@@ -39,6 +39,37 @@ export function foodHTML(shop, tier) {
   // ケンタッキー：ポテト → チキン → バーレル
   if (k) return '<div class="barrel"><i class="ck a"></i><i class="ck b"></i><i class="ck c"></i><i class="ck d"></i><i class="bk"></i></div>';
   return `<div class="kbox">${c ? '<i class="ck a"></i><i class="ck b"></i>' : '<i class="fr"></i>'}<i class="bx"></i></div>`;
+}
+
+// ムービーの背景の絵：話の絵（tools/prepare-boards.mjs）。家族と猫の場面は、近い絵を使う
+const FILLER_PIC = { home: 'catnap', park: 'catrun', night: 'catnight' };
+function scenePic(bg, epId) {
+  return BOARD_IMAGES[epId] || BOARD_IMAGES[bg] || BOARD_IMAGES[FILLER_PIC[bg]] || null;
+}
+// 場面ごとにずっと舞っているもの
+const SCENE_FX = {
+  sushi: 'petals', flower: 'petals', home: 'petals', museum: 'sparkle', karaoke: 'sparkle', hyakkin: 'sparkle', village: 'sparkle',
+  icecream: 'sparkle', party: 'sparkle', hamburg: 'steam', chicken: 'steam', burger: 'steam', park: 'butterfly', drive: 'streak',
+  market: 'bokeh', night: 'firefly',
+};
+// 舞うもの・咲くもの（i の位置と時間は番号から決める。毎回同じ見え方）
+const FX_COUNT = { petals: 14, sparkle: 12, steam: 5, butterfly: 4, streak: 8, bokeh: 9, firefly: 12, confetti: 26, fireworks: 5, bloom: 7 };
+const FX_COLORS = ['#ff8aa6', '#ffd34d', '#7dc6ff', '#9be08a', '#c79bff', '#ffffff', '#ff9f6a'];
+export function fxHTML(kind) {
+  if (!kind) return '';
+  const n = FX_COUNT[kind];
+  const items = Array.from({ length: n }, (_, i) => {
+    const x = Math.round(((i * 53) % 97) / 97 * 100), y = Math.round(((i * 31) % 89) / 89 * 100);
+    const dl = -((i * 0.73) % 6).toFixed(2), du = (4 + (i % 5) * 0.9).toFixed(2), c = FX_COLORS[i % FX_COLORS.length];
+    if (kind === 'bloom') {
+      const left = 6 + i * (88 / (n - 1)), h = 26 + ((i * 13) % 4) * 7;
+      return `<b class="fl" style="left:${left}%;--h:${h}px;--c:${['#ff8aa6', '#ffd34d', '#ff9f6a', '#c79bff', '#ff6a8a', '#7dc6ff', '#ffb3c7'][i]};--dl:${(i % 2 ? 0.5 : 0) + i * 0.18}s"><i class="stem"></i><i class="lf"></i><i class="hd"><i></i><i></i><i></i><i></i><i></i><i class="ct"></i></i><i class="spk"></i></b>`;
+    }
+    if (kind === 'fireworks') return `<i style="left:${12 + (i * 37) % 76}%;top:${8 + (i * 23) % 40}%;--c:${c};--dl:${(i * 0.55).toFixed(2)}s"></i>`;
+    if (kind === 'confetti') return `<i style="left:${x}%;--c:${c};--dl:${(i * 0.09).toFixed(2)}s;--du:${(2.4 + (i % 4) * 0.4).toFixed(2)}s;--r:${(i * 47) % 360}deg"></i>`;
+    return `<i style="left:${x}%;top:${y}%;--c:${c};--dl:${dl}s;--du:${du}s"></i>`;
+  }).join('');
+  return `<div class="fx fx-${kind}">${items}</div>`;
 }
 
 // 液晶：リール・予告・リーチ・大当たりムービー
@@ -117,14 +148,21 @@ export function createLcd(root) {
   state.forEach((_, i) => drawReel(i));
 
   // ムービーの 1 場面：人と猫が歩いてきて、ばあちゃんに話しかける
-  function playScene(stage, sc) {
+  // epId：いま流している話（その話の絵を背景にする）、k：話の中で何場面目か（カメラの動きを変える）
+  function playScene(stage, sc, epId, k = 0) {
     sceneTimers.forEach(clearTimeout);
     sceneTimers = [];
     const later = (ms, fn) => sceneTimers.push(setTimeout(fn, ms));
-    stage.className = `stage bg-${sc.bg}`;
-    stage.innerHTML = '<div class="bgArt"><i></i><i></i><i></i><i></i><i></i></div>'
+    const pic = scenePic(sc.bg, epId);
+    stage.className = `stage bg-${sc.bg}${pic ? ' hasPic' : ''}`;
+    stage.innerHTML = (pic ? `<div class="pic cam${k % 4}" style="background-image:url(assets/img/${pic})"></div>` : '')
+      + '<div class="bgArt"><i></i><i></i><i></i><i></i><i></i></div><i class="light"></i>'
+      + fxHTML(SCENE_FX[sc.bg])
+      + (sc.fx ? `<div class="fxOne"></div>` : '')
       + sc.actors.map(a => `<div class="actor${a.star ? ' star' : ''}${CAST[a.who].human ? '' : ' isCat'}" style="left:${a.from}px">${figureHTML(a.who)}</div>`).join('')
-      + `<div class="speech"></div><div class="cap">${sc.cap}</div>`;
+      + `<div class="speech"></div><div class="cap"><span>${sc.cap}</span></div><i class="wipe"></i>`;
+    // 場面だけの演出（花が咲く・紙吹雪・花火）
+    if (sc.fx) later(sc.fxAt || 0, () => { stage.querySelector('.fxOne').innerHTML = fxHTML(sc.fx); });
     const els = [...stage.querySelectorAll('.actor')];
     sc.actors.forEach((a, i) => {
       const el = els[i];
@@ -239,6 +277,9 @@ export function createLcd(root) {
       const m = MENUS[shop];
       const el = root.querySelector('.order');
       el.className = `order bg-${m.bg} ${shop} ${tier}`;
+      const opic = BOARD_IMAGES[m.bg] || BOARD_IMAGES[shop];
+      el.style.backgroundImage = opic ? `url(assets/img/${opic})` : '';
+      el.classList.toggle('hasPic', !!opic);
       el.querySelector('.ofam').innerHTML = [['nanae', 22], ['hiroko', 92], ['daisuke', 162]]
         .map(([who, x]) => `<div class="actor idle" style="left:${x}px">${figureHTML(who)}</div>`).join('');
       el.querySelector('.food').innerHTML = foodHTML(shop, tier);
@@ -322,7 +363,7 @@ export function createLcd(root) {
           void et.offsetWidth;
           et.classList.add('go');
         }
-        playScene(stage, scenes[n < scenes.length ? n : ep.scenes.length + (n - ep.scenes.length) % FILLER.length]);
+        playScene(stage, scenes[n < scenes.length ? n : ep.scenes.length + (n - ep.scenes.length) % FILLER.length], n < ep.scenes.length ? ep.id : null, n);
         n++;
         sceneTimer = setTimeout(next, SCENE_MS);
       };
@@ -387,6 +428,16 @@ export function createLcd(root) {
       state.forEach((s, i) => { if (s.spin) drawReel(i); });
     },
     get spin() { return current; },
+    // 確かめ用：話の k 場面目をすぐ映す（大当たりの画面にしてから使う）
+    debugScene(epId, k) {
+      const ep = EPISODES.find(e => e.id === epId);
+      const sc = ep ? ep.scenes[k] : FILLER[k];
+      clearTimeout(sceneTimer);
+      timers.forEach(clearTimeout);
+      movie.classList.add('playing');
+      root.classList.add('movieOn');
+      playScene(movie.querySelector('.stage'), sc, ep ? ep.id : null, k);
+    },
     set onEvent(fn) { onEvent = fn; },
     set episodePicker(fn) { pickEpisode = fn; },
     get spinning() { return state.filter(s => s.spin).length; },

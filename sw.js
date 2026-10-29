@@ -1,6 +1,6 @@
 // オフラインでも開けるように、ゲームのファイルを先に保存しておく。
 // このファイルは tools/build-sw.mjs が作る（手で直さない）
-const VERSION = 'fm-47b8dd50f95f';
+const VERSION = 'fm-329c58c8e707';
 const FILES = [
   './',
   './index.html',
