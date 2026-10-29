@@ -6,7 +6,8 @@ import { readdirSync, writeFileSync, existsSync } from 'node:fs';
 import { EPISODES } from '../src/story.js';
 
 const SRC = 'incoming/boards';
-const ids = new Set(EPISODES.map(e => e.id));
+// 話の名前と、家族と猫の場面の背景（home・party）
+const ids = new Set([...EPISODES.map(e => e.id), 'home', 'party']);
 const files = existsSync(SRC) ? readdirSync(SRC).filter(f => /\.(jpe?g|png|webp)$/i.test(f)) : [];
 const map = {};
 for (const f of files.sort()) {

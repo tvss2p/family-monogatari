@@ -44,7 +44,23 @@ if (import.meta.url === `file://${process.argv[1]}`) {
     console.log(`${who}: ${sizes.join('、')}`);
     done.push(who);
   }
+  // 料理（正方形）と花（縦長）：まわりの透明を切って、使う大きさに
+  const foods = [], flowers = [];
+  for (const f of existsSync(SRC) ? readdirSync(SRC).sort() : []) {
+    const name = f.replace(/\.\w+$/, '');
+    if (name.startsWith('food-')) {
+      await sharp(`${SRC}/${f}`).trim().resize(240, 240, { fit: 'inside' }).webp({ quality: 82, alphaQuality: 90 }).toFile(`${OUT}/${name}.webp`);
+      foods.push(name.slice(5));
+    } else if (name.startsWith('flower-')) {
+      await sharp(`${SRC}/${f}`).trim().resize({ height: 150 }).webp({ quality: 82, alphaQuality: 90 }).toFile(`${OUT}/${name}.webp`);
+      flowers.push(name.slice(7));
+    }
+  }
+  console.log(`料理 ${foods.length}、花 ${flowers.length}`);
   writeFileSync('src/parts.js', `// tools/prepare-parts.mjs が作る（手で直さない）。体の部品の絵がある人（assets/img/parts）
 export const PARTS = ${JSON.stringify(done.sort()).replace(/"/g, "'")};
+// 料理の絵（food-お店-段階）と、花の絵（flower-色）
+export const FOODS = ${JSON.stringify(foods).replace(/"/g, "'")};
+export const FLOWERS = ${JSON.stringify(flowers).replace(/"/g, "'")};
 `);
 }

@@ -9,12 +9,14 @@ export const BOARD_IMAGES = {
   drive: 'board-drive.webp',
   flower: 'board-flower.webp',
   hamburg: 'board-hamburg.webp',
+  home: 'board-home.webp',
   hyakkin: 'board-hyakkin.webp',
   icecream: 'board-icecream.webp',
   karaoke: 'board-karaoke.webp',
   market: 'board-market.webp',
   museum: 'board-museum.webp',
   oe: 'board-oe.webp',
+  party: 'board-party.webp',
   sushi: 'board-sushi.webp',
   village: 'board-village.webp'
 };

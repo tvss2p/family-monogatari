@@ -1,6 +1,6 @@
 import { SYMBOLS, PREMIUM_ID, symbolById } from '../symbols.js';
 import { pawPath } from './parts.js';
-import { PARTS } from '../parts.js';
+import { PARTS, FOODS, FLOWERS } from '../parts.js';
 import { CAST, EPISODES, FILLER, MENUS, ORDER_LINES, BOARD_IMAGES, SCENE_MS, pickLine } from '../story.js';
 import { ORDER_MS } from '../scenario.js';
 
@@ -34,6 +34,8 @@ function symHTML(id, small) {
 
 // 注文アニメで運ばれてくるもの（お店ごとの出し方。tier で中身が豪華になる）
 export function foodHTML(shop, tier) {
+  // 料理の絵（tools/prepare-parts.mjs）があれば絵を出す
+  if (FOODS.includes(`${shop}-${tier}`)) return `<img class="foodPic" src="assets/img/parts/food-${shop}-${tier}.webp" alt="">`;
   const k = tier === 'kakutei', c = tier !== 'normal';
   if (shop === 'burger') {
     const burger = `<div class="burger"><i class="bt"></i><i class="lt"></i>${c ? '<i class="cz"></i>' : ''}<i class="pt"></i>${k ? '<i class="cz"></i><i class="pt"></i>' : ''}<i class="bb"></i></div>`;
@@ -71,6 +73,11 @@ export function fxHTML(kind) {
   const items = Array.from({ length: n }, (_, i) => {
     const x = Math.round(((i * 53) % 97) / 97 * 100), y = Math.round(((i * 31) % 89) / 89 * 100);
     const dl = -((i * 0.73) % 6).toFixed(2), du = (4 + (i % 5) * 0.9).toFixed(2), c = FX_COLORS[i % FX_COLORS.length];
+    if (kind === 'bloom' && FLOWERS.length) {
+      // 花の絵：下から茎ごとのびて、花がひらく
+      const left = 4 + i * (92 / (n - 1)), h = 54 + ((i * 13) % 4) * 9;
+      return `<b class="flPic" style="left:${left}%;--h:${h}px;--dl:${(i % 2 ? 0.45 : 0) + i * 0.16}s"><img src="assets/img/parts/flower-${FLOWERS[i % FLOWERS.length]}.webp" alt=""><i class="spk"></i></b>`;
+    }
     if (kind === 'bloom') {
       const left = 6 + i * (88 / (n - 1)), h = 26 + ((i * 13) % 4) * 7;
       return `<b class="fl" style="left:${left}%;--h:${h}px;--c:${['#ff8aa6', '#ffd34d', '#ff9f6a', '#c79bff', '#ff6a8a', '#7dc6ff', '#ffb3c7'][i]};--dl:${(i % 2 ? 0.5 : 0) + i * 0.18}s"><i class="stem"></i><i class="lf"></i><i class="hd"><i></i><i></i><i></i><i></i><i></i><i class="ct"></i></i><i class="spk"></i></b>`;

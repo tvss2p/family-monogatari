@@ -117,7 +117,7 @@ test('盤面の背景：どの話にも色があり、絵を使う話は絵の�
   const css = readFileSync('styles/cabinet.css', 'utf8');
   for (const e of EPISODES) assert.ok(css.includes(`.t-${e.id}{`), e.id);
   for (const [id, f] of Object.entries(BOARD_IMAGES)) {
-    assert.ok(EPISODES.find(e => e.id === id), id);
+    assert.ok(EPISODES.find(e => e.id === id) || ['home', 'party'].includes(id), id);
     assert.ok(existsSync(`assets/img/${f}`), f);
   }
 });
