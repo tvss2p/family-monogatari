@@ -19,8 +19,11 @@ import { createBgm, trackFor } from './bgm.js';
 import { fitCabinet } from './fit.js';
 import { modeDisplay } from './hud.js';
 import { BGM_FILES, SE_FILES, AUDIO_DIR } from './sounds.js';
+import { VOICE_SAMPLES, voiceSample, pickVoice } from './voices.js';
 import { createWakeLock } from './wakelock.js';
 import { reloadDecision } from './update.js';
+import { connectCloud, decideSync, createUploader } from './cloud.js';
+import { FIREBASE_SDK, FIREBASE_CONFIG } from './firebase-config.js';
 
 const wake = createWakeLock();
 
@@ -66,13 +69,15 @@ let trayBoxes = -1;
 // 確変昇格チャンスの音
 lcd.onEvent = e => {
   if (e === 'promoChance') audio.play('reach');
-  if (e === 'promoWin') { audio.play('jackpot'); audio.play('meow', 1.2, 0.4); }
+  if (e === 'promoWin') { audio.play('jackpot'); audio.play('meow', 1.2, 0.4); speak('promoWin'); }
   if (e === 'promoLose') audio.play('miss');
 };
 const audio = createAudio();
 audio.setOn(!saved || saved.sound !== false);
 const filesIn = map => Object.fromEntries(Object.entries(map).map(([k, f]) => [k, `${AUDIO_DIR}/${f}`]));
 audio.loadSamples(filesIn(SE_FILES));
+audio.loadSamples(filesIn(VOICE_SAMPLES));
+const speak = (event, opt, delay = 0) => { const v = pickVoice(event, opt); if (v) audio.voice(voiceSample(v), delay); };
 const bgm = createBgm(audio, { files: filesIn(BGM_FILES), decode: decodeAudio });
 let bgmOn = !saved || saved.bgm !== false;
 bgm.setOn(audio.on && bgmOn);
@@ -130,6 +135,10 @@ const menuGuard = createTapGuard(500);
 function renderMenu() {
   $('#mSound').textContent = audio.on ? '効果音：オン' : '効果音：オフ';
   $('#mBgm').textContent = bgmOn ? 'BGM：オン' : 'BGM：オフ';
+  $('#mLogin').textContent = cloudUser ? 'ログアウト' : 'Googleでログイン';
+  $('#mAccount').textContent = cloudUser
+    ? `${cloudUser.displayName || cloudUser.email || ''} でログイン中\nスマホとタブレットで同じセーブになります`
+    : 'ログインすると、スマホとタブレットで\n同じセーブで遊べます';
 }
 function openMenu() {
   menu.classList.add('show');
@@ -146,14 +155,26 @@ menu.addEventListener('click', e => {
   if (id === 'mReset') { menu.classList.add('confirm'); menuGuard.arm(performance.now()); }
   if (id === 'mResetNo') menu.classList.remove('confirm');
   if (id === 'mResetYes') { resetting = true; clear(); location.reload(); }
+  if (id === 'mLogin') loginOrOut();
   if (id === 'mClose' || e.target === menu) menu.classList.remove('show');
 });
 
-// 保存：2秒ごとと、画面を離れるとき
+// 保存：2秒ごとと、画面を離れるとき。savedAt は中身が変わったときだけ進める
+// （さわっていない端末が「新しいセーブ」になって、ほかの端末の続きを上書きしないように）
 let resetting = false;
+let lastSig = null, lastSavedAt = (saved && saved.savedAt) || Date.now();
+function currentData() {
+  const d = { machine: machine.toJSON(), sound: audio.on, bgm: bgmOn, power, locked, chain, jackpotGain };
+  const sig = JSON.stringify(d);
+  if (lastSig !== null && sig !== lastSig) lastSavedAt = Date.now();
+  lastSig = sig;
+  return { ...d, savedAt: lastSavedAt };
+}
 function persist() {
   if (resetting) return;
-  save({ machine: machine.toJSON(), sound: audio.on, bgm: bgmOn, power, locked, chain, jackpotGain });
+  const d = currentData();
+  save(d);
+  if (cloudUser && cloudSynced) uploader.queue(d);
 }
 setInterval(persist, 2000);
 // バックグラウンドに行ったら、ゲームの時計・玉・演出・音をすべて止める。戻ったら続きから
@@ -162,6 +183,7 @@ function pauseGame() {
   if (paused) return;
   paused = true;
   persist();
+  uploader.flush();
   runner.pause();
   audio.suspend();
 }
@@ -233,6 +255,9 @@ function playCue(cue, sp) {
   if (cue === 'fam:red') vibrate([40, 30, 40]);
   if (cue === 'develop') audio.play('cutin');
   if (cue === 'rt:allspin') audio.play('jackpot');
+  // ボイス：リーチ・激アツ・大当たり（家族そろいは専用の声）
+  if (cue === 'reach' || cue === 'hot') speak(cue);
+  if (cue === 'jackpot') speak('jackpot', { premium: !!(sp && sp.stops[1] === 'trio') }, 0.6);
   // 家族のひとこと（ばあちゃんに話しかける）
   if (cue === 'reach' && sp && sp.reach !== 'family') lcd.say(pickLine('reach', Math.random));
   if (cue === 'hot') lcd.say(pickLine('hot', Math.random), true);
@@ -290,6 +315,7 @@ function updateHud() {
       audio.play('ending');
       lcd.endJackpot();
       lcd.showMode(s.mode);
+      speak(`mode:${s.mode}`);
       lcd.say(pickLine('end', Math.random));
       setTimeout(() => lcd.say(pickLine(s.mode, Math.random)), 2600);
       audio.play('meow', 1.2, 0.5);
@@ -324,8 +350,8 @@ function frame(now) {
   if (stats.frames > 30) { stats.maxFrameMs = Math.max(stats.maxFrameMs, ms); if (ms > 34) stats.slowFrames++; }
   const dt = Math.min(0.05, ms / 1000);
   last = now;
-  const upd = reloadDecision({ pending: updatePending, ballsOnBoard: physics.balls.length, hidden: document.hidden, waitedMs: now - updateSince });
-  if (upd.reload) reloadForUpdate();
+  const upd = reloadDecision({ pending: updatePending || !!cloudPending, ballsOnBoard: physics.balls.length, hidden: document.hidden, waitedMs: now - updateSince });
+  if (upd.reload) (cloudPending ? reloadWithSave(cloudPending) : reloadForUpdate());
   if (firing && !upd.holdFire) {
     fireAcc += dt;
     const interval = 1 / CONFIG.fireRatePerSec;
@@ -398,6 +424,61 @@ function reloadForUpdate() {
   persist();
   location.reload();
 }
+// ほかの端末のセーブで続けるとき：そのセーブを端末に入れてから読みこみなおす
+function reloadWithSave(data) {
+  if (reloading) return;
+  reloading = true;
+  resetting = true;
+  save(data);
+  location.reload();
+}
+
+// Googleログイン：スマホとタブレットでセーブを共通にする（cloud.js）
+const LINK_KEY = 'family-monogatari:cloud-uid';
+const getLink = () => { try { return localStorage.getItem(LINK_KEY); } catch (e) { return null; } };
+const setLink = uid => { try { localStorage.setItem(LINK_KEY, uid); } catch (e) { /* なにもしない */ } };
+let cloud = null, cloudUser = null, cloudSynced = false, cloudPending = null;
+const uploader = createUploader({ send: d => { if (cloud && cloudUser) cloud.save(cloudUser.uid, d).catch(() => {}); } });
+async function syncCloud() {
+  if (!cloud || !cloudUser || cloudPending) return;
+  const uid = cloudUser.uid;
+  let remote;
+  try { remote = await cloud.load(uid); } catch (e) { return; }
+  if (!cloudUser || cloudUser.uid !== uid) return;
+  const local = currentData();
+  const how = decideSync({ uid, linkedUid: getLink(), local, remote });
+  setLink(uid);
+  if (how === 'useRemote') {
+    // 盤面の玉がなくなるのを待ってから、ほかの端末のセーブで読みこみなおす
+    cloudPending = remote;
+    updateSince = performance.now();
+    lcd.say({ who: 'nanae', text: 'おかあさん、続きから遊ぼう！' });
+    return;
+  }
+  cloudSynced = true;
+  if (how === 'upload') cloud.save(uid, local).catch(() => {});
+}
+async function loginOrOut() {
+  if (!cloud) { $('#mAccount').textContent = 'いまはログインできません（電波を確かめてね）'; return; }
+  try {
+    if (cloudUser) { uploader.flush(); await cloud.signOut(); }
+    else await cloud.signIn();
+  } catch (e) {
+    $('#mAccount').textContent = 'ログインできませんでした。もう一度ためしてね';
+  }
+}
+connectCloud({ sdk: FIREBASE_SDK, config: FIREBASE_CONFIG }).then(c => {
+  cloud = c;
+  if (!cloud) return;
+  cloud.onUser(user => {
+    cloudUser = user;
+    cloudSynced = false;
+    renderMenu();
+    if (user) syncCloud();
+  });
+});
+// 画面にもどったら、ほかの端末で遊んだ続きがないか確かめる
+document.addEventListener('visibilitychange', () => { if (!document.hidden && cloudUser) { cloudSynced = false; syncCloud(); } });
 if ('serviceWorker' in navigator && (location.protocol === 'https:' || location.hostname === 'localhost')) {
   const sw = navigator.serviceWorker;
   // はじめて開いたときに保存のしくみが動きだすのは、新しい版ではないので数えない

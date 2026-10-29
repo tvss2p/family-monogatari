@@ -78,13 +78,17 @@ export function createAudio({ AC = typeof window === 'undefined' ? null : (windo
     },
   };
 
-  function playSample(buffer, t) {
+  function playSample(buffer, t, gain = SAMPLE_GAIN) {
     const s = ctx.createBufferSource(), g = ctx.createGain();
     s.buffer = buffer;
-    g.gain.value = SAMPLE_GAIN;
+    g.gain.value = gain;
     s.connect(g).connect(master);
     s.start(t);
+    return s;
   }
+  // ボイスは効果音より前に出す。新しい声が出たら前の声は止める（重ならないように）
+  const VOICE_GAIN = 1;
+  let lastVoice = null;
 
   // ノイズの音（パンチ・ドン）と、高さが動くノイズ（シュバッ）
   let noiseBuf = null;
@@ -164,6 +168,12 @@ export function createAudio({ AC = typeof window === 'undefined' ? null : (windo
       const t = ctx.currentTime + 0.005 + delay;
       if (samples[name]) playSample(samples[name], t);
       else SOUNDS[name](t, opt);
+    },
+    // ボイス（voices.js）。読みこめていない声は鳴らさない
+    voice(name, delay = 0) {
+      if (!on || !ctx || ctx.state !== 'running' || !samples[name]) return;
+      try { if (lastVoice) lastVoice.stop(); } catch (e) { /* もう止まっている */ }
+      lastVoice = playSample(samples[name], ctx.currentTime + 0.005 + delay, VOICE_GAIN);
     },
     // 効果音のファイルを読みこむ（{ 名前: URL }）。読めなかったものは合成の音のまま
     loadSamples(map, fetchFn = fetch) {
