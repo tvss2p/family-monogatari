@@ -22,7 +22,8 @@ export const RATES = {
   promoKakuhen: 0.35,
   promoNormal: 0.3,
   // 注文アニメ（リーチ中だけ）：激アツのリーチほど出やすい。いちばん豪華な注文（確定）は当たりのときだけ
-  menu: { hot: { hit: 0.7, miss: 0.3 }, plain: { hit: 0.4, miss: 0.1 } },
+  // 出すぎると飽きるので、大当たりの半分くらいの回数に
+  menu: { hot: { hit: 0.45, miss: 0.12 }, plain: { hit: 0.2, miss: 0.03 } },
   menuTier: { hit: { normal: 0.3, chance: 0.35, kakutei: 0.35 }, miss: { normal: 0.8, chance: 0.2, kakutei: 0 } },
   hold: { hit: { white: 0.3, blue: 0.25, green: 0.2, red: 0.2, gold: 0.05 }, miss: { white: 0.993, blue: 0.005, green: 0.0015, red: 0.0005, gold: 0 } },
 };
@@ -51,7 +52,8 @@ export function holdColor(hold, rng) {
 export const ORDER_MS = 3200;
 
 // 1回転ぶんの台本：止まる図柄・予告・リーチ・合図の時刻（ms）
-export function buildSpin(hold, mode, rng) {
+// lastShop：前の注文アニメのお店（同じお店が続かないように）
+export function buildSpin(hold, mode, rng, { lastShop = null } = {}) {
   const fast = mode !== 'normal';
   const premium = hold.hit && hold.symbolId === PREMIUM_ID;
   const side = hold.hit ? 'hit' : 'miss';
@@ -64,7 +66,7 @@ export function buildSpin(hold, mode, rng) {
   const hot = !!reach && (premium || chance(RATES.hot));
   // 注文アニメ（リーチ中、家族がお店にいて注文が運ばれてくる）。運ばれてきたものが豪華なほどアツい
   const menu = reach && !develop && rng() < RATES.menu[hot ? 'hot' : 'plain'][side]
-    ? { shop: pick(rng, Object.keys(MENUS)), tier: weighted(rng, RATES.menuTier[side]) }
+    ? { shop: pick(rng, Object.keys(MENUS).filter(k => k !== lastShop)), tier: weighted(rng, RATES.menuTier[side]) }
     : null;
 
   const notices = [];

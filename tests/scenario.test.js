@@ -261,6 +261,18 @@ test('注文アニメ：リーチ中だけ（発展とは別）。確定の注�
     if (hit.menu) { hitMenus++; if (hit.menu.tier === 'kakutei') kakutei++; }
   }
   assert.ok(missMenus > 0 && missMenus < 20000 * 0.03, `miss ${missMenus}`);
-  assert.ok(hitMenus > 20000 * 0.2, `hit ${hitMenus}`);
+  assert.ok(hitMenus > 20000 * 0.12, `hit ${hitMenus}`);
   assert.ok(kakutei > hitMenus * 0.25, `kakutei ${kakutei}`);
+});
+
+test('注文アニメ：大当たりより少ない回数。同じお店は続かない', () => {
+  const rng = mulberry32(31);
+  let menus = 0, hits = 0, last = null;
+  for (let i = 0; i < 40000; i++) {
+    const h = drawHit('normal', rng);
+    const s = buildSpin(h, 'normal', rng, { lastShop: last });
+    if (h.hit) hits++;
+    if (s.menu) { menus++; assert.notEqual(s.menu.shop, last); last = s.menu.shop; }
+  }
+  assert.ok(menus < hits && menus > hits * 0.3, `menus ${menus} hits ${hits}`);
 });

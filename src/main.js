@@ -217,6 +217,8 @@ window.addEventListener('pagehide', pauseGame);
 window.addEventListener('pageshow', resumeGame);
 window.addEventListener('blur', () => { if (document.hidden) pauseGame(); });
 
+// 前の注文アニメのお店
+let lastShop = null;
 // 1回転を始める（?force=premium|hot|reach|mom|miss で次の1回を決められる。確かめ用。mom はおかあさんの図柄で当たり）
 function startSpin(now) {
   let hold = machine.startNextSpin();
@@ -229,11 +231,12 @@ function startSpin(now) {
     if (force === 'miss') hold = { hit: false, symbolId: null, kind: null };
     machine.state.current = hold;
     for (let i = 0; i < 200; i++) {
-      spin = buildSpin(hold, machine.state.mode, Math.random);
+      spin = buildSpin(hold, machine.state.mode, Math.random, { lastShop });
       if (force !== 'hot' || spin.hot) break;
     }
     force = null;
-  } else spin = buildSpin(hold, machine.state.mode, Math.random);
+  } else spin = buildSpin(hold, machine.state.mode, Math.random, { lastShop });
+  if (spin.menu) lastShop = spin.menu.shop;
   runner.start(spin, now);
 }
 
