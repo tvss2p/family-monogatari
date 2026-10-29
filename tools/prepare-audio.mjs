@@ -46,7 +46,7 @@ function writeWav(file, { ch, rate, data }) {
   writeFileSync(file, Buffer.concat([h, Buffer.from(data.buffer, data.byteOffset, data.length * 2)]));
 }
 
-function convert(src, out, { rate, ch, bps, cut, fade, target }) {
+export function convert(src, out, { rate, ch, bps, cut, fade, target }) {
   const tmp = `${AUDIO_DIR}/.tmp.wav`;
   execFileSync('afconvert', ['-f', 'WAVE', '-d', `LEI16@${rate}`, '-c', String(ch), src, tmp]);
   const w = readWav(tmp);
