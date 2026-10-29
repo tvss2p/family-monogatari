@@ -8,6 +8,8 @@
 
 音楽・効果音：魔王魂 https://maou.audio/（CC BY 4.0、形式変換・音量調整・一部カットあり）
 
+ボイス：edge-tts（Microsoft の ja-JP-NanamiNeural を、高さ +100Hz・速さ +15% にして子どもっぽく）で作成。セリフは src/voices.js、作り直しは `node tools/make-voices.mjs`
+
 使っている曲・効果音の一覧と元のページは [assets/audio/CREDITS.txt](assets/audio/CREDITS.txt) にあります。
 
 ## 作り方のメモ

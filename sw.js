@@ -1,6 +1,6 @@
 // オフラインでも開けるように、ゲームのファイルを先に保存しておく。
 // このファイルは tools/build-sw.mjs が作る（手で直さない）
-const VERSION = 'fm-cddba316f6a5';
+const VERSION = 'fm-ee5760109d0d';
 const FILES = [
   './',
   './index.html',
@@ -24,6 +24,15 @@ const FILES = [
   './assets/audio/maou_se_onepoint32.m4a',
   './assets/audio/maou_se_system21.m4a',
   './assets/audio/maou_se_system37.m4a',
+  './assets/audio/voice_family.m4a',
+  './assets/audio/voice_hot.m4a',
+  './assets/audio/voice_jackpot1.m4a',
+  './assets/audio/voice_jackpot2.m4a',
+  './assets/audio/voice_jitan.m4a',
+  './assets/audio/voice_kakuhen.m4a',
+  './assets/audio/voice_kakuhenUp.m4a',
+  './assets/audio/voice_reach1.m4a',
+  './assets/audio/voice_reach2.m4a',
   './assets/img/apple-touch-icon.png',
   './assets/img/cab-bottom.webp',
   './assets/img/cab-crown.webp',
@@ -52,8 +61,10 @@ const FILES = [
   './src/audio.js',
   './src/bgm.js',
   './src/board-layout.js',
+  './src/cloud.js',
   './src/config.js',
   './src/cues.js',
+  './src/firebase-config.js',
   './src/fit.js',
   './src/hud.js',
   './src/input.js',
@@ -74,6 +85,7 @@ const FILES = [
   './src/story.js',
   './src/symbols.js',
   './src/update.js',
+  './src/voices.js',
   './src/wakelock.js',
   './styles/cabinet.css',
   './styles/lcd.css',
