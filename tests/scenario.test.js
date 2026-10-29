@@ -97,13 +97,13 @@ test('cue order', () => {
   }
 });
 
-test('durations: plain miss 3800ms, fast miss 1800ms, reach 7000–19000ms', () => {
+test('durations: plain miss 3800ms, fast miss 1800ms, reach 7000–20000ms（注文アニメのぶん長くなる）', () => {
   const rng = mulberry32(16);
   for (let i = 0; i < 5000; i++) {
     const s = buildSpin(MISS, 'normal', rng);
     const plain = !s.reach && s.nyanren === 0;
     if (plain) assert.equal(s.durationMs, 3800);
-    else if (s.reach) assert.ok(s.durationMs >= 7000 && s.durationMs <= 19000, `${s.durationMs}`);
+    else if (s.reach) assert.ok(s.durationMs >= 7000 && s.durationMs <= 20000, `${s.durationMs}`);
     const f = buildSpin(MISS, 'kakuhen', rng);
     if (!f.reach && f.nyanren === 0) assert.equal(f.durationMs, 1800);
   }
@@ -202,7 +202,7 @@ test('new cue order: nyanren before the first stop, develop inside the reach', (
     assert.equal(nyans.length, s.nyanren);
     for (const c of nyans) assert.ok(c.t < L);
     if (s.develop) assert.ok(at(s, 'develop') > at(s, 'reach') && at(s, 'develop') < M - 1000);
-    assert.ok(s.durationMs <= 18000, `long ${s.durationMs}`);
+    assert.ok(s.durationMs <= 20000, `long ${s.durationMs}`);
   }
 });
 
@@ -244,4 +244,23 @@ test('家族予告：外れでも3回に1回くらい出て、当たりではも
   assert.deepEqual(Object.keys(color).sort(), ['blue', 'green', 'red', 'white']);
   assert.ok(rel(color.red) > 0.1 && rel(color.red) > rel(color.white) * 20, `red ${rel(color.red)} white ${rel(color.white)}`);
   assert.ok(rel(color.white) < rel(color.blue) && rel(color.blue) < rel(color.green) && rel(color.green) < rel(color.red));
+});
+
+test('注文アニメ：リーチ中だけ（発展とは別）。確定の注文は当たりのときだけ、外れでもたまに出る', () => {
+  const rng = mulberry32(21);
+  let missMenus = 0, hitMenus = 0, kakutei = 0;
+  for (let i = 0; i < 20000; i++) {
+    const miss = buildSpin({ hit: false, symbolId: null, kind: null }, 'normal', rng);
+    if (miss.menu) {
+      missMenus++;
+      assert.ok(miss.reach && !miss.develop);
+      assert.notEqual(miss.menu.tier, 'kakutei');
+      assert.ok(miss.cues.some(c => c.cue === 'menu'));
+    }
+    const hit = buildSpin({ hit: true, symbolId: 'kira', kind: 'kakuhen' }, 'normal', rng);
+    if (hit.menu) { hitMenus++; if (hit.menu.tier === 'kakutei') kakutei++; }
+  }
+  assert.ok(missMenus > 0 && missMenus < 20000 * 0.03, `miss ${missMenus}`);
+  assert.ok(hitMenus > 20000 * 0.2, `hit ${hitMenus}`);
+  assert.ok(kakutei > hitMenus * 0.25, `kakutei ${kakutei}`);
 });

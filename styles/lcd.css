@@ -348,3 +348,117 @@
 .stage .cap{position:absolute;left:0;right:0;bottom:0;z-index:7;padding:3px 0;text-align:center;font-size:12px;font-weight:900;color:#fff;
   background:linear-gradient(90deg,transparent,rgba(90,30,60,.82) 20%,rgba(90,30,60,.82) 80%,transparent);animation:cap 2s ease 1 forwards}
 @keyframes cap{0%{opacity:0;transform:translateY(10px)}12%,75%{opacity:1;transform:none}100%{opacity:0}}
+
+/* おでかけの話のタイトル（話のはじめに 2.6 秒） */
+.epTitle{position:absolute;left:10px;right:10px;top:34%;z-index:12;padding:6px 4px 7px;border-radius:12px;text-align:center;font-size:17px;font-weight:900;color:#fff;
+  background:linear-gradient(90deg,#ff8aa6,#ffb04d);box-shadow:0 0 0 3px #fff,0 3px 10px rgba(0,0,0,.3);text-shadow:0 1px 0 #c2345c;opacity:0;pointer-events:none}
+.epTitle small{display:block;font-size:10px;letter-spacing:.1em;color:#fff6c8}
+.epTitle.go{animation:epTitle 2.6s ease 1}
+@keyframes epTitle{0%{opacity:0;transform:scale(.4) rotate(-6deg)}12%{opacity:1;transform:scale(1.08)}20%,82%{opacity:1;transform:none}100%{opacity:0;transform:translateY(-10px)}}
+
+/* 注文アニメ：リーチ中、家族がお店で待っていると注文が運ばれてくる（豪華なほどアツい） */
+.order{position:absolute;inset:0;z-index:10;overflow:hidden;opacity:0;pointer-events:none;transition:opacity .25s}
+.order.show{opacity:1}
+.order .ofam{position:absolute;inset:0;z-index:2}
+.order .ofam .actor{bottom:54px;transform:scale(.9);transform-origin:50% 100%}
+.order .otable{position:absolute;left:0;right:0;bottom:0;height:58px;z-index:3;background:linear-gradient(#c98a4a,#9a6232);box-shadow:0 -3px 0 #e3a866 inset}
+.order .oshop{position:absolute;left:8px;top:8px;z-index:6;padding:2px 8px;border-radius:8px;background:rgba(255,255,255,.9);font-size:10px;font-weight:900;color:#7a4a2a}
+.order .ostaff{position:absolute;right:8px;top:50px;z-index:6;padding:3px 8px;border-radius:10px;background:#fff;font-size:11px;font-weight:900;color:#4a2a2a;box-shadow:0 2px 4px rgba(0,0,0,.2);opacity:0}
+.order .oname{position:absolute;left:0;right:0;bottom:3px;z-index:6;text-align:center;font-size:13px;font-weight:900;color:#fff;text-shadow:0 1px 0 #6b3a1a,0 0 4px #6b3a1a;opacity:0}
+.order .food{position:absolute;left:50%;bottom:20px;z-index:5;width:150px;height:64px;margin-left:-75px;display:flex;align-items:flex-end;justify-content:center;transform:translateX(220px)}
+.order .oglow{position:absolute;left:50%;bottom:0;z-index:1;width:200px;height:120px;margin-left:-100px;opacity:0;border-radius:50%}
+.order.come .food{transition:transform .5s cubic-bezier(.3,1.4,.5,1);transform:none}
+.order.come .ostaff{animation:ostaff 1.4s ease 1 forwards}
+.order.come .oname{transition:opacity .3s .6s;opacity:1}
+.order.chance.come .oglow{opacity:1;transition:opacity .3s .5s;background:radial-gradient(rgba(255,120,150,.55),transparent 65%)}
+.order.kakutei.come .oglow{opacity:1;transition:opacity .3s .5s;background:repeating-conic-gradient(from 0deg,rgba(255,240,150,.85) 0 10deg,transparent 10deg 24deg);animation:spin 4s linear infinite;
+  -webkit-mask:radial-gradient(#000 30%,transparent 70%);mask:radial-gradient(#000 30%,transparent 70%)}
+.order.kakutei.come .oname{color:#ffe14d;animation:allspin 1s linear infinite}
+.order.kakutei.come .food::after{content:'✦ ✦ ✦';position:absolute;left:0;right:0;top:-18px;text-align:center;font-size:14px;color:#fff6a8;text-shadow:0 0 6px #ffd34d;animation:idleBob .6s ease-in-out infinite}
+@keyframes ostaff{0%{opacity:0;transform:translateY(6px)}15%,80%{opacity:1;transform:none}100%{opacity:0}}
+.food i,.food div{position:relative;display:block}
+/* マクドナルド：トレーにバーガー・ポテト・ドリンク */
+.food .tray{width:146px;height:22px;border-radius:5px;background:#d9822b;box-shadow:inset 0 0 0 4px #b8661a;display:flex;align-items:flex-end;justify-content:center;gap:8px;padding-bottom:9px;overflow:visible}
+.food .burger{display:flex;flex-direction:column;align-items:center;margin-bottom:-2px}
+.food .burger .bt{width:46px;height:16px;border-radius:23px 23px 4px 4px;background:radial-gradient(circle at 30% 40%,#fff6 1px,transparent 2px) 0 0/8px 6px,#e9a64a}
+.food .burger .lt{width:50px;height:4px;border-radius:3px;background:#7bc35a}
+.food .burger .cz{width:48px;height:4px;background:#ffd34d;clip-path:polygon(0 0,100% 0,96% 100%,80% 40%,62% 100%,40% 40%,20% 100%,4% 40%)}
+.food .burger .pt{width:46px;height:7px;border-radius:4px;background:#6b3416}
+.food .burger .bb{width:44px;height:8px;border-radius:2px 2px 8px 8px;background:#e09a40}
+.food .fries{width:24px;height:34px}
+.food .fries i{position:absolute;left:3px;right:3px;top:0;height:14px;background:repeating-linear-gradient(90deg,#ffd34d 0 3px,#f2b92a 3px 5px)}
+.food .fries::after{content:'';position:absolute;left:0;right:0;bottom:0;height:22px;background:#d63a2e;clip-path:polygon(0 0,100% 0,88% 100%,12% 100%)}
+.food .cup{width:22px;height:38px;background:linear-gradient(#fff 0 12%,#d63a2e 12% 60%,#fff 60%);clip-path:polygon(0 0,100% 0,88% 100%,12% 100%)}
+.food .cup i{position:absolute;left:12px;top:-12px;width:3px;height:16px;background:#fff;transform:rotate(14deg);box-shadow:0 0 0 1px #ddd}
+/* びっくりドンキー：木のお皿にハンバーグ・ごはん・サラダ */
+.food .wood{width:146px;height:40px;border-radius:50%;background:radial-gradient(ellipse at 50% 40%,#e7b77a,#c98a4a 70%,#9a6232);box-shadow:0 3px 0 #6b3f22}
+.food .wood .rice{position:absolute;left:14px;top:6px;width:38px;height:24px;border-radius:50%;background:radial-gradient(circle at 40% 30%,#fff,#ece6da)}
+.food .wood .salad{position:absolute;right:16px;top:6px;width:34px;height:22px;border-radius:50%;background:radial-gradient(circle at 30% 40%,#ff6a4d 0 4px,transparent 5px),radial-gradient(circle,#9be08a 0 40%,#5aa94e)}
+.food .wood .hb{position:absolute;left:50%;top:6px;width:46px;height:26px;margin-left:-23px;border-radius:50%;background:radial-gradient(ellipse at 40% 30%,#9a5a2a,#5a2a10 70%);box-shadow:0 2px 0 #3a1a08}
+.food .wood .hbcz{position:absolute;left:50%;top:4px;width:36px;height:16px;margin-left:-18px;border-radius:40% 40% 50% 50%;background:#ffd34d;clip-path:polygon(0 0,100% 0,100% 60%,82% 100%,66% 55%,46% 100%,30% 55%,12% 100%,0 60%)}
+.food .wood .potesara{position:absolute;right:10px;top:-14px;width:46px;height:32px;border-radius:50% 50% 40% 40%;background:radial-gradient(circle at 30% 40%,#ff9f6a 0 3px,transparent 4px),radial-gradient(circle at 65% 60%,#7bc35a 0 3px,transparent 4px),radial-gradient(circle at 40% 30%,#fffbe6,#f3e3a0)}
+/* サーティワン：コーンにアイス（シングル → ダブル → トリプル） */
+.food .cone{display:flex;flex-direction:column;align-items:center}
+.food .cone i:not(.cn){width:30px;height:24px;border-radius:50%;margin-bottom:-8px;box-shadow:inset -4px -4px 0 rgba(0,0,0,.08)}
+.food .cone .s1{background:#ff9fbe}.food .cone .s2{background:#9be8d0}.food .cone .s3{background:#8a5a3a}
+.food .cone .cn{width:26px;height:28px;margin-top:2px;background:repeating-linear-gradient(45deg,#e8b06a 0 4px,#c98a3a 4px 6px);clip-path:polygon(0 0,100% 0,50% 100%)}
+/* ケンタッキー：箱のポテト・チキン、バーレル */
+.food .kbox,.food .barrel{display:flex;flex-direction:column;align-items:center}
+.food .bx{width:56px;height:30px;background:repeating-linear-gradient(90deg,#c8102e 0 7px,#fff 7px 14px);clip-path:polygon(0 0,100% 0,90% 100%,10% 100%)}
+.food .bk{width:80px;height:44px;background:repeating-linear-gradient(90deg,#c8102e 0 9px,#fff 9px 18px);clip-path:polygon(0 0,100% 0,88% 100%,12% 100%)}
+.food .fr{width:44px;height:12px;margin-bottom:-2px;background:repeating-linear-gradient(90deg,#ffd34d 0 3px,#f2b92a 3px 5px)}
+.food .ck{width:30px;height:22px;border-radius:50% 50% 45% 45%;background:radial-gradient(circle at 35% 35%,#e0a050,#b8742a 60%,#8a4a1a);margin-bottom:-8px}
+.food .kbox .ck.b,.food .barrel .ck.b,.food .barrel .ck.d{position:absolute;top:-4px}
+.food .kbox .ck.a{left:-10px}.food .kbox .ck.b{left:10px}
+.food .barrel .ck.a{left:-22px}.food .barrel .ck.b{left:-14px;top:-14px}.food .barrel .ck.c{left:22px;top:-22px}.food .barrel .ck.d{left:14px;top:-10px}
+
+/* ドライブ：山と道路（木が後ろへ流れる）と、赤い車 */
+.bg-drive{background:linear-gradient(#8fd3ff,#e6f6ff 58%,#9a9da4 58% 62%,#6d7078 62%)}
+.bg-drive .bgArt i:nth-child(1){display:block;left:-10px;right:-10px;top:58px;height:60px;background:#6bbf5a;clip-path:polygon(0 100%,18% 30%,34% 70%,52% 10%,70% 60%,86% 25%,100% 100%)}
+.bg-drive .bgArt i:nth-child(2){display:block;left:0;width:520px;top:96px;height:30px;animation:road 3s linear infinite;
+  background:radial-gradient(ellipse 12px 15px at 50% 40%,#3f8f3c 96%,transparent) 0 0/60px 30px repeat-x}
+.bg-drive .bgArt i:nth-child(3){display:block;left:0;width:520px;bottom:24px;height:4px;animation:road 1s linear infinite;background:repeating-linear-gradient(90deg,#fff 0 22px,transparent 22px 44px)}
+.bg-drive .bgArt i:nth-child(4){display:block;left:150px;top:94px;width:76px;height:26px;border-radius:14px 22px 6px 6px;background:linear-gradient(#e8473a 0 55%,#b8302a 55%);
+  box-shadow:12px 22px 0 -6px #2a2a32,56px 22px 0 -6px #2a2a32}
+.bg-drive .bgArt i:nth-child(5){display:block;left:168px;top:97px;width:36px;height:10px;border-radius:6px 10px 2px 2px;background:#bfe6ff}
+@keyframes road{to{transform:translateX(-60px)}}
+
+/* カラオケ：うす暗い部屋、ミラーボール、画面の歌詞、ソファ */
+.bg-karaoke{background:linear-gradient(#2a1846,#4a2a6e 70%,#8a2a4a 70%)}
+.bg-karaoke .bgArt i:nth-child(1){display:block;left:104px;top:4px;width:26px;height:26px;border-radius:50%;animation:spin 3s linear infinite;
+  background:repeating-conic-gradient(#fff 0 15deg,#b9c4d6 15deg 30deg);box-shadow:0 0 14px #fff}
+.bg-karaoke .bgArt i:nth-child(2){display:block;left:40px;top:38px;width:150px;height:72px;border-radius:4px;border:4px solid #1a1a22;
+  background:linear-gradient(transparent 58%,#ffe14d 58% 66%,transparent 66% 76%,#fff 76% 84%,transparent 84%),linear-gradient(135deg,#3a7bd5,#6a3ad5)}
+.bg-karaoke .bgArt i:nth-child(3),.bg-karaoke .bgArt i:nth-child(4){display:block;top:-10px;width:60px;height:200px;transform-origin:50% 0;opacity:.5;clip-path:polygon(44% 0,56% 0,100% 100%,0 100%);animation:spot 1.6s ease-in-out infinite alternate}
+.bg-karaoke .bgArt i:nth-child(3){left:20px;background:linear-gradient(#ff8aa6,transparent)}
+.bg-karaoke .bgArt i:nth-child(4){right:20px;background:linear-gradient(#7dc6ff,transparent);animation-direction:alternate-reverse}
+.bg-karaoke .bgArt i:nth-child(5){display:block;left:0;right:0;bottom:0;height:20px;background:linear-gradient(#c2345c,#7a1a3a)}
+
+/* サーティワン：ピンクのお店、アイスのケース、看板 */
+.bg-icecream{background:linear-gradient(#fff0f6 0 60%,#f7c6d9 60% 63%,#f3e6ee 63%)}
+.bg-icecream .bgArt i:nth-child(1){display:block;left:0;right:0;top:0;height:18px;background:repeating-linear-gradient(90deg,#e2457f 0 18px,#5a3a8a 18px 36px)}
+.bg-icecream .bgArt i:nth-child(2){display:block;left:96px;top:24px;width:42px;height:42px;border-radius:50%;background:#e2457f;box-shadow:0 0 0 3px #fff,0 0 0 5px #5a3a8a}
+.bg-icecream .bgArt i:nth-child(2)::after{content:'31';position:absolute;inset:0;text-align:center;font:900 20px/42px sans-serif;color:#fff}
+.bg-icecream .bgArt i:nth-child(3){display:block;left:10px;right:10px;top:76px;height:40px;border-radius:6px;border:3px solid #d8dde6;
+  background:radial-gradient(circle at 50% 70%,#ff8aa6 0 9px,transparent 10px) 0 0/30px 40px,radial-gradient(circle at 50% 70%,#fff3c8 0 9px,transparent 10px) 15px 0/30px 40px,linear-gradient(#e9f7ff,#c9e7f7)}
+.bg-icecream .bgArt i:nth-child(4){display:block;left:28px;top:30px;width:16px;height:30px;background:linear-gradient(#9be08a 0 40%,transparent 40%),linear-gradient(#e8b06a,#c98a3a);clip-path:polygon(0 0,100% 0,50% 100%);animation:sway 2s ease-in-out infinite alternate}
+
+/* ケンタッキー：赤白のしましま、チキンのバケツ */
+.bg-chicken{background:linear-gradient(#fff 0 64%,#c8102e 64% 67%,#efe6dc 67%)}
+.bg-chicken .bgArt i:nth-child(1){display:block;left:0;right:0;top:0;height:30px;background:repeating-linear-gradient(90deg,#c8102e 0 16px,#fff 16px 32px);border-radius:0 0 12px 12px}
+.bg-chicken .bgArt i:nth-child(2){display:block;left:150px;top:62px;width:50px;height:54px;clip-path:polygon(0 0,100% 0,86% 100%,14% 100%);background:repeating-linear-gradient(90deg,#c8102e 0 8px,#fff 8px 16px)}
+.bg-chicken .bgArt i:nth-child(3){display:block;left:150px;top:44px;width:50px;height:24px;border-radius:50% 50% 30% 30%;
+  background:radial-gradient(circle at 25% 60%,#c98a3a 0 9px,transparent 10px),radial-gradient(circle at 70% 50%,#b8742a 0 11px,transparent 12px),radial-gradient(circle at 50% 80%,#d9a04a 0 10px,transparent 11px)}
+.bg-chicken .bgArt i:nth-child(4){display:block;left:30px;top:40px;width:70px;height:22px;border-radius:5px;background:#c8102e}
+.bg-chicken .bgArt i:nth-child(4)::after{content:'チキン';position:absolute;inset:0;text-align:center;font:900 13px/22px sans-serif;color:#fff}
+
+/* ヤオコー：スーパーの棚と看板、カート */
+.bg-market{background:linear-gradient(#fbfbfd 0 66%,#e3e6ea 66%)}
+.bg-market .bgArt i:nth-child(1),.bg-market .bgArt i:nth-child(2){display:block;top:62px;width:80px;height:64px;
+  background:linear-gradient(transparent 30%,#b9bec6 30% 33%,transparent 33% 63%,#b9bec6 63% 66%,transparent 66% 96%,#b9bec6 96%),
+  radial-gradient(circle at 50% 50%,#ff6a4d 0 6px,transparent 7px) 0 8px/16px 32px,radial-gradient(circle at 50% 50%,#7bc35a 0 6px,transparent 7px) 8px 18px/16px 32px,#f2f4f7}
+.bg-market .bgArt i:nth-child(1){left:6px}.bg-market .bgArt i:nth-child(2){right:6px}
+.bg-market .bgArt i:nth-child(3){display:block;left:50%;margin-left:-41px;top:34px;width:82px;height:22px;border-radius:6px;background:#e8473a}
+.bg-market .bgArt i:nth-child(3)::after{content:'ヤオコー';position:absolute;inset:0;text-align:center;font:900 13px/22px sans-serif;color:#fff}
+.bg-market .bgArt i:nth-child(4){display:block;left:104px;top:96px;width:34px;height:20px;border:3px solid #8a96a8;border-top-width:2px;border-radius:2px 2px 6px 6px;
+  background:repeating-linear-gradient(90deg,transparent 0 5px,rgba(138,150,168,.6) 5px 6px)}

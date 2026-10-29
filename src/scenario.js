@@ -1,5 +1,5 @@
 import { SYMBOLS, PREMIUM_ID } from './symbols.js';
-import { pickLine } from './story.js';
+import { pickLine, MENUS } from './story.js';
 
 // 出やすさ（当たりのとき／外れのとき）。出たらアツいものほど外れでは出にくい
 export const RATES = {
@@ -21,10 +21,13 @@ export const RATES = {
   famColor: { hit: { white: 0.15, blue: 0.25, green: 0.25, red: 0.35 }, miss: { white: 0.72, blue: 0.2, green: 0.07, red: 0.01 } },
   promoKakuhen: 0.35,
   promoNormal: 0.3,
+  // 注文アニメ（リーチ中だけ）：激アツのリーチほど出やすい。いちばん豪華な注文（確定）は当たりのときだけ
+  menu: { hot: { hit: 0.7, miss: 0.3 }, plain: { hit: 0.4, miss: 0.1 } },
+  menuTier: { hit: { normal: 0.3, chance: 0.35, kakutei: 0.35 }, miss: { normal: 0.8, chance: 0.2, kakutei: 0 } },
   hold: { hit: { white: 0.3, blue: 0.25, green: 0.2, red: 0.2, gold: 0.05 }, miss: { white: 0.993, blue: 0.005, green: 0.0015, red: 0.0005, gold: 0 } },
 };
 
-const CATS = SYMBOLS.filter(s => s.no !== null && !['daisuke', 'hiroko', 'nanae'].includes(s.id)).map(s => s.id);
+const CATS = SYMBOLS.filter(s => s.no !== null && !['daisuke', 'hiroko', 'nanae', 'oe'].includes(s.id)).map(s => s.id);
 const pick = (rng, list) => list[Math.floor(rng() * list.length)];
 const pickOther = (rng, not) => pick(rng, SYMBOLS.filter(s => s.id !== not)).id;
 function weighted(rng, table) {
@@ -44,6 +47,9 @@ export function holdColor(hold, rng) {
   return weighted(rng, hold.hit ? RATES.hold.hit : RATES.hold.miss);
 }
 
+// 注文アニメの長さ（リーチのはじめに流す）
+export const ORDER_MS = 3200;
+
 // 1回転ぶんの台本：止まる図柄・予告・リーチ・合図の時刻（ms）
 export function buildSpin(hold, mode, rng) {
   const fast = mode !== 'normal';
@@ -56,6 +62,10 @@ export function buildSpin(hold, mode, rng) {
   if (hasReach) reach = premium ? (rng() < 0.5 ? 'allspin' : 'family') : weighted(rng, RATES.reachKind[side]);
   const develop = !!reach && (reach === 'jarashi' || reach === 'nap' || reach === 'family') && rng() < RATES.develop;
   const hot = !!reach && (premium || chance(RATES.hot));
+  // 注文アニメ（リーチ中、家族がお店にいて注文が運ばれてくる）。運ばれてきたものが豪華なほどアツい
+  const menu = reach && !develop && rng() < RATES.menu[hot ? 'hot' : 'plain'][side]
+    ? { shop: pick(rng, Object.keys(MENUS)), tier: weighted(rng, RATES.menuTier[side]) }
+    : null;
 
   const notices = [];
   if (chance(RATES.paw)) notices.push('paw');
@@ -91,6 +101,7 @@ export function buildSpin(hold, mode, rng) {
   else if (reach) { const p = pick(rng, SYMBOLS).id; stops = [p, pickOther(rng, p), p]; }
   else { const l = pick(rng, SYMBOLS).id; stops = [l, pick(rng, SYMBOLS).id, pickOther(rng, l)]; }
 
+
   const cues = [{ t: 0, cue: 'start' }];
   const add = (t, cue) => cues.push({ t, cue });
   const k = fast ? 3 : 1;
@@ -120,9 +131,12 @@ export function buildSpin(hold, mode, rng) {
     add(stopR + 200, 'armsIn');
     const len = { normal: 4400, jarashi: 6000, nap: 6000, family: 7000, allspin: 6500 }[reach];
     const devLen = develop ? 1800 : 0;
-    stopM = stopR + len + devLen + (hot ? 1000 : 0);
-    if (develop) add(stopR + 2200, 'develop');
-    add(stopR + (develop ? 2200 + 400 : 100), `rt:${reach}`);
+    // 注文アニメがあるときは、そのぶん（ORDER_MS）リーチの演出をあとにずらす
+    const r0 = stopR + (menu ? ORDER_MS : 0);
+    stopM = r0 + len + devLen + (hot ? 1000 : 0);
+    if (develop) add(r0 + 2200, 'develop');
+    if (menu) add(stopR + 300, 'menu');
+    add(r0 + (develop ? 2200 + 400 : 100), `rt:${reach}`);
     if (hot) {
       const h = stopM - 3500;
       add(h, 'hot');
@@ -142,5 +156,5 @@ export function buildSpin(hold, mode, rng) {
   add(end, 'end');
 
   cues.sort((a, b) => a.t - b.t);
-  return { stops, reach, develop, notices, step, chara, bubble, famNote, nyanren: nyanCount, premiumNotice, promo, hot, durationMs: end, cues };
+  return { stops, reach, develop, notices, step, chara, bubble, famNote, nyanren: nyanCount, premiumNotice, promo, hot, menu, durationMs: end, cues };
 }

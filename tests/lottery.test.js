@@ -5,11 +5,11 @@ import { drawHit } from '../src/lottery.js';
 import { mulberry32 } from './helpers.js';
 
 test('symbols table matches spec', () => {
-  assert.equal(SYMBOLS.length, 12);
-  assert.deepEqual(SYMBOLS.map(s => s.name), ['ジル', 'リー', 'ベリー', 'なーふぁん', 'ラッキー', 'キラ', 'グレン', 'だいすけ', 'ばあちゃん', 'ななえ', 'ハニー', '家族3人']);
+  assert.equal(SYMBOLS.length, 13);
+  assert.deepEqual(SYMBOLS.map(s => s.name), ['ジル', 'リー', 'ベリー', 'なーふぁん', 'ラッキー', 'キラ', 'グレン', 'だいすけ', 'ばあちゃん', 'ななえ', 'ハニー', '大江さん', '家族4人']);
   for (const s of NUMBERED) assert.equal(s.type, s.no % 2 === 1 ? 'kakuhen' : 'normal');
-  assert.equal(NUMBERED.length, 11);
-  const last = SYMBOLS[11];
+  assert.equal(NUMBERED.length, 12);
+  const last = SYMBOLS[12];
   assert.equal(last.id, PREMIUM_ID);
   assert.equal(last.id, 'trio');
   assert.equal(last.type, 'premium');
@@ -53,7 +53,7 @@ test('premium share ≈ 10%', () => {
   assert.ok(r > 0.08 && r < 0.12, `share ${r}`);
 });
 
-test('numbered hits are uniform and kind follows parity', () => {
+test('当たりの図柄：確変の図柄は 6/66 ずつ、通常は 5/66 ずつ。確変に入る割合は 6/11 のまま', () => {
   const rng = mulberry32(5);
   const count = {};
   let n = 0;
@@ -67,8 +67,12 @@ test('numbered hits are uniform and kind follows parity', () => {
   }
   for (const s of NUMBERED) {
     const r = count[s.id] / n;
-    assert.ok(r > 0.07 && r < 0.11, `${s.id} ${r}`);
+    const want = s.type === 'kakuhen' ? 6 / 66 : 5 / 66;
+    assert.ok(Math.abs(r - want) < 0.006, `${s.id} ${r}`);
   }
+  const k = NUMBERED.filter(s => s.type === 'kakuhen').reduce((a, s) => a + count[s.id], 0) / n;
+  assert.ok(Math.abs(k - 6 / 11) < 0.006, `kakuhen ${k}`);
+  assert.ok(count.oe > 0);
 });
 
 test('miss has no symbol', () => {

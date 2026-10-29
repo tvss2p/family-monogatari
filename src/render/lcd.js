@@ -1,6 +1,7 @@
 import { SYMBOLS, PREMIUM_ID, symbolById } from '../symbols.js';
 import { pawPath } from './parts.js';
-import { CAST, MOVIE, SCENE_MS, pickLine } from '../story.js';
+import { CAST, EPISODES, FILLER, MENUS, ORDER_LINES, SCENE_MS, pickLine } from '../story.js';
+import { ORDER_MS } from '../scenario.js';
 
 // 顔イラストに体をつける（人は服・腕・足、猫はそのまま）
 export function figureHTML(who) {
@@ -21,13 +22,32 @@ function symHTML(id, small) {
   return `<div class="sym ${ring(s)}${small ? ' small' : ''}"><img class="${s.id === PREMIUM_ID ? 'wide' : ''}" src="${s.img}" alt=""><span class="num">${s.no ?? '★'}</span></div>`;
 }
 
+// 注文アニメで運ばれてくるもの（お店ごとの出し方。tier で中身が豪華になる）
+export function foodHTML(shop, tier) {
+  const k = tier === 'kakutei', c = tier !== 'normal';
+  if (shop === 'burger') {
+    const burger = `<div class="burger"><i class="bt"></i><i class="lt"></i>${c ? '<i class="cz"></i>' : ''}<i class="pt"></i>${k ? '<i class="cz"></i><i class="pt"></i>' : ''}<i class="bb"></i></div>`;
+    return `<div class="tray">${burger}<div class="fries"><i></i></div><div class="cup"><i></i></div></div>`;
+  }
+  if (shop === 'donkey') {
+    return `<div class="wood"><i class="rice"></i><i class="salad"></i><i class="hb"></i>${c ? '<i class="hbcz"></i>' : ''}${k ? '<i class="potesara"></i>' : ''}</div>`;
+  }
+  if (shop === 'icecream') {
+    const n = k ? 3 : c ? 2 : 1;
+    return `<div class="cone">${['s1', 's2', 's3'].slice(0, n).reverse().map(x => `<i class="${x}"></i>`).join('')}<i class="cn"></i></div>`;
+  }
+  // ケンタッキー：ポテト → チキン → バーレル
+  if (k) return '<div class="barrel"><i class="ck a"></i><i class="ck b"></i><i class="ck c"></i><i class="ck d"></i><i class="bk"></i></div>';
+  return `<div class="kbox">${c ? '<i class="ck a"></i><i class="ck b"></i>' : '<i class="fr"></i>'}<i class="bx"></i></div>`;
+}
+
 // 液晶：リール・予告・リーチ・大当たりムービー
 export function createLcd(root) {
   root.innerHTML = `<div class="rays"></div>
     <div class="bn reach">${st(['リ', 'ー', 'チ', '！'], 28, ['#ffe14d', '#ffe14d', '#ffe14d', '#fff'], [-4, 3, -2, 6])}</div>
     <div class="bn hot">${st(['ボ', 'タ', 'ン', 'を', '押', 'せ', '！'], 22, ['#fff', '#fff', '#fff', '#fff', '#ffe14d', '#ffe14d', '#ffe14d'], [-4, 3, -2, 4, -3, 5, 6])}</div>
     <div class="reels"><div class="reel"></div><div class="reel"></div><div class="reel"></div></div>
-    <div class="famcast"><img src="assets/img/sym-daisuke.png" alt=""><img src="assets/img/sym-hiroko.png" alt=""><img src="assets/img/sym-nanae.png" alt=""></div>
+    <div class="famcast"><img src="assets/img/sym-daisuke.png" alt=""><img src="assets/img/sym-hiroko.png" alt=""><img src="assets/img/sym-nanae.png" alt=""><img src="assets/img/sym-oe.png" alt=""></div>
     <div class="paws">${[[20, 30], [150, 20], [60, 110], [180, 120], [110, 60]].map(([x, y], i) => `<i style="left:${x}px;top:${y}px;animation-delay:${i * 0.12}s"><svg viewBox="0 0 24 24" fill="#ff8fae">${pawPath}</svg></i>`).join('')}</div>
     <img class="honeyRun" src="assets/img/sym-honey.png" alt="">
     <div class="parade">${['jill', 'lee', 'berry', 'nafan', 'kira', 'glen', 'honey', 'lucky'].map(n => `<img src="assets/img/sym-${n}.png" alt="">`).join('')}</div>
@@ -40,6 +60,7 @@ export function createLcd(root) {
     <div class="premiumNote"><img alt=""><b></b></div>
     <div class="develop">${st(['リ', 'ー', 'チ', '!', '!'], 38, ['#fff', '#fff', '#fff', '#ffe14d', '#ffe14d'], [-6, 4, -3, 6, 10])}</div>
     <div class="rtDeco"><img class="toy" src="assets/img/part-jarashi.webp" alt=""><img class="napper" src="assets/img/sym-honey.png" alt=""><span class="zzz">Z z z</span><b class="allspinTxt">全回転</b></div>
+    <div class="order"><div class="bgArt"><i></i><i></i><i></i><i></i><i></i></div><div class="ofam"></div><i class="otable"></i><i class="oglow"></i><div class="food"></div><div class="ostaff">おまたせしました〜♪</div><div class="oname"></div><div class="oshop"></div></div>
     <div class="talk"><img alt=""><span></span></div>
     <div class="modeCut"></div>
     <div class="chain"></div>
@@ -55,6 +76,8 @@ export function createLcd(root) {
   let sceneTimers = [];
   let talkTimer = null;
   let onEvent = () => {};
+  // 次に流すおでかけの話を決める（main.js が、まだ見ていない話から選ぶ）
+  let pickEpisode = () => EPISODES[Math.floor(Math.random() * EPISODES.length)];
   const rnd = () => SYMBOLS[Math.floor(Math.random() * SYMBOLS.length)].id;
   const idx = id => SYMBOLS.findIndex(s => s.id === id);
   const around = (id, d) => SYMBOLS[(idx(id) + d + SYMBOLS.length) % SYMBOLS.length].id;
@@ -200,6 +223,8 @@ export function createLcd(root) {
         el.className = `premiumNote ${arg}`;
         replay('.premiumNote');
       }
+      // 注文アニメ：家族がお店で待っていると、注文が運ばれてくる（豪華なほどアツい）
+      else if (cue === 'menu' && spin && spin.menu) this.order(spin.menu);
       else if (cue === 'develop') { root.classList.add('sp'); replay('.develop'); }
       else if (kind === 'rt') root.classList.add(`rt-${arg}`);
       else if (cue === 'stopL') stop(0, spin.stops[0]);
@@ -209,6 +234,23 @@ export function createLcd(root) {
       else if (cue === 'notice:honey') replay('.honeyRun');
       else if (cue === 'notice:parade') replay('.parade');
       else if (cue === 'jackpot') this.showJackpot(spin.stops[1], spin);
+    },
+    order({ shop, tier }) {
+      const m = MENUS[shop];
+      const el = root.querySelector('.order');
+      el.className = `order bg-${m.bg} ${shop} ${tier}`;
+      el.querySelector('.ofam').innerHTML = [['nanae', 22], ['hiroko', 92], ['daisuke', 162]]
+        .map(([who, x]) => `<div class="actor idle" style="left:${x}px">${figureHTML(who)}</div>`).join('');
+      el.querySelector('.food').innerHTML = foodHTML(shop, tier);
+      el.querySelector('.oname').textContent = m[tier];
+      el.querySelector('.oshop').textContent = m.shop;
+      void el.offsetWidth;
+      el.classList.add('show');
+      const pick = list => list[Math.floor(Math.random() * list.length)];
+      this.say(pick(ORDER_LINES.wait), true);
+      setTimeout(() => el.classList.add('come'), 1000);
+      setTimeout(() => this.say(pick(ORDER_LINES[tier]), true), 1900);
+      setTimeout(() => el.classList.remove('show', 'come'), ORDER_MS - 250);
     },
     showJackpot(id, spin) {
       const s = symbolById(id);
@@ -230,7 +272,7 @@ export function createLcd(root) {
         + `<div class="jpGain">獲得 <b>0</b>玉</div><div class="dancer"></div>`
         + `<div class="guide"><div>${st(['ア', 'タ', 'ッ', 'カ', 'ー', 'O', 'P', 'E', 'N', '！'], 20, ['#ffe14d'], [-3, 3, -2, 2, 0, 0, 0, 0, 0, 6])}</div><p>そのまま打ちっぱなしでOK！<br>「固定」にしておくとらくちん</p></div>`;
       movie.insertAdjacentHTML('afterbegin', '<div class="stage"></div>');
-      movie.insertAdjacentHTML('beforeend', '<div class="promo"></div>');
+      movie.insertAdjacentHTML('beforeend', '<div class="promo"></div><div class="epTitle"></div>');
       movie.classList.remove('guiding', 'playing');
       root.classList.remove('movieOn');
       void movie.offsetWidth;
@@ -263,12 +305,21 @@ export function createLcd(root) {
       // 案内のあと、家族のひとこと。そのあとは家族と猫・おでかけのムービーが流れる（7 秒ごとに場面が変わる）
       at(3500, () => this.say(pickLine(id === PREMIUM_ID ? 'family' : 'jackpot', Math.random)));
       const stage = movie.querySelector('.stage');
-      // 大当たりのたびに、ちがう場面から始まる（spin.scene は確かめ用に場面を決めるとき）
-      let n = Number.isInteger(spin && spin.scene) ? spin.scene : Math.floor(Math.random() * MOVIE.length);
+      // 大当たりのたびに、おでかけの話を 1 話（spin.episode は確かめ用に話を決めるとき）。話のあとは家族と猫の場面
+      const ep = EPISODES.find(e => e.id === (spin && spin.episode)) || pickEpisode();
+      const scenes = [...ep.scenes, ...FILLER];
+      let n = 0;
       const next = () => {
         movie.classList.add('playing');
         root.classList.add('movieOn');
-        playScene(stage, MOVIE[n % MOVIE.length]);
+        if (n === 0) {
+          const et = movie.querySelector('.epTitle');
+          et.innerHTML = `<small>きょうのおでかけ</small>${ep.title}`;
+          et.classList.remove('go');
+          void et.offsetWidth;
+          et.classList.add('go');
+        }
+        playScene(stage, scenes[n < scenes.length ? n : ep.scenes.length + (n - ep.scenes.length) % FILLER.length]);
         n++;
         sceneTimer = setTimeout(next, SCENE_MS);
       };
@@ -334,6 +385,7 @@ export function createLcd(root) {
     },
     get spin() { return current; },
     set onEvent(fn) { onEvent = fn; },
+    set episodePicker(fn) { pickEpisode = fn; },
     get spinning() { return state.filter(s => s.spin).length; },
   };
 }

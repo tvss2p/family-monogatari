@@ -1,12 +1,13 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { CAST, LINES, MOVIE, SCENE_MS, pickLine } from '../src/story.js';
+import { CAST, LINES, MOVIE, EPISODES, MENUS, ORDER_LINES, SCENE_MS, pickLine, pickEpisode } from '../src/story.js';
 import { readFileSync } from 'node:fs';
 import { mulberry32 } from './helpers.js';
 
 const allLines = () => [
   ...Object.values(LINES).flat(),
   ...MOVIE.flatMap(sc => sc.lines),
+  ...Object.values(ORDER_LINES).flat(),
 ];
 
 test('セリフと場面に出てくるのは、決まった登場人物と猫だけ', () => {
@@ -52,7 +53,7 @@ test('どの場面の背景も、液晶の絵（lcd.css）がある', () => {
 });
 
 test('人には服の色があり、猫にはない', () => {
-  for (const id of ['daisuke', 'nanae', 'hiroko']) assert.ok(CAST[id].human && CAST[id].shirt && CAST[id].pants);
+  for (const id of ['daisuke', 'nanae', 'hiroko', 'oe']) assert.ok(CAST[id].human && CAST[id].shirt && CAST[id].pants);
   assert.equal(CAST.honey.human, false);
 });
 
@@ -63,4 +64,41 @@ test('場面ごとのひとこと：リーチ・激アツ・はずれ・大当�
     assert.ok(l && CAST[l.who] && l.text, kind);
   }
   assert.equal(pickLine('nothing', rng), null);
+});
+
+test('おでかけの話：1話4場面。サーティワン・ケンタッキー・ヤオコーは3人、ドライブ・カラオケは大江さんも', () => {
+  const three = ['daisuke', 'hiroko', 'nanae'];
+  for (const ep of EPISODES) assert.equal(ep.scenes.length, 4, ep.id);
+  for (const id of ['drive', 'karaoke']) for (const sc of EPISODES.find(e => e.id === id).scenes) assert.deepEqual(sc.actors.map(a => a.who).sort(), [...three, 'oe'].sort(), id);
+  assert.ok(EPISODES.find(e => e.id === 'oe'));
+  for (const id of ['icecream', 'chicken', 'market']) {
+    const ep = EPISODES.find(e => e.id === id);
+    assert.ok(ep, id);
+    for (const sc of ep.scenes) assert.deepEqual(sc.actors.filter(a => CAST[a.who].human).map(a => a.who).sort(), three, `${id} ${sc.cap}`);
+  }
+  assert.equal(new Set(EPISODES.map(e => e.id)).size, EPISODES.length);
+});
+
+test('話の選び方：まだ見ていない話から。ぜんぶ見たら、また最初から', () => {
+  const rng = mulberry32(3);
+  let seen = [];
+  const got = [];
+  for (let i = 0; i < EPISODES.length; i++) {
+    const r = pickEpisode(seen, rng);
+    seen = r.seen;
+    got.push(r.episode.id);
+  }
+  assert.equal(new Set(got).size, EPISODES.length);
+  const again = pickEpisode(seen, rng);
+  assert.deepEqual(again.seen, [again.episode.id]);
+});
+
+test('注文アニメ：どのお店にも背景と、いつもの・ちょっと豪華・いちばん豪華の注文がある', () => {
+  const css = readFileSync('styles/lcd.css', 'utf8');
+  for (const [id, m] of Object.entries(MENUS)) {
+    assert.ok(m.shop && css.includes(`.bg-${m.bg}{`), id);
+    for (const tier of ['normal', 'chance', 'kakutei']) assert.ok(m[tier], `${id} ${tier}`);
+  }
+  assert.equal(MENUS.donkey.kakutei, 'ポテサラパケットディッシュ');
+  assert.equal(MENUS.burger.kakutei, 'ダブルチーズバーガーのセット');
 });

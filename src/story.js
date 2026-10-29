@@ -1,11 +1,11 @@
 import { symbolById } from './symbols.js';
 
-// 登場人物。遊ぶのはばあちゃん：だいすけは「ばあちゃん」、ななえは「おかあさん」と呼びかける
+// 登場人物。遊ぶのはばあちゃん：だいすけは「ばあちゃん」、ななえは「おかあさん」と呼びかける。大江さんはみんなから「大江さん」
 // 服の色は肩組みの絵に合わせる（だいすけ＝黒T、ななえ＝白T、ばあちゃん＝花柄ブラウス）
 const PEOPLE = {
   daisuke: { shirt: '#2a2a32', pants: '#3f5f8f' },
   nanae: { shirt: '#fbfbfb', pants: '#8fb3dc' },
-  hiroko: { shirt: '#f6dbe7', pants: '#7d6f8c', floral: true },
+  hiroko: { shirt: '#f6dbe7', pants: '#7d6f8c', floral: true },  oe: { shirt: '#d9583a', pants: '#5a5a6a' },
 };
 const CATS = ['jill', 'lee', 'berry', 'nafan', 'lucky', 'kira', 'glen', 'honey'];
 
@@ -82,10 +82,19 @@ export function pickLine(kind, rng) {
   return list ? list[Math.floor(rng() * list.length)] : null;
 }
 
-// 大当たり中に流れるムービー（1 場面 7 秒、くり返し）
+// 大当たり中に流れるムービー（1 場面 8 秒）
+// 1 回の大当たりで、おでかけの話（EPISODES）を 1 話だけ流す。話が終わったら、家族と猫の場面（FILLER）をくり返す
 // actors：from から to まで歩いてきて止まる（x は液晶の左からの px）。walk:true は止まらず歩きぬける
-export const SCENE_MS = 7000;
-export const MOVIE = [
+export const SCENE_MS = 8000;
+const AT = [1000, 3300, 5600];
+const sc = (bg, cap, actors, lines) => ({ bg, cap, actors, lines: lines.map(([who, text], i) => ({ at: AT[i], who, text })) });
+// その場に立っている人・左右から歩いてくる人
+const at = (who, x, extra = {}) => ({ who, from: x, to: x, ...extra });
+const inL = (who, x, delay = 0) => ({ who, from: -70, to: x, delay });
+const inR = (who, x, delay = 0) => ({ who, from: 260, to: x, delay });
+
+// 家族と猫の場面（おでかけの話のあとにくり返す）
+export const FILLER = [
   {
     bg: 'home', cap: 'ばあちゃんのお家',
     actors: [{ who: 'daisuke', from: 260, to: 140 }, { who: 'nanae', from: -70, to: 30 }, { who: 'honey', from: 260, to: 196, delay: 900 }],
@@ -121,76 +130,211 @@ export const MOVIE = [
     bg: 'party', cap: '主役はばあちゃん！',
     actors: [
       { who: 'hiroko', from: 80, to: 80, star: true }, { who: 'daisuke', from: 260, to: 160, delay: 400 },
-      { who: 'nanae', from: -70, to: 4, delay: 400 }, { who: 'berry', from: -40, to: 52, delay: 1200 }, { who: 'glen', from: 260, to: 140, delay: 1200 },
+      { who: 'nanae', from: -70, to: 4, delay: 400 }, { who: 'oe', from: 260, to: 196, delay: 800 }, { who: 'berry', from: -40, to: 52, delay: 1200 },
     ],
     lines: [
       { at: 900, who: 'daisuke', text: '主役のばあちゃん登場〜！' },
       { at: 3000, who: 'nanae', text: 'おかあさん、ばんざーい！' },
-      { at: 5000, who: 'daisuke', text: 'まだまだ打ってね！' },
-    ],
-  },
-  // 家族のおでかけ（だいすけ・ななえ・ばあちゃんの 3 人）
-  {
-    bg: 'sushi', cap: '3人で回転寿司',
-    actors: [{ who: 'hiroko', from: 94, to: 94 }, { who: 'nanae', from: -70, to: 30, delay: 300 }, { who: 'daisuke', from: 260, to: 158, delay: 300 }],
-    lines: [
-      { at: 1200, who: 'daisuke', text: 'ばあちゃん、何皿いく？' },
-      { at: 3200, who: 'nanae', text: 'おかあさん、まぐろ来たよ！' },
-      { at: 5000, who: 'hiroko', text: 'おいしいねえ' },
-    ],
-  },
-  {
-    bg: 'museum', cap: '3人でジブリ美術館',
-    actors: [{ who: 'nanae', from: -70, to: 20 }, { who: 'hiroko', from: -130, to: 80, delay: 400 }, { who: 'daisuke', from: 260, to: 168, delay: 200 }],
-    lines: [
-      { at: 1300, who: 'nanae', text: 'おかあさん、かわいいね〜' },
-      { at: 3300, who: 'daisuke', text: 'ばあちゃん、こっちこっち！' },
-      { at: 5100, who: 'hiroko', text: 'ふしぎな建物だねえ' },
-    ],
-  },
-  {
-    bg: 'hamburg', cap: '3人でびっくりドンキー',
-    actors: [{ who: 'daisuke', from: 260, to: 104 }, { who: 'nanae', from: -70, to: 6, delay: 300 }, { who: 'hiroko', from: -120, to: 54, delay: 600 }],
-    lines: [
-      { at: 1300, who: 'daisuke', text: 'ハンバーグ、でっかい！' },
-      { at: 3200, who: 'nanae', text: 'おかあさん、熱いから気をつけて' },
-      { at: 5100, who: 'hiroko', text: 'やわらかいねえ' },
-    ],
-  },
-  {
-    bg: 'hyakkin', cap: '3人で百均へ',
-    actors: [{ who: 'nanae', from: 260, to: 150 }, { who: 'hiroko', from: 300, to: 92, delay: 300 }, { who: 'daisuke', from: -70, to: 24, delay: 500 }],
-    lines: [
-      { at: 1300, who: 'nanae', text: 'おかあさん、これ全部100円！' },
-      { at: 3300, who: 'daisuke', text: 'ばあちゃん、カゴ持つよ' },
-      { at: 5100, who: 'hiroko', text: 'あれもこれも欲しいねえ' },
-    ],
-  },
-  {
-    bg: 'burger', cap: '3人でマクドナルド',
-    actors: [{ who: 'daisuke', from: -70, to: 10 }, { who: 'hiroko', from: -130, to: 58, delay: 300 }, { who: 'nanae', from: -190, to: 102, delay: 600 }],
-    lines: [
-      { at: 1400, who: 'daisuke', text: 'ばあちゃん、ポテト食べる？' },
-      { at: 3300, who: 'nanae', text: 'おかあさん、何にする？' },
-      { at: 5100, who: 'hiroko', text: 'たまにはいいねえ' },
-    ],
-  },
-  {
-    bg: 'flower', cap: 'おかあさんとお花を見に',
-    actors: [{ who: 'nanae', from: -70, to: 60 }, { who: 'hiroko', from: -130, to: 116, delay: 200 }, { who: 'honey', from: 260, to: 190, delay: 2400 }],
-    lines: [
-      { at: 1300, who: 'nanae', text: 'おかあさん、この花きれい！' },
-      { at: 3200, who: 'hiroko', text: 'うちの庭に植えようかね' },
-      { at: 5100, who: 'nanae', text: 'これ買っていこう〜' },
-    ],
-  },
-  {
-    bg: 'village', cap: '3人でビレッジバンガード',
-    actors: [{ who: 'daisuke', from: 260, to: 150 }, { who: 'hiroko', from: -120, to: 82, delay: 300 }, { who: 'nanae', from: -70, to: 22, delay: 500 }],
-    lines: [
-      { at: 1300, who: 'daisuke', text: 'ばあちゃん、これ見て！' },
-      { at: 3200, who: 'nanae', text: 'おかあさん、へんなのある〜' },
-      { at: 5100, who: 'hiroko', text: 'おもしろい店だねえ' },
+      { at: 5000, who: 'oe', text: 'めでたいなあ！' },
     ],
   },
 ];
+
+// おでかけの話（だいすけ・ななえ・ばあちゃんの 3 人でよく行ったところ）。1 話 4 場面
+export const EPISODES = [
+  {
+    id: 'sushi', title: '3人で回転寿司',
+    scenes: [
+      sc('sushi', '回転寿司に到着！', [inL('nanae', 30), inL('hiroko', 94, 300), inR('daisuke', 158, 300)],
+        [['daisuke', 'ばあちゃん、着いたよ！'], ['nanae', 'おかあさん、席あいてる〜'], ['hiroko', 'いいにおいだねえ']]),
+      sc('sushi', 'なにから食べる？', [at('nanae', 30), at('hiroko', 94), at('daisuke', 158)],
+        [['nanae', 'おかあさん、まぐろ来たよ！'], ['daisuke', 'ばあちゃん、何皿いく？'], ['hiroko', 'たまごも取っておくれ']]),
+      sc('sushi', '茶わん蒸しもたのもう', [at('daisuke', 30), at('hiroko', 94), at('nanae', 158)],
+        [['daisuke', '茶わん蒸しもたのもう！'], ['nanae', 'おかあさん、熱いからね'], ['hiroko', 'あったまるねえ']]),
+      sc('sushi', 'おなかいっぱい！', [at('nanae', 30), at('hiroko', 94), at('daisuke', 158)],
+        [['daisuke', 'ばあちゃん、何皿食べた？'], ['hiroko', 'おいしかったねえ'], ['nanae', 'おかあさん、また来よう！']]),
+    ],
+  },
+  {
+    id: 'museum', title: '3人でジブリ美術館',
+    scenes: [
+      sc('museum', 'ジブリ美術館に到着！', [inL('nanae', 20), inL('hiroko', 80, 400), inR('daisuke', 168, 200)],
+        [['nanae', 'おかあさん、かわいいね〜'], ['daisuke', 'ばあちゃん、こっちこっち！'], ['hiroko', 'ふしぎな建物だねえ']]),
+      sc('museum', 'ステンドグラスがきれい', [at('hiroko', 20), at('nanae', 80), at('daisuke', 168)],
+        [['nanae', 'おかあさん、窓がきれい！'], ['hiroko', '光がきらきらだねえ'], ['daisuke', 'ばあちゃん、写真とろう！']]),
+      sc('museum', '屋上のロボット兵', [at('daisuke', 20), at('hiroko', 90), at('nanae', 160)],
+        [['daisuke', 'ばあちゃん、ロボットだよ'], ['hiroko', '大きいねえ'], ['nanae', 'おかあさん、階段気をつけて']]),
+      sc('museum', 'おみやげ選び', [at('nanae', 20), at('hiroko', 90), at('daisuke', 160)],
+        [['nanae', 'おかあさん、どれにする？'], ['hiroko', 'みんなにあげようかね'], ['daisuke', '袋はおれが持つよ！']]),
+    ],
+  },
+  {
+    id: 'hamburg', title: '3人でびっくりドンキー',
+    scenes: [
+      sc('hamburg', 'びっくりドンキーに到着！', [inR('daisuke', 104), inL('nanae', 6, 300), inL('hiroko', 54, 600)],
+        [['daisuke', 'ばあちゃん、ここだよ！'], ['nanae', 'おかあさん、木のお店だね'], ['hiroko', 'にぎやかだねえ']]),
+      sc('hamburg', '大きなメニュー', [at('nanae', 6), at('hiroko', 54), at('daisuke', 104)],
+        [['daisuke', 'メニューでっかい！'], ['nanae', 'おかあさん、どれにする？'], ['hiroko', 'チーズのにしようかね']]),
+      sc('hamburg', 'いただきます！', [at('nanae', 6), at('hiroko', 54), at('daisuke', 104)],
+        [['daisuke', 'ハンバーグ、でっかい！'], ['nanae', 'おかあさん、熱いから気をつけて'], ['hiroko', 'やわらかいねえ']]),
+      sc('hamburg', 'デザートも食べよう', [at('daisuke', 6), at('hiroko', 54), at('nanae', 104)],
+        [['nanae', 'おかあさん、パフェ半分こ！'], ['hiroko', '甘いのは別腹だねえ'], ['daisuke', 'ばあちゃん、満足？']]),
+    ],
+  },
+  {
+    id: 'hyakkin', title: '3人で百均へ',
+    scenes: [
+      sc('hyakkin', '百均に到着！', [inR('nanae', 150), inR('hiroko', 92, 300), inL('daisuke', 24, 500)],
+        [['nanae', 'おかあさん、これ全部100円！'], ['daisuke', 'ばあちゃん、カゴ持つよ'], ['hiroko', 'あれもこれも欲しいねえ']]),
+      sc('hyakkin', '台所のもの', [at('daisuke', 24), at('hiroko', 92), at('nanae', 150)],
+        [['hiroko', 'このざる便利そうだねえ'], ['nanae', 'おかあさん、色ちがいもあるよ'], ['daisuke', 'ばあちゃん、それ入れとく！']]),
+      sc('hyakkin', 'おもしろグッズ', [at('nanae', 24), at('daisuke', 92), at('hiroko', 150)],
+        [['daisuke', 'ばあちゃん、これ見て！'], ['hiroko', 'なんだいそれは'], ['nanae', 'おかあさん、笑いすぎ〜']]),
+      sc('hyakkin', 'カゴがいっぱい', [at('daisuke', 24), at('hiroko', 92), at('nanae', 150)],
+        [['nanae', 'おかあさん、カゴいっぱい！'], ['daisuke', 'ばあちゃん、よく買ったね'], ['hiroko', '安いからつい、ねえ']]),
+    ],
+  },
+  {
+    id: 'burger', title: '3人でマクドナルド',
+    scenes: [
+      sc('burger', 'マクドナルドに到着！', [inL('daisuke', 10), inL('hiroko', 58, 300), inL('nanae', 102, 600)],
+        [['daisuke', 'ばあちゃん、ポテト食べる？'], ['nanae', 'おかあさん、何にする？'], ['hiroko', 'たまにはいいねえ']]),
+      sc('burger', '注文はどれ？', [at('daisuke', 10), at('hiroko', 58), at('nanae', 102)],
+        [['daisuke', 'ばあちゃん、セットにする？'], ['hiroko', 'えびのにしようかね'], ['nanae', 'おかあさん、飲み物は？']]),
+      sc('burger', 'いただきます！', [at('nanae', 10), at('hiroko', 58), at('daisuke', 102)],
+        [['nanae', 'おかあさん、ポテトあげる'], ['hiroko', 'しょっぱくておいしいねえ'], ['daisuke', 'ばあちゃん、口についてる！']]),
+      sc('burger', 'おもちゃ当たった！', [at('daisuke', 10), at('hiroko', 58), at('nanae', 102)],
+        [['daisuke', 'ばあちゃん、おまけついてた'], ['hiroko', 'かわいいねえ'], ['nanae', 'おかあさん、もらっちゃえ！']]),
+    ],
+  },
+  {
+    id: 'flower', title: 'おかあさんとお花を見に',
+    scenes: [
+      sc('flower', 'お花屋さんに到着！', [inL('nanae', 60), inL('hiroko', 116, 200), inR('honey', 190, 2400)],
+        [['nanae', 'おかあさん、この花きれい！'], ['hiroko', 'うちの庭に植えようかね'], ['nanae', 'これ買っていこう〜']]),
+      sc('flower', 'どの色にする？', [at('hiroko', 40), at('nanae', 116)],
+        [['nanae', 'おかあさん、赤と黄色どっち？'], ['hiroko', '両方にしようかね'], ['nanae', 'ぜいたく〜！']]),
+      sc('flower', 'お庭に植えよう', [at('nanae', 40), at('hiroko', 110), inR('honey', 188, 1200)],
+        [['hiroko', 'ここに植えようかね'], ['nanae', 'おかあさん、土やわらかいよ'], ['honey', 'にゃ？']]),
+      sc('flower', 'きれいに咲いた！', [at('nanae', 40), at('hiroko', 110), at('honey', 188)],
+        [['nanae', 'おかあさん、咲いたね！'], ['hiroko', '毎日水やりしたからねえ'], ['honey', 'にゃ〜ん♪']]),
+    ],
+  },
+  {
+    id: 'village', title: '3人でビレッジバンガード',
+    scenes: [
+      sc('village', 'ビレバンに到着！', [inR('daisuke', 150), inL('hiroko', 82, 300), inL('nanae', 22, 500)],
+        [['daisuke', 'ばあちゃん、これ見て！'], ['nanae', 'おかあさん、へんなのある〜'], ['hiroko', 'おもしろい店だねえ']]),
+      sc('village', '迷路みたい', [at('nanae', 22), at('hiroko', 82), at('daisuke', 150)],
+        [['hiroko', '迷子になりそうだねえ'], ['daisuke', 'ばあちゃん、こっちだよ'], ['nanae', 'おかあさん、手つなごう']]),
+      sc('village', 'へんなお菓子', [at('daisuke', 22), at('hiroko', 82), at('nanae', 150)],
+        [['daisuke', 'ばあちゃん、これ食べる？'], ['hiroko', 'なんの味だいそれ'], ['nanae', 'おかあさん、やめとこ〜']]),
+      sc('village', 'おみやげ買った！', [at('nanae', 22), at('hiroko', 82), at('daisuke', 150)],
+        [['nanae', 'おかあさん、何買ったの？'], ['hiroko', 'ないしょだよ'], ['daisuke', 'ばあちゃん、気になる〜！']]),
+    ],
+  },
+  {
+    id: 'drive', title: '大江さんとドライブ',
+    scenes: [
+      sc('drive', 'ドライブに出発！', [inL('daisuke', 6), inL('hiroko', 62, 300), inL('nanae', 118, 600), inR('oe', 178, 300)],
+        [['oe', 'さあ、出発するぞ！'], ['nanae', 'おかあさん、シートベルト！'], ['hiroko', 'どこ行くんだい？']]),
+      sc('drive', '窓の外がきれい', [at('nanae', 6), at('hiroko', 62), at('oe', 118), at('daisuke', 178)],
+        [['hiroko', '山がきれいだねえ'], ['oe', 'あれが日光の山だよ'], ['daisuke', '大江さん、くわしい！']]),
+      sc('drive', 'サービスエリアで休憩', [at('daisuke', 6), at('hiroko', 62), at('oe', 118), at('nanae', 178)],
+        [['daisuke', 'ソフトクリーム買ってきた！'], ['hiroko', 'つめたくておいしいねえ'], ['oe', 'ひと休みだなあ']]),
+      sc('drive', '夕やけの帰り道', [at('nanae', 6), at('hiroko', 62), at('oe', 118), at('daisuke', 178)],
+        [['nanae', 'おかあさん、夕やけきれい'], ['oe', 'また行こうなあ'], ['daisuke', 'ばあちゃん、寝てていいよ']]),
+    ],
+  },
+  {
+    id: 'karaoke', title: '大江さんとカラオケ',
+    scenes: [
+      sc('karaoke', 'カラオケに到着！', [inR('daisuke', 178), inL('nanae', 6, 300), inL('hiroko', 62, 500), inR('oe', 118, 300)],
+        [['daisuke', 'ばあちゃん、歌おう！'], ['oe', 'よし、一番はわしだ'], ['hiroko', 'はずかしいねえ']]),
+      sc('karaoke', '大江さんの番', [at('nanae', 6), at('hiroko', 62), at('oe', 118, { star: true }), at('daisuke', 178)],
+        [['oe', '十八番いくぞ〜！'], ['nanae', 'おかあさん、手拍子〜！'], ['daisuke', '大江さん、渋い！']]),
+      sc('karaoke', 'だいすけの番', [at('nanae', 6), at('hiroko', 62), at('oe', 118), at('daisuke', 178, { star: true })],
+        [['daisuke', 'NiziU歌います！'], ['hiroko', '上手だねえ'], ['oe', '若いのはいいなあ']]),
+      sc('karaoke', 'ばあちゃんも一曲', [at('nanae', 6), at('hiroko', 62, { star: true }), at('oe', 118), at('daisuke', 178)],
+        [['daisuke', 'ばあちゃん、演歌入れたよ！'], ['hiroko', 'じゃあ一曲だけね'], ['oe', '100点だなあ！']]),
+    ],
+  },
+  {
+    id: 'oe', title: '大江さんとお茶の時間',
+    scenes: [
+      sc('home', '大江さんがきた！', [at('hiroko', 30), inR('oe', 110), inL('daisuke', 174, 800)],
+        [['oe', 'こんにちは〜'], ['hiroko', 'あら、大江さん'], ['daisuke', '大江さん、いらっしゃい！']]),
+      sc('home', 'お茶とおせんべい', [at('hiroko', 6), at('oe', 62), at('nanae', 118), at('daisuke', 178)],
+        [['nanae', 'おかあさん、お茶いれたよ'], ['oe', 'このせんべい、うまいなあ'], ['hiroko', 'もっと食べなさいね']]),
+      sc('home', '昔の話', [at('hiroko', 6), at('oe', 62), at('nanae', 118), at('daisuke', 178)],
+        [['oe', '昔はこのへん田んぼでなあ'], ['daisuke', '大江さん、そうなの？'], ['hiroko', 'なつかしいねえ']]),
+      sc('home', 'またね！', [at('hiroko', 6), at('nanae', 62), at('daisuke', 118), at('oe', 178)],
+        [['oe', 'また来るよ〜'], ['nanae', '大江さん、気をつけてね'], ['hiroko', 'またおいでね']]),
+    ],
+  },
+  {
+    id: 'icecream', title: '3人でサーティワン',
+    scenes: [
+      sc('icecream', 'サーティワンに到着！', [inL('nanae', 22), inL('hiroko', 86, 300), inR('daisuke', 150, 300)],
+        [['nanae', 'おかあさん、どれにする？'], ['hiroko', 'たくさんあって迷うねえ'], ['daisuke', 'ばあちゃん、味見できるよ']]),
+      sc('icecream', '味見させて', [at('daisuke', 22), at('hiroko', 86), at('nanae', 150)],
+        [['daisuke', 'ばあちゃん、これ味見！'], ['hiroko', 'おや、ラムネの味だ'], ['nanae', 'おかあさん、ダブルにしよ']]),
+      sc('icecream', 'いただきます！', [at('nanae', 22), at('hiroko', 86), at('daisuke', 150)],
+        [['hiroko', 'つめたいねえ'], ['nanae', 'おかあさん、ひと口ちょうだい'], ['daisuke', 'ばあちゃん、とけてる！']]),
+      sc('icecream', 'あっというまに完食', [at('daisuke', 22), at('hiroko', 86), at('nanae', 150)],
+        [['daisuke', 'ばあちゃん、はやっ！'], ['hiroko', 'もうひとつ食べようかね'], ['nanae', 'おかあさん、さすが〜']]),
+    ],
+  },
+  {
+    id: 'chicken', title: '3人でケンタッキー',
+    scenes: [
+      sc('chicken', 'ケンタッキーに到着！', [inR('daisuke', 150), inL('hiroko', 86, 300), inL('nanae', 22, 500)],
+        [['daisuke', 'ばあちゃん、チキンだよ！'], ['nanae', 'おかあさん、いいにおい〜'], ['hiroko', 'おなかすいたねえ']]),
+      sc('chicken', 'バーレルにしよう', [at('nanae', 22), at('hiroko', 86), at('daisuke', 150)],
+        [['daisuke', 'バーレルにしちゃおう！'], ['hiroko', 'そんなに食べられるかね'], ['nanae', 'おかあさん、いけるいける']]),
+      sc('chicken', 'いただきます！', [at('daisuke', 22), at('hiroko', 86), at('nanae', 150)],
+        [['hiroko', '皮がパリパリだねえ'], ['nanae', 'おかあさん、ビスケットも！'], ['daisuke', 'ばあちゃん、手ふきどうぞ']]),
+      sc('chicken', 'のこりはおみやげ', [at('nanae', 22), at('hiroko', 86), at('daisuke', 150)],
+        [['nanae', 'おかあさん、持って帰ろう'], ['daisuke', 'ばあちゃん、明日のお昼ね'], ['hiroko', 'たすかるねえ']]),
+    ],
+  },
+  {
+    id: 'market', title: '3人でヤオコー',
+    scenes: [
+      sc('market', 'ヤオコーに到着！', [inL('daisuke', 22), inL('hiroko', 86, 300), inL('nanae', 150, 600)],
+        [['daisuke', 'ばあちゃん、カート押すよ'], ['nanae', 'おかあさん、何買うんだっけ？'], ['hiroko', 'メモ持ってきたよ']]),
+      sc('market', 'お野菜コーナー', [at('nanae', 22), at('hiroko', 86), at('daisuke', 150)],
+        [['hiroko', 'このトマト安いねえ'], ['nanae', 'おかあさん、きゅうりも！'], ['daisuke', 'ばあちゃん、カゴ入れるね']]),
+      sc('market', 'お惣菜コーナー', [at('daisuke', 22), at('hiroko', 86), at('nanae', 150)],
+        [['daisuke', 'ばあちゃん、おはぎある！'], ['hiroko', 'それも買っていこうかね'], ['nanae', 'おかあさん、半額だって！']]),
+      sc('market', 'お会計', [at('nanae', 22), at('hiroko', 86), at('daisuke', 150)],
+        [['nanae', 'おかあさん、ポイントカード'], ['hiroko', 'はいはい、あったよ'], ['daisuke', 'ばあちゃん、荷物持つね！']]),
+    ],
+  },
+];
+
+// 注文アニメ（リーチ中、家族がお店にいて注文が運ばれてくる）。normal＝いつもの、chance＝ちょっと豪華、kakutei＝いちばん豪華（当たり確定）
+// bg はお店の背景（lcd.css の .bg-○○）。react は運ばれてきたときのひとこと
+export const MENUS = {
+  donkey: { shop: 'びっくりドンキー', bg: 'hamburg', normal: 'レギュラーバーグディッシュ', chance: 'チーズバーグディッシュ', kakutei: 'ポテサラパケットディッシュ' },
+  burger: { shop: 'マクドナルド', bg: 'burger', normal: 'ハンバーガーのセット', chance: 'チーズバーガーのセット', kakutei: 'ダブルチーズバーガーのセット' },
+  icecream: { shop: 'サーティワン', bg: 'icecream', normal: 'シングル', chance: 'ダブル', kakutei: 'トリプル' },
+  chicken: { shop: 'ケンタッキー', bg: 'chicken', normal: 'ポテトのセット', chance: 'チキンのセット', kakutei: 'パーティバーレル' },
+};
+export const ORDER_LINES = {
+  wait: [{ who: 'daisuke', text: 'ばあちゃん、なに来るかな？' }, { who: 'nanae', text: 'おかあさん、楽しみだね' }],
+  normal: [{ who: 'hiroko', text: 'おいしそうだねえ' }, { who: 'daisuke', text: 'いただきまーす！' }],
+  chance: [{ who: 'nanae', text: 'おかあさん、豪華〜！' }, { who: 'hiroko', text: 'あらま、チーズだねえ' }],
+  kakutei: [{ who: 'daisuke', text: 'ばあちゃん、これはすごい！' }, { who: 'nanae', text: 'おかあさん、特別だよ！' }],
+};
+
+// すべての場面（確かめ用）
+export const MOVIE = [...FILLER, ...EPISODES.flatMap(e => e.scenes)];
+
+// 次に流す話：まだ見ていない話から選ぶ（ぜんぶ見たら、また最初から）
+export function pickEpisode(seen, rng) {
+  const left = EPISODES.filter(e => !seen.includes(e.id));
+  const list = left.length ? left : EPISODES;
+  const ep = list[Math.floor(rng() * list.length)];
+  return { episode: ep, seen: left.length ? [...seen, ep.id] : [ep.id] };
+}

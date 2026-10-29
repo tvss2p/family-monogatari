@@ -3,7 +3,7 @@ import { LAYOUT } from './board-layout.js';
 import { createMachine } from './machine.js';
 import { createPhysics } from './physics.js';
 import { buildSpin, holdColor } from './scenario.js';
-import { pickLine } from './story.js';
+import { pickLine, pickEpisode } from './story.js';
 import { drawBoard, resetBoardCache } from './render/board.js';
 import { createLcd } from './render/lcd.js';
 import { createGimmicks } from './render/gimmicks.js';
@@ -85,6 +85,13 @@ let power = saved && Number.isFinite(saved.power) ? saved.power : 0.55;
 let locked = !!(saved && saved.locked);
 // 連チャン数（確変・時短のあいだに続けて当たった回数）
 let chain = saved && Number.isFinite(saved.chain) ? saved.chain : 0;
+// 大当たりのおでかけの話：見た話をおぼえて、まだ見ていない話から流す
+let seenEp = saved && Array.isArray(saved.seenEp) ? saved.seenEp : [];
+lcd.episodePicker = () => {
+  const r = pickEpisode(seenEp, Math.random);
+  seenEp = r.seen;
+  return r.episode;
+};
 lcd.setChain(chain);
 let holding = false;
 let firing = false;
@@ -164,7 +171,7 @@ menu.addEventListener('click', e => {
 let resetting = false;
 let lastSig = null, lastSavedAt = (saved && saved.savedAt) || Date.now();
 function currentData() {
-  const d = { machine: machine.toJSON(), sound: audio.on, bgm: bgmOn, power, locked, chain, jackpotGain };
+  const d = { machine: machine.toJSON(), sound: audio.on, bgm: bgmOn, power, locked, chain, jackpotGain, seenEp };
   const sig = JSON.stringify(d);
   if (lastSig !== null && sig !== lastSig) lastSavedAt = Date.now();
   lastSig = sig;
@@ -255,6 +262,12 @@ function playCue(cue, sp) {
   if (cue.startsWith('fam:')) audio.play({ red: 'hot', green: 'cutin' }[cue.slice(4)] || 'paw');
   if (cue === 'fam:red') vibrate([40, 30, 40]);
   if (cue === 'develop') audio.play('cutin');
+  // メニュー予告：バーン！ 確定はファンファーレとふるえ
+  if (cue === 'menu' && sp && sp.menu) {
+    audio.play('stopBig');
+    if (sp.menu.tier === 'chance') audio.play('reach', null, 0.2);
+    if (sp.menu.tier === 'kakutei') { audio.play('ending', null, 0.2); vibrate([80, 40, 80]); }
+  }
   if (cue === 'rt:allspin') audio.play('jackpot');
   // ボイス：リーチ・激アツ・大当たり（家族そろいは専用の声）
   if (cue === 'reach' || cue === 'hot') speak(cue);
