@@ -377,10 +377,29 @@ export const MENUS = {
 };
 export const ORDER_LINES = {
   wait: [{ who: 'daisuke', text: 'ばあちゃん、なに来るかな？' }, { who: 'nanae', text: 'おかあさん、楽しみだね' }],
-  normal: [{ who: 'hiroko', text: 'おいしそうだねえ' }, { who: 'daisuke', text: 'いただきまーす！' }],
-  chance: [{ who: 'nanae', text: 'おかあさん、豪華〜！' }, { who: 'hiroko', text: 'あらま、チーズだねえ' }],
-  kakutei: [{ who: 'daisuke', text: 'ばあちゃん、これはすごい！' }, { who: 'nanae', text: 'おかあさん、特別だよ！' }],
+  // 運ばれてきたときのひとこと：お店と注文ごと（出てきた料理と合うように）
+  burger: {
+    normal: [{ who: 'hiroko', text: 'ポテトもついてるねえ' }, { who: 'daisuke', text: 'いただきまーす！' }],
+    chance: [{ who: 'hiroko', text: 'あらま、チーズだねえ' }, { who: 'nanae', text: 'おかあさん、チーズとろとろ！' }],
+    kakutei: [{ who: 'daisuke', text: 'ばあちゃん、ダブルだよ！' }, { who: 'nanae', text: 'おかあさん、ぶあつ〜い！' }],
+  },
+  donkey: {
+    normal: [{ who: 'hiroko', text: 'おいしそうだねえ' }, { who: 'daisuke', text: 'ハンバーグ来た！' }],
+    chance: [{ who: 'hiroko', text: 'あらま、チーズだねえ' }, { who: 'nanae', text: 'おかあさん、チーズのせ！' }],
+    kakutei: [{ who: 'daisuke', text: 'ばあちゃん、ポテサラ山もり！' }, { who: 'nanae', text: 'おかあさん、特別だよ！' }],
+  },
+  icecream: {
+    normal: [{ who: 'hiroko', text: 'つめたそうだねえ' }, { who: 'nanae', text: 'おかあさん、いちごだよ' }],
+    chance: [{ who: 'nanae', text: 'おかあさん、ダブルだ〜！' }, { who: 'hiroko', text: '2つものってるねえ' }],
+    kakutei: [{ who: 'daisuke', text: 'ばあちゃん、トリプル！' }, { who: 'nanae', text: 'おかあさん、3段だよ！' }],
+  },
+  chicken: {
+    normal: [{ who: 'hiroko', text: 'ポテトがあったかいねえ' }, { who: 'daisuke', text: 'いただきまーす！' }],
+    chance: [{ who: 'hiroko', text: 'チキンがきたねえ' }, { who: 'nanae', text: 'おかあさん、2本もある！' }],
+    kakutei: [{ who: 'daisuke', text: 'ばあちゃん、バーレルだ！' }, { who: 'nanae', text: 'おかあさん、山もりだよ！' }],
+  },
 };
+
 
 // 大当たり中の盤面の背景の絵（assets/img、tools/prepare-boards.mjs が作る）。絵がない話は、色と花びら（cabinet.css の .t-○○）
 export { BOARD_IMAGES } from './board-images.js';

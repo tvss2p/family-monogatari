@@ -307,7 +307,7 @@ export function createLcd(root) {
       const pick = list => list[Math.floor(Math.random() * list.length)];
       this.say(pick(ORDER_LINES.wait), true);
       setTimeout(() => el.classList.add('come'), 1000);
-      setTimeout(() => this.say(pick(ORDER_LINES[tier]), true), 1900);
+      setTimeout(() => this.say(pick(ORDER_LINES[shop][tier]), true), 1900);
       setTimeout(() => el.classList.remove('show', 'come'), ORDER_MS - 250);
     },
     showJackpot(id, spin) {

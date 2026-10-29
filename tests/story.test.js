@@ -8,7 +8,8 @@ import { mulberry32 } from './helpers.js';
 const allLines = () => [
   ...Object.values(LINES).flat(),
   ...MOVIE.flatMap(sc => sc.lines),
-  ...Object.values(ORDER_LINES).flat(),
+  ...ORDER_LINES.wait,
+  ...Object.keys(MENUS).flatMap(shop => Object.values(ORDER_LINES[shop]).flat()),
 ];
 
 test('セリフと場面に出てくるのは、決まった登場人物と猫だけ', () => {
@@ -126,4 +127,14 @@ test('ドライブで運転するのは、だいすけ（大江さんは運転�
   const lines = EPISODES.find(e => e.id === 'drive').scenes.flatMap(sc => sc.lines);
   assert.ok(lines.some(l => l.who === 'daisuke' && l.text.includes('運転')));
   assert.ok(!lines.some(l => l.who === 'oe' && /運転|出発するぞ/.test(l.text)));
+});
+
+test('注文アニメのひとこと：どのお店・注文にもあり、チーズの話はチーズの料理のときだけ', () => {
+  for (const shop of Object.keys(MENUS)) {
+    for (const tier of ['normal', 'chance', 'kakutei']) {
+      const lines = ORDER_LINES[shop][tier];
+      assert.ok(lines && lines.length >= 1, `${shop} ${tier}`);
+      if (lines.some(l => l.text.includes('チーズ'))) assert.ok(MENUS[shop][tier].includes('チーズ'), `${shop} ${tier}`);
+    }
+  }
 });
