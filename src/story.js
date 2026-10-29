@@ -83,7 +83,8 @@ export function pickLine(kind, rng) {
 }
 
 // 大当たり中に流れるムービー（1 場面 8 秒）
-// 1 回の大当たりで、おでかけの話（EPISODES）を 1 話だけ流す。話が終わったら、家族と猫の場面（FILLER）をくり返す
+// 1 回の大当たりで、おでかけの話（EPISODES）を、まだ見ていない話から次々に流す（大当たりが終わるまで）
+// 家族と猫の場面（FILLER）は、ムービーでは使わない（確かめ用に残す）
 // actors：from から to まで歩いてきて止まる（x は液晶の左からの px）。walk:true は止まらず歩きぬける
 export const SCENE_MS = 8000;
 const AT = [1000, 3300, 5600];
