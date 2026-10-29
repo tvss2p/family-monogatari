@@ -33,3 +33,21 @@ test('interrupted context is recreated right away', () => {
   a.unlock();
   assert.equal(log.made, 2);
 });
+
+test('大当たり中は効果音だけ小さくできる（作りなおした音でも同じ大きさ）', () => {
+  const gains = [];
+  const AC = class {
+    constructor() { this.state = 'suspended'; this.currentTime = 0; this.destination = {}; }
+    createGain() { const g = { gain: { value: 1, setTargetAtTime(v) { this.value = v; } }, connect() {} }; gains.push(g); return g; }
+    resume() { return Promise.resolve(); }
+    close() { this.state = 'closed'; return Promise.resolve(); }
+  };
+  const a = createAudio({ AC });
+  a.unlock();
+  a.setDuck(0.55);
+  assert.equal(a.duck, 0.55);
+  assert.equal(gains[1].gain.value, 0.55);
+  a.debugSetState('interrupted');
+  a.unlock();
+  assert.equal(gains[gains.length - 1].gain.value, 0.55);
+});

@@ -121,3 +121,9 @@ test('盤面の背景：どの話にも色があり、絵を使う話は絵の�
     assert.ok(existsSync(`assets/img/${f}`), f);
   }
 });
+
+test('ドライブで運転するのは、だいすけ（大江さんは運転しない）', () => {
+  const lines = EPISODES.find(e => e.id === 'drive').scenes.flatMap(sc => sc.lines);
+  assert.ok(lines.some(l => l.who === 'daisuke' && l.text.includes('運転')));
+  assert.ok(!lines.some(l => l.who === 'oe' && /運転|出発するぞ/.test(l.text)));
+});

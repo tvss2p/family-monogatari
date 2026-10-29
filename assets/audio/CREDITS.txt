@@ -31,6 +31,6 @@
 猫の鳴き声・玉のジャラジャラ・くぎの音などは、ゲームの中で合成した音です。
 
 家族の歌（個人で撮影した録音。tools/prepare-songs.mjs でモノラルにして、音量を魔王魂の曲にそろえました）
-- song_withu.m4a … だいすけが歌った NiziU の曲（大当たりの2回に1回、Paradise と交互）
-- song_paradise.m4a … だいすけが歌った NiziU の曲（大当たりの2回に1回、With U と交互）
+- song_withu.m4a … だいすけが歌った NiziU の曲（1曲まるごと。大当たりの2回に1回、Paradise と交互。毎回ちがう位置から）
+- song_paradise.m4a … だいすけが歌った NiziU の曲（1曲まるごと。大当たりの2回に1回、With U と交互。毎回ちがう位置から）
 - song_mom.m4a … おかあさんの歌（おかあさんの図柄のリーチ・激アツ）

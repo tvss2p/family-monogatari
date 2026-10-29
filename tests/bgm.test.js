@@ -1,6 +1,6 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { trackFor, songFor, parseLine, noteFreq, TRACKS } from '../src/bgm.js';
+import { trackFor, songFor, songStart, SONG_STARTS, trackGain, parseLine, noteFreq, TRACKS } from '../src/bgm.js';
 
 test('track follows the scene', () => {
   assert.equal(trackFor({ phase: 'idle', mode: 'normal', scene: 'normal' }), 'normal');
@@ -22,11 +22,27 @@ test('家族の歌：大当たりの2回に1回、だいすけの歌を交互に
   assert.equal(jp(1, true), 'family');
 });
 
+test('歌はまるごと：大当たりのたびに始める位置が変わり、ぜんぶの位置を順に使う', () => {
+  const withU = [1, 5, 9, 13, 17, 21, 25, 29, 33].map(songStart);
+  assert.deepEqual([...withU].sort((a, b) => a - b), [...SONG_STARTS.withU].sort((a, b) => a - b));
+  for (let i = 1; i < withU.length; i++) assert.notEqual(withU[i], withU[i - 1]);
+  const paradise = [3, 7, 11, 15, 19, 23, 27].map(songStart);
+  assert.deepEqual([...paradise].sort((a, b) => a - b), [...SONG_STARTS.paradise].sort((a, b) => a - b));
+  assert.equal(songStart(2), 0);
+  // 曲の長さ（With U 271 秒・Paradise 207 秒）の中から始まる
+  assert.ok(Math.max(...SONG_STARTS.withU) < 271 && Math.max(...SONG_STARTS.paradise) < 207);
+});
+
 test('おかあさんの図柄のリーチは、リーチから激アツまでおかあさんの歌', () => {
   assert.equal(trackFor({ phase: 'spinning', mode: 'normal', scene: 'reach', reachOn: 'nanae' }), 'mom');
   assert.equal(trackFor({ phase: 'spinning', mode: 'kakuhen', scene: 'hot', reachOn: 'nanae' }), 'mom');
   assert.equal(trackFor({ phase: 'spinning', mode: 'normal', scene: 'reach', reachOn: 'kira' }), 'reach');
   assert.equal(trackFor({ phase: 'spinning', mode: 'normal', scene: 'normal', reachOn: 'nanae' }), 'normal');
+});
+
+test('大当たり中の曲は、ほかの曲より少し大きい', () => {
+  for (const n of ['jackpot', 'family', 'withU', 'paradise']) assert.ok(trackGain(n) > 1.4 && trackGain(n) < 2, n);
+  for (const n of ['normal', 'reach', 'hot', 'mom', 'kakuhen', 'jitan']) assert.equal(trackGain(n), 1, n);
 });
 
 test('a line of notes is read into timed events', () => {

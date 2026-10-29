@@ -27,7 +27,7 @@ test('スマホで重くならない大きさ（曲ぜんぶで 4MB まで）', 
   assert.ok(total < 4 * 1024 * 1024, `${total}`);
 });
 
-test('家族の歌：ファイルがあり、軽い（3曲で 2MB まで）。クレジットにも書く', () => {
+test('家族の歌：ファイルがあり、軽い（3曲で 3MB まで）。クレジットにも書く', () => {
   assert.deepEqual(Object.keys(SONG_FILES).sort(), ['mom', 'paradise', 'withU']);
   let total = 0;
   const credits = readFileSync(`${AUDIO_DIR}/CREDITS.txt`, 'utf8');
@@ -36,7 +36,7 @@ test('家族の歌：ファイルがあり、軽い（3曲で 2MB まで）。�
     total += statSync(`${AUDIO_DIR}/${f}`).size;
     assert.ok(credits.includes(f), f);
   }
-  assert.ok(total < 2 * 1024 * 1024, `${total}`);
+  assert.ok(total < 3 * 1024 * 1024, `${total}`);
 });
 
 test('クレジット：ゲームの設定画面・README・CREDITS.txt に魔王魂と CC BY 4.0', () => {

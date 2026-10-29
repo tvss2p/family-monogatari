@@ -111,6 +111,23 @@ export function songFor(jackpotNo) {
   if (jackpotNo % 2 === 0) return null;
   return jackpotNo % 4 === 1 ? 'withU' : 'paradise';
 }
+// 歌はまるごと入っていて、大当たりのたびに始める位置（秒）を変える。最後まで行ったら頭にもどってつながる
+// 続けて同じあたりにならないように、とびとびの順番にしてある
+export const SONG_STARTS = {
+  withU: [0, 120, 60, 180, 30, 150, 90, 210, 240],
+  paradise: [0, 90, 150, 30, 120, 60, 180],
+};
+export function songStart(jackpotNo) {
+  const song = songFor(jackpotNo);
+  if (!song) return 0;
+  const turn = Math.floor((jackpotNo - 1) / 4);
+  const list = SONG_STARTS[song];
+  return list[turn % list.length];
+}
+// 曲ごとの大きさ：大当たり中の曲（家族の歌も）は、ほかより少し大きく（約 +4dB）
+const LOUDER = { jackpot: 1.6, family: 1.6, withU: 1.6, paradise: 1.6 };
+export const trackGain = n => LOUDER[n] || 1;
+
 // 歌のファイルが読めるまで代わりに鳴らす合成の曲
 const SONG_STANDIN = { withU: 'jackpot', paradise: 'jackpot', mom: 'hot' };
 
@@ -139,6 +156,7 @@ const KEEP = ['normal', 'mom'];
 export function createBgm(audio, { files = {}, fetchFn = typeof fetch === 'undefined' ? null : fetch, decode = null } = {}) {
   let ctx = null, out = null, lane = null;
   let name = null, loopStart = 0, until = 0;
+  let offset = 0;
   let on = true;
   let noise = null;
   let fileSrc = null;
@@ -184,7 +202,13 @@ export function createBgm(audio, { files = {}, fetchFn = typeof fetch === 'undef
     }
     fileSrc = null;
     lane = ctx.createGain();
+    lane.gain.value = trackGain(n);
     lane.connect(out);
+    // 歌のとちゅうから始めるときは、1 秒かけて音を上げる
+    if (offset) {
+      lane.gain.setValueAtTime(0.0001, ctx.currentTime + 0.06);
+      lane.gain.linearRampToValueAtTime(trackGain(n), ctx.currentTime + 1.1);
+    }
     loopStart = ctx.currentTime + 0.06;
     until = loopStart;
     const f = buffers.get(n);
@@ -197,7 +221,7 @@ export function createBgm(audio, { files = {}, fetchFn = typeof fetch === 'undef
       src.loopStart = f.start;
       src.loopEnd = f.end;
       src.connect(lane);
-      src.start(loopStart, f.start);
+      src.start(loopStart, Math.min(f.end - 0.5, f.start + offset));
       fileSrc = src;
     } else {
       want(n).then(got => { if (got && name === n && !fileSrc && ctx) start(n); });
@@ -265,9 +289,13 @@ export function createBgm(audio, { files = {}, fetchFn = typeof fetch === 'undef
   [...KEEP, ...prefetchFor('normal')].forEach(want);
 
   return {
-    play(n) {
+    // at：歌を始める位置（秒）
+    play(n, at = 0) {
       if (n === name) return;
+      // 大きい歌のデータは、流しおわったら手放す（次に流すときにまた読む）
+      if (name && SONG_STARTS[name] && n !== name) buffers.delete(name);
       name = n;
+      offset = at;
       if (setup()) start(n);
     },
     // 次に使いそうな曲を読んでおく（次の大当たりで流す歌など）

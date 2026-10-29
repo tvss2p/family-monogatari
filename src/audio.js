@@ -5,6 +5,8 @@ const NOTES = { C5: 523.25, D5: 587.33, E5: 659.25, G5: 783.99, A5: 880, C6: 104
 export function createAudio({ AC = typeof window === 'undefined' ? null : (window.AudioContext || window.webkitAudioContext) } = {}) {
   let ctx = null;
   let master = null;
+  let sfx = null;
+  let duck = 1;
   let on = true;
   let triedResume = false;
   const samples = {};
@@ -18,6 +20,10 @@ export function createAudio({ AC = typeof window === 'undefined' ? null : (windo
     master = ctx.createGain();
     master.gain.value = 0.5;
     master.connect(ctx.destination);
+    // 効果音はここを通す（大当たり中は小さくして、曲が埋もれないように）。ボイスと BGM は通さない
+    sfx = ctx.createGain();
+    sfx.gain.value = duck;
+    sfx.connect(master);
     return ctx;
   }
 
@@ -30,7 +36,7 @@ export function createAudio({ AC = typeof window === 'undefined' ? null : (windo
     g.gain.setValueAtTime(0.0001, t);
     g.gain.exponentialRampToValueAtTime(gain, t + 0.01);
     g.gain.exponentialRampToValueAtTime(0.0001, t + dur);
-    o.connect(g).connect(master);
+    o.connect(g).connect(sfx);
     o.start(t);
     o.stop(t + dur + 0.02);
   }
@@ -78,11 +84,11 @@ export function createAudio({ AC = typeof window === 'undefined' ? null : (windo
     },
   };
 
-  function playSample(buffer, t, gain = SAMPLE_GAIN) {
+  function playSample(buffer, t, gain = SAMPLE_GAIN, dest = sfx) {
     const s = ctx.createBufferSource(), g = ctx.createGain();
     s.buffer = buffer;
     g.gain.value = gain;
-    s.connect(g).connect(master);
+    s.connect(g).connect(dest);
     s.start(t);
     return s;
   }
@@ -103,14 +109,14 @@ export function createAudio({ AC = typeof window === 'undefined' ? null : (windo
     const s = ctx.createBufferSource(), f = ctx.createBiquadFilter(), g = ctx.createGain();
     s.buffer = noise(); f.type = 'lowpass'; f.frequency.value = freq;
     g.gain.setValueAtTime(gain, t); g.gain.exponentialRampToValueAtTime(0.0001, t + dur);
-    s.connect(f).connect(g).connect(master); s.start(t); s.stop(t + dur + 0.02);
+    s.connect(f).connect(g).connect(sfx); s.start(t); s.stop(t + dur + 0.02);
   }
   function noiseSweep(t, dur) {
     const s = ctx.createBufferSource(), f = ctx.createBiquadFilter(), g = ctx.createGain();
     s.buffer = noise(); f.type = 'bandpass'; f.Q.value = 2;
     f.frequency.setValueAtTime(400, t); f.frequency.exponentialRampToValueAtTime(5000, t + dur);
     g.gain.setValueAtTime(0.0001, t); g.gain.exponentialRampToValueAtTime(0.35, t + 0.05); g.gain.exponentialRampToValueAtTime(0.0001, t + dur);
-    s.connect(f).connect(g).connect(master); s.start(t); s.stop(t + dur + 0.02);
+    s.connect(f).connect(g).connect(sfx); s.start(t); s.stop(t + dur + 0.02);
   }
 
   // 猫の「にゃー」：音の高さを上げてから下げ、口の形（フォルマント）のフィルターを通す
@@ -138,7 +144,7 @@ export function createAudio({ AC = typeof window === 'undefined' ? null : (windo
     o.connect(f1).connect(mix);
     o.connect(f2).connect(mix);
     mix.gain.value = 0.9;
-    mix.connect(g).connect(master);
+    mix.connect(g).connect(sfx);
     o.start(t); vib.start(t);
     o.stop(t + dur + 0.02); vib.stop(t + dur + 0.02);
   }
@@ -173,7 +179,7 @@ export function createAudio({ AC = typeof window === 'undefined' ? null : (windo
     voice(name, delay = 0) {
       if (!on || !ctx || ctx.state !== 'running' || !samples[name]) return;
       try { if (lastVoice) lastVoice.stop(); } catch (e) { /* もう止まっている */ }
-      lastVoice = playSample(samples[name], ctx.currentTime + 0.005 + delay, VOICE_GAIN);
+      lastVoice = playSample(samples[name], ctx.currentTime + 0.005 + delay, VOICE_GAIN, master);
     },
     // 効果音のファイルを読みこむ（{ 名前: URL }）。読めなかったものは合成の音のまま
     loadSamples(map, fetchFn = fetch) {
@@ -185,6 +191,13 @@ export function createAudio({ AC = typeof window === 'undefined' ? null : (windo
     },
     get samples() { return Object.keys(samples); },
     setOn(v) { on = v; },
+    // 効果音だけの大きさ（1＝ふつう）。大当たり中は小さくする
+    setDuck(v) {
+      if (v === duck) return;
+      duck = v;
+      if (sfx) sfx.gain.setTargetAtTime(v, ctx.currentTime, 0.2);
+    },
+    get duck() { return duck; },
     get on() { return on; },
     get state() { return ctx ? ctx.state : 'none'; },
     get context() { return ctx && ctx.state !== 'closed' ? ctx : null; },

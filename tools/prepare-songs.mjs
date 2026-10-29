@@ -1,6 +1,6 @@
 // 家族が歌った曲（個人の録音）→ ゲーム用（assets/audio）
 // 元のファイルは assets/original/songs（git に入れない）。ffmpeg を使う
-// 軽くするためモノラル 24kHz・48kbps の AAC。大きさは魔王魂の曲（-12 LUFS 前後）にそろえる
+// 軽くするためモノラル 24kHz・40kbps の AAC。大きさは魔王魂の曲（-12 LUFS 前後）にそろえる
 // （モノラルはゲームで左右の両方から鳴るので、左右に同じ音を置いた形で測る）
 // 使い方: node tools/prepare-songs.mjs
 import { execFileSync, spawnSync } from 'node:child_process';
@@ -10,9 +10,10 @@ const SRC = 'assets/original/songs';
 export const SONG_LUFS = -12;
 
 // 曲の名前：元のファイル、切る長さ（秒、なし＝全部）、最後のフェードアウト（秒）
+// だいすけの歌は1曲まるごと（大当たりのたびに始める位置を変える。bgm.js の songStart）
 const SONG_SRC = {
-  withU: ['withu.mp3', 110, 3],
-  paradise: ['paradise.mp3', 110, 3],
+  withU: ['withu.mp3'],
+  paradise: ['paradise.mp3'],
   mom: ['mom.mp3'],
 };
 
@@ -28,7 +29,7 @@ function encode(src, out, { cut, fade, gainDb }) {
   const af = ['loudnorm=I=-14:TP=-1.5:LRA=7', `volume=${gainDb.toFixed(2)}dB`, 'alimiter=limit=0.95'];
   if (cut) af.push(`afade=t=out:st=${cut - fade}:d=${fade}`);
   execFileSync('ffmpeg', ['-v', 'error', '-y', '-i', src, ...(cut ? ['-t', String(cut)] : []),
-    '-af', af.join(','), '-ac', '1', '-ar', '24000', '-c:a', 'aac', '-b:a', '48k', out]);
+    '-af', af.join(','), '-ac', '1', '-ar', '24000', '-c:a', 'aac', '-b:a', '40k', out]);
 }
 
 if (import.meta.url === `file://${process.argv[1]}`) {

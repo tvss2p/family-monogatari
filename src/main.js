@@ -15,7 +15,7 @@ import { save, load, clear } from './storage.js';
 import { createTapGuard } from './render/gimmicks.js';
 import { createCueRunner } from './cues.js';
 import { isFiring, stepPower, powerLabel } from './lever.js';
-import { createBgm, trackFor, songFor } from './bgm.js';
+import { createBgm, trackFor, songFor, songStart } from './bgm.js';
 import { fitCabinet } from './fit.js';
 import { modeDisplay } from './hud.js';
 import { BGM_FILES, SONG_FILES, SE_FILES, AUDIO_DIR } from './sounds.js';
@@ -66,6 +66,7 @@ const lcd = createLcd($('#lcd'));
 const gimmicks = createGimmicks(cab);
 const tray = createTray($('.bottom'));
 let trayBoxes = -1;
+const JACKPOT_SFX = 0.55;
 // 確変昇格チャンスの音
 lcd.onEvent = e => {
   if (e === 'promoChance') audio.play('reach');
@@ -423,7 +424,9 @@ function frame(now) {
   // 何回目の大当たりか（大当たりの瞬間はまだ数が増えていないので +1）
   const jackpotNo = st.phase === 'jackpot' ? st.hits : st.hits + 1;
   const reachOn = runner.spin && runner.spin.reach ? runner.spin.stops[0] : null;
-  bgm.play(trackFor({ phase: st.phase, mode: st.mode, scene, premium, jackpotNo, reachOn }));
+  bgm.play(trackFor({ phase: st.phase, mode: st.mode, scene, premium, jackpotNo, reachOn }), songStart(jackpotNo));
+  // 大当たり中は効果音（玉のジャラジャラなど）を小さくして、曲を聞かせる
+  audio.setDuck(st.phase === 'jackpot' ? JACKPOT_SFX : 1);
   requestAnimationFrame(frame);
 }
 requestAnimationFrame(frame);

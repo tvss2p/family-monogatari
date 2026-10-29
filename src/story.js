@@ -237,7 +237,7 @@ export const EPISODES = [
     id: 'drive', title: '大江さんとドライブ',
     scenes: [
       sc('drive', 'ドライブに出発！', [inL('daisuke', 6), inL('hiroko', 62, 300), inL('nanae', 118, 600), inR('oe', 178, 300)],
-        [['oe', 'さあ、出発するぞ！'], ['nanae', 'おかあさん、シートベルト！'], ['hiroko', 'どこ行くんだい？']]),
+        [['daisuke', '運転はおれにまかせて！'], ['nanae', 'おかあさん、シートベルト！'], ['oe', 'よろしく頼むよ']]),
       sc('drive', '窓の外がきれい', [at('nanae', 6), at('hiroko', 62), at('oe', 118), at('daisuke', 178)],
         [['hiroko', '山がきれいだねえ'], ['oe', 'あれが日光の山だよ'], ['daisuke', '大江さん、くわしい！']]),
       sc('drive', 'サービスエリアで休憩', [at('daisuke', 6), at('hiroko', 62), at('oe', 118), at('nanae', 178)],
