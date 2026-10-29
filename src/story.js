@@ -339,7 +339,7 @@ export const EPISODES = [
     ],
   },
   {
-    id: 'catfish', title: 'ねこたちのおさかなパーティー', cats: ['berry', 'glen', 'honey'],
+    id: 'catfish', title: 'ねこのおさかなパーティー', cats: ['berry', 'glen', 'honey'],
     scenes: [
       sc('party', 'おさかなパーティー', [inL('berry', 30), inR('glen', 100, 300), inR('honey', 170, 600)],
         [['berry', 'にゃっ！（いいにおい）'], ['glen', 'にゃにゃ？'], ['honey', 'にゃ〜ん']]),
@@ -381,8 +381,8 @@ export const ORDER_LINES = {
   kakutei: [{ who: 'daisuke', text: 'ばあちゃん、これはすごい！' }, { who: 'nanae', text: 'おかあさん、特別だよ！' }],
 };
 
-// 大当たり中の盤面の背景の絵（assets/img）。絵がない話は、色と花びら（lcd ではなく cabinet.css の .t-○○）
-export const BOARD_IMAGES = {};
+// 大当たり中の盤面の背景の絵（assets/img、tools/prepare-boards.mjs が作る）。絵がない話は、色と花びら（cabinet.css の .t-○○）
+export { BOARD_IMAGES } from './board-images.js';
 
 // すべての場面（確かめ用）
 export const MOVIE = [...FILLER, ...EPISODES.flatMap(e => e.scenes)];

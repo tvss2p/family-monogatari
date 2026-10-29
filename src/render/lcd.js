@@ -255,6 +255,8 @@ export function createLcd(root) {
     showJackpot(id, spin) {
       const s = symbolById(id);
       clearTimeout(sceneTimer);
+      timers.forEach(clearTimeout);
+      sceneTimers.forEach(clearTimeout);
       // リーチの飾りは片づけてからムービーへ
       root.className = root.className.replace(/\brt-\w+|\bsp\b/g, '').replace(/\s+/g, ' ').trim();
       const conf = Array.from({ length: 24 }, (_, i) => `<i class="conf" style="left:${(i * 37) % 230}px;top:${(i * 53) % 180}px;background:${['#ff8aa6', '#ffc94d', '#7dc6ff', '#9be08a', '#fff'][i % 5]};animation-delay:${-(i * 0.13) % 1.6}s"></i>`).join('');
