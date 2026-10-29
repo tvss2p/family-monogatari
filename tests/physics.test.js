@@ -41,6 +41,27 @@ test('layout has pins and keeps the lcd clear', () => {
   }
 });
 
+test('道クギ：ヘソへ向かう道は金の線ではなく釘の列で描き、穴の2か所だけ釘がとぎれる', () => {
+  const along = (p, r) => {
+    const dx = r.x2 - r.x1, dy = r.y2 - r.y1, len = Math.hypot(dx, dy);
+    const t = ((p.x - r.x1) * dx + (p.y - r.y1) * dy) / (len * len);
+    const off = Math.abs((p.x - r.x1) * dy - (p.y - r.y1) * dx) / len;
+    return t >= -0.01 && t <= 1.01 && off < 2 ? t : null;
+  };
+  assert.ok(LAYOUT.roadWalls.length > 0, 'road walls for physics');
+  for (const r of LAYOUT.rails) {
+    assert.ok(LAYOUT.walls.every(w => along({ x: (w.x1 + w.x2) / 2, y: (w.y1 + w.y2) / 2 }, r) === null), 'gold rail line left');
+    const road = LAYOUT.roadPins.filter(p => along(p, r) !== null).sort((a, b) => along(a, r) - along(b, r));
+    assert.ok(road.length >= 15, `road pins ${road.length}`);
+    const holes = [];
+    for (let i = 1; i < road.length; i++) {
+      const edge = Math.hypot(road[i].x - road[i - 1].x, road[i].y - road[i - 1].y) - road[i].r - road[i - 1].r;
+      if (edge > BALL_R * 2) holes.push(edge);
+    }
+    assert.equal(holes.length, 2, `holes ${holes}`);
+  }
+});
+
 test('ball bounces off a pin', () => {
   const p = createPhysics({ ...LAYOUT, pins: [{ x: 100, y: 100, r: 2 }], walls: [] });
   p.addBall(100.5, 70, 0, 0);
@@ -81,14 +102,14 @@ test('no ball stays stuck', () => {
   }
 });
 
-test('heso rate at best power is 8–10% (between the first and second tuning), boost is 1.5x or more', () => {
+test('heso rate at best power is 10–13% (a little easier than 8–10%), boost is 1.5x or more', () => {
   const table = [];
   for (let pw = 0.1; pw <= 0.95; pw += 0.05) table.push([+pw.toFixed(2), shoot(pw, 400).rate]);
   const [best] = table.slice().sort((a, b) => b[1] - a[1])[0];
   const r = shoot(best, 3000);
   const boost = shoot(best, 3000, { attackerOpen: false, hesoBoost: true });
   console.log('heso table', JSON.stringify(table), 'best', best, r.rate, 'boost', boost.rate);
-  assert.ok(r.rate >= 0.08 && r.rate <= 0.10, `rate ${r.rate} at ${best}`);
+  assert.ok(r.rate >= 0.10 && r.rate <= 0.13, `rate ${r.rate} at ${best}`);
   assert.ok(boost.rate >= r.rate * 1.5, `boost ${boost.rate}`);
 });
 

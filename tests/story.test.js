@@ -1,6 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { CAST, LINES, MOVIE, SCENE_MS, pickLine } from '../src/story.js';
+import { readFileSync } from 'node:fs';
 import { mulberry32 } from './helpers.js';
 
 const allLines = () => [
@@ -33,6 +34,21 @@ test('ムービーの場面：背景があり、セリフは場面の時間の�
     assert.ok(sc.bg && sc.cap && sc.actors.length >= 1 && sc.lines.length >= 1);
     for (const l of sc.lines) assert.ok(l.at >= 0 && l.at + 1800 <= SCENE_MS, `${sc.cap}: ${l.at}`);
   }
+});
+
+test('家族でおでかけの場面：回転寿司・ジブリ美術館・ハンバーグ・百均・マクドナルド・お花・ビレバン', () => {
+  const three = ['daisuke', 'hiroko', 'nanae'];
+  const want = { sushi: three, museum: three, hamburg: three, hyakkin: three, burger: three, flower: ['hiroko', 'nanae'], village: three };
+  for (const [bg, people] of Object.entries(want)) {
+    const sc = MOVIE.find(s => s.bg === bg);
+    assert.ok(sc, bg);
+    assert.deepEqual(sc.actors.filter(a => CAST[a.who].human).map(a => a.who).sort(), people, bg);
+  }
+});
+
+test('どの場面の背景も、液晶の絵（lcd.css）がある', () => {
+  const css = readFileSync('styles/lcd.css', 'utf8');
+  for (const sc of MOVIE) assert.ok(css.includes(`.bg-${sc.bg}{`), sc.bg);
 });
 
 test('人には服の色があり、猫にはない', () => {

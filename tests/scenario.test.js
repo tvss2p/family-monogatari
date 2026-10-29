@@ -4,6 +4,7 @@ import { buildSpin } from '../src/scenario.js';
 import { drawHit } from '../src/lottery.js';
 import { NUMBERED } from '../src/symbols.js';
 import { simulate } from '../tools/sim.mjs';
+import { CAST, LINES } from '../src/story.js';
 import { mulberry32 } from './helpers.js';
 
 const MISS = { hit: false, symbolId: null, kind: null };
@@ -217,4 +218,30 @@ test('外れたら、止まった図柄が見えるくらい待ってから次�
       assert.ok(wait >= need, `${mode} reach=${sp.reach} wait=${wait}`);
     }
   }
+});
+
+test('家族予告：外れでも3回に1回くらい出て、当たりではもっと出る。ふきだしが赤いほどアツい', () => {
+  const rng = mulberry32(21);
+  const n = { miss: 0, missNote: 0, hit: 0, hitNote: 0 };
+  const color = {};
+  for (let i = 0; i < 300000; i++) {
+    const h = drawHit('normal', rng);
+    const s = buildSpin(h, 'normal', rng);
+    const k = h.hit ? 'hit' : 'miss';
+    n[k]++;
+    if (!s.famNote) continue;
+    n[`${k}Note`]++;
+    const c = (color[s.famNote.color] ||= [0, 0]);
+    c[h.hit ? 0 : 1]++;
+    assert.ok(CAST[s.famNote.who] && CAST[s.famNote.who].human, s.famNote.who);
+    assert.ok(LINES[`notice_${s.famNote.color}`].some(l => l.who === s.famNote.who && l.text === s.famNote.text), s.famNote.text);
+    assert.ok(s.cues.some(c => c.cue === `fam:${s.famNote.color}`));
+  }
+  const missRate = n.missNote / n.miss, hitRate = n.hitNote / n.hit;
+  assert.ok(missRate > 0.28 && missRate < 0.38, `miss ${missRate}`);
+  assert.ok(hitRate > 0.6, `hit ${hitRate}`);
+  const rel = c => c[0] / (c[0] + c[1]);
+  assert.deepEqual(Object.keys(color).sort(), ['blue', 'green', 'red', 'white']);
+  assert.ok(rel(color.red) > 0.1 && rel(color.red) > rel(color.white) * 20, `red ${rel(color.red)} white ${rel(color.white)}`);
+  assert.ok(rel(color.white) < rel(color.blue) && rel(color.blue) < rel(color.green) && rel(color.green) < rel(color.red));
 });

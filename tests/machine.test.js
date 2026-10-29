@@ -132,18 +132,23 @@ test('jitan counts down to normal', () => {
   assert.equal(m.isHesoBoost(), false);
 });
 
-test('restores mid-jackpot', () => {
+test('大当たり中に再読み込みしても、同じラウンドの続きから', () => {
   const m = createMachine({ rng: seq(...NORMAL_HIT) });
   m.onHeso(); m.startNextSpin(); m.finishSpin();
-  for (let i = 0; i < 20; i++) m.onAttacker();
+  for (let i = 0; i < 23; i++) m.onAttacker();
+  m.tick(5000);
   assert.equal(m.state.round, 3);
   const saved = JSON.parse(JSON.stringify(m.toJSON()));
   const r = createMachine({ rng: seq(), saved });
-  assert.equal(r.state.phase, 'idle');
-  assert.equal(r.state.balls, m.state.balls + 8 * 10 * 15);
+  assert.equal(r.state.phase, 'jackpot');
+  assert.equal(r.isAttackerOpen(), true);
+  assert.equal(r.state.balls, m.state.balls);
+  assert.deepEqual([r.state.round, r.state.roundsTotal, r.state.roundCount, r.state.roundElapsed], [3, 10, 3, 5000]);
+  assert.equal(r.state.hits, 1);
+  // 続きを打ち切ると、ふつうに時短へ
+  playJackpot(r);
   assert.equal(r.state.mode, 'jitan');
   assert.equal(r.state.jitanLeft, 100);
-  assert.equal(r.state.hits, 1);
 });
 
 test('restores a spinning hold back to the front', () => {
