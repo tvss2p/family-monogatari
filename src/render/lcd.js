@@ -306,7 +306,8 @@ export function createLcd(root) {
       at(3500, () => this.say(pickLine(id === PREMIUM_ID ? 'family' : 'jackpot', Math.random)));
       const stage = movie.querySelector('.stage');
       // 大当たりのたびに、おでかけの話を 1 話（spin.episode は確かめ用に話を決めるとき）。話のあとは家族と猫の場面
-      const ep = EPISODES.find(e => e.id === (spin && spin.episode)) || pickEpisode();
+      const ep = EPISODES.find(e => e.id === (spin && spin.episode)) || pickEpisode(id);
+      onEvent(`episode:${ep.id}`);
       const scenes = [...ep.scenes, ...FILLER];
       let n = 0;
       const next = () => {
@@ -314,7 +315,7 @@ export function createLcd(root) {
         root.classList.add('movieOn');
         if (n === 0) {
           const et = movie.querySelector('.epTitle');
-          et.innerHTML = `<small>きょうのおでかけ</small>${ep.title}`;
+          et.innerHTML = `<small>${ep.cats ? 'ねこたちのおはなし' : 'きょうのおでかけ'}</small>${ep.title}`;
           et.classList.remove('go');
           void et.offsetWidth;
           et.classList.add('go');

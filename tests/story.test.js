@@ -1,6 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { CAST, LINES, MOVIE, EPISODES, MENUS, ORDER_LINES, SCENE_MS, pickLine, pickEpisode } from '../src/story.js';
+import { CAST, LINES, MOVIE, EPISODES, MENUS, ORDER_LINES, BOARD_IMAGES, SCENE_MS, pickLine, pickEpisode } from '../src/story.js';
+import { existsSync } from 'node:fs';
 import { readFileSync } from 'node:fs';
 import { mulberry32 } from './helpers.js';
 
@@ -101,4 +102,22 @@ test('注文アニメ：どのお店にも背景と、いつもの・ちょっ�
   }
   assert.equal(MENUS.donkey.kakutei, 'ポテサラパケットディッシュ');
   assert.equal(MENUS.burger.kakutei, 'ダブルチーズバーガーのセット');
+});
+
+test('猫の話：8匹みんなどれかの話に出る。猫の図柄で当たると、その猫の話が先に選ばれる', () => {
+  const cats = EPISODES.filter(e => e.cats).flatMap(e => e.cats);
+  for (const c of ['jill', 'lee', 'berry', 'nafan', 'lucky', 'kira', 'glen', 'honey']) assert.ok(cats.includes(c), c);
+  const r = pickEpisode([], mulberry32(9), 'glen');
+  assert.ok(r.episode.cats.includes('glen'));
+  const human = pickEpisode([], mulberry32(9), null);
+  assert.ok(human.episode);
+});
+
+test('盤面の背景：どの話にも色があり、絵を使う話は絵のファイルがある', () => {
+  const css = readFileSync('styles/cabinet.css', 'utf8');
+  for (const e of EPISODES) assert.ok(css.includes(`.t-${e.id}{`), e.id);
+  for (const [id, f] of Object.entries(BOARD_IMAGES)) {
+    assert.ok(EPISODES.find(e => e.id === id), id);
+    assert.ok(existsSync(`assets/img/${f}`), f);
+  }
 });

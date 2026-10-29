@@ -74,9 +74,39 @@ button{font:inherit;border:0;background:none;color:inherit;cursor:pointer}
 .pil .gem{left:3px}
 
 /* 盤面 320×404（座標は src/board-layout.js と同じ） */
-.board{position:absolute;left:20px;top:14px;width:320px;height:404px;border-radius:16px;overflow:hidden;background:#eef6fb;
+.board{position:absolute;left:20px;top:14px;width:320px;height:404px;border-radius:16px;overflow:hidden;background:radial-gradient(circle at 50% 15%,#fff 0 5%,#eef6fb 60%,#fbe9f0);
   box-shadow:0 0 0 3px var(--m2),0 0 0 5px var(--m1),0 0 0 6px var(--m3),inset 0 4px 14px rgba(40,60,90,.35)}
 #boardCanvas{position:absolute;left:0;top:0;width:320px;height:404px}
+/* 大当たり中の盤面の背景：話に合わせた絵（なければ色）と、舞う花びら。釘と玉が見えるように白をうすくかける */
+.boardBg{position:absolute;inset:0;opacity:0;transition:opacity .8s;background:linear-gradient(160deg,var(--b1,#ffe3ee),var(--b2,#fff6d8));--p:#ff9fbe}
+.ph-jackpot .boardBg{opacity:1}
+.boardBg .img{position:absolute;inset:0;background:center/cover no-repeat;animation:bgDrift 24s ease-in-out infinite alternate}
+.boardBg::after{content:'';position:absolute;inset:0;background:rgba(255,255,255,.32)}
+.boardBg .petals i{position:absolute;top:-20px;width:10px;height:8px;border-radius:80% 10% 80% 10%;background:var(--p);opacity:.85;animation:petal 7s linear infinite}
+.boardBg .petals i:nth-child(3n){background:var(--p2,#fff)}
+.boardBg .petals i:nth-child(4n){width:7px;height:6px}
+.ph-jackpot .boardBg .petals i{animation-play-state:running}
+.boardBg .petals i{animation-play-state:paused}
+@keyframes petal{0%{transform:translate(0,0) rotate(0)}50%{transform:translate(24px,220px) rotate(200deg)}100%{transform:translate(-10px,440px) rotate(400deg)}}
+@keyframes bgDrift{from{transform:scale(1.04) translateY(-6px)}to{transform:scale(1.1) translateY(6px)}}
+/* 話ごとの色（b1・b2＝背景、p・p2＝花びら） */
+.t-sushi{--b1:#ffe6cf;--b2:#e9f3ff;--p:#ffb3c7}
+.t-museum{--b1:#d9f1ff;--b2:#e3f7d6;--p:#9be08a;--p2:#fff6a8}
+.t-hamburg{--b1:#ffe2c2;--b2:#fff3dc;--p:#e8a23a;--p2:#fff}
+.t-hyakkin{--b1:#fff0f0;--b2:#f2f4ff;--p:#ff8a8a;--p2:#8ab8ff}
+.t-burger{--b1:#fff1c7;--b2:#ffe0dc;--p:#ffd34d;--p2:#ff6a5a}
+.t-flower{--b1:#ffe3f0;--b2:#fff8d6;--p:#ff9fbe;--p2:#ffe14d}
+.t-village{--b1:#fff2b8;--b2:#ffd9e8;--p:#ffe14d;--p2:#7dc6ff}
+.t-drive{--b1:#cfeeff;--b2:#ffe6c7;--p:#9be08a;--p2:#fff}
+.t-karaoke{--b1:#e6d6ff;--b2:#ffd6ec;--p:#c79bff;--p2:#7dc6ff}
+.t-oe{--b1:#fff0dc;--b2:#e9f6e4;--p:#ffb38a;--p2:#fff}
+.t-icecream{--b1:#ffe0ef;--b2:#e0fff4;--p:#ff9fbe;--p2:#9be8d0}
+.t-chicken{--b1:#fff0e6;--b2:#ffe2e2;--p:#e0a050;--p2:#ff6a5a}
+.t-market{--b1:#ecffe6;--b2:#fff3df;--p:#7bc35a;--p2:#ff8a5a}
+.t-catnap{--b1:#fff6d8;--b2:#ffe9f2;--p:#ffd98a;--p2:#fff}
+.t-catrun{--b1:#dff6ff;--b2:#e8ffd9;--p:#9be08a;--p2:#ffe14d}
+.t-catfish{--b1:#d9f0ff;--b2:#ffe3ee;--p:#7dc6ff;--p2:#ff9fbe}
+.t-catnight{--b1:#cfd6ff;--b2:#ffe9f6;--p:#ffe14d;--p2:#fff}
 .glass{position:absolute;inset:0;pointer-events:none;z-index:20;
   background:linear-gradient(115deg,rgba(255,255,255,.3) 0%,rgba(255,255,255,0) 22%,rgba(255,255,255,0) 60%,rgba(255,255,255,.12) 66%,rgba(255,255,255,0) 72%)}
 .lcdf{position:absolute;left:36px;top:58px;width:248px;height:206px;border-radius:28px;z-index:5;

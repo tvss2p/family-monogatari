@@ -311,6 +311,59 @@ export const EPISODES = [
         [['nanae', 'おかあさん、ポイントカード'], ['hiroko', 'はいはい、あったよ'], ['daisuke', 'ばあちゃん、荷物持つね！']]),
     ],
   },
+  // 猫たちの話（猫の図柄で当たると、その猫が出る話が選ばれやすい）
+  {
+    id: 'catnap', title: 'ねこたちのお昼寝', cats: ['honey', 'lucky', 'kira'],
+    scenes: [
+      sc('home', 'ひなたぼっこ', [inR('honey', 30), inR('lucky', 100, 500), inL('kira', 170, 900)],
+        [['honey', 'にゃ〜（ぽかぽかだにゃ）'], ['lucky', 'にゃふ…'], ['kira', 'にゃっ（ここ空いてる？）']]),
+      sc('home', 'みんなでお昼寝', [at('honey', 30), at('lucky', 100), at('kira', 170)],
+        [['honey', 'すぴー…'], ['lucky', 'むにゃむにゃ'], ['kira', 'Zzz…']]),
+      sc('home', 'ばあちゃんが毛布を', [at('honey', 30), inR('hiroko', 100), at('lucky', 170)],
+        [['hiroko', 'かぜひかないようにね'], ['honey', 'にゃ〜ん（ありがと）'], ['lucky', 'ごろごろ…']]),
+      sc('home', 'おやつの時間！', [at('kira', 30), at('hiroko', 100), at('honey', 170)],
+        [['kira', 'にゃっ！（おやつだにゃ）'], ['honey', 'にゃにゃっ！'], ['hiroko', 'はいはい、おやつだよ']]),
+    ],
+  },
+  {
+    id: 'catrun', title: 'ねこたちの運動会', cats: ['jill', 'lee', 'nafan'],
+    scenes: [
+      sc('park', 'よーい、どん！', [inL('jill', 30), inL('lee', 100, 300), inL('nafan', 170, 600)],
+        [['jill', 'にゃっ！（よーいどん）'], ['lee', 'にゃにゃー！'], ['nafan', 'まってにゃ〜']]),
+      sc('park', 'ちょうちょを追いかけ', [{ who: 'lee', from: -50, to: 300, walk: true }, { who: 'jill', from: -110, to: 300, walk: true, delay: 300 }, { who: 'nafan', from: -170, to: 300, walk: true, delay: 600 }],
+        [['lee', 'にゃっ（ちょうちょ！）'], ['jill', 'にゃにゃっ'], ['nafan', 'にゃ〜ん']]),
+      sc('park', 'ゴール！', [at('jill', 30), at('lee', 100), at('nafan', 170)],
+        [['jill', 'にゃーっ！（いちばん）'], ['lee', 'にゃふ（くやしい）'], ['nafan', 'みんなえらいにゃ']]),
+      sc('park', 'だいすけからごほうび', [at('jill', 20), at('nafan', 80), inR('daisuke', 130), at('lee', 196)],
+        [['daisuke', 'みんな、おやつだよ！'], ['jill', 'にゃ〜ん♪'], ['nafan', 'にゃむにゃむ']]),
+    ],
+  },
+  {
+    id: 'catfish', title: 'ねこたちのおさかなパーティー', cats: ['berry', 'glen', 'honey'],
+    scenes: [
+      sc('party', 'おさかなパーティー', [inL('berry', 30), inR('glen', 100, 300), inR('honey', 170, 600)],
+        [['berry', 'にゃっ！（いいにおい）'], ['glen', 'にゃにゃ？'], ['honey', 'にゃ〜ん']]),
+      sc('party', 'ななえがおさかなを', [at('berry', 20), inL('nanae', 80), at('glen', 140), at('honey', 196)],
+        [['nanae', 'みんな、お刺身だよ〜'], ['berry', 'にゃにゃっ！'], ['glen', 'にゃむにゃむ']]),
+      sc('party', 'おなかいっぱい', [at('glen', 30), at('berry', 100), at('honey', 170)],
+        [['glen', 'にゃふ〜（まんぷく）'], ['berry', 'ごろごろ…'], ['honey', 'にゃ〜（しあわせ）']]),
+      sc('party', 'みんなで記念写真', [at('berry', 20), at('nanae', 80), at('glen', 140), at('honey', 196)],
+        [['nanae', 'はい、チーズ！'], ['berry', 'にゃっ！'], ['glen', 'にゃ〜ん♪']]),
+    ],
+  },
+  {
+    id: 'catnight', title: 'ねこたちの夜さんぽ', cats: ['kira', 'nafan', 'lee'],
+    scenes: [
+      sc('night', '夜のおさんぽ', [inL('kira', 30), inL('nafan', 100, 300), inL('lee', 170, 600)],
+        [['kira', 'にゃっ（出発だにゃ）'], ['nafan', 'にゃ〜ん'], ['lee', 'にゃにゃ']]),
+      sc('night', 'お月さまきれい', [at('lee', 30), at('nafan', 100), at('kira', 170)],
+        [['nafan', 'にゃ〜（まんまる）'], ['kira', 'にゃふ'], ['lee', 'にゃっ（星もある）']]),
+      sc('night', '花火があがった！', [at('kira', 30), at('lee', 100), at('nafan', 170)],
+        [['kira', 'にゃにゃっ！？'], ['lee', 'にゃーっ！'], ['nafan', 'きれいだにゃ〜']]),
+      sc('night', 'おうちに帰ろう', [at('kira', 20), at('nafan', 80), inR('daisuke', 140), at('lee', 196)],
+        [['daisuke', 'みんな、おかえり！'], ['kira', 'にゃ〜ん'], ['nafan', 'にゃっ（ただいま）']]),
+    ],
+  },
 ];
 
 // 注文アニメ（リーチ中、家族がお店にいて注文が運ばれてくる）。normal＝いつもの、chance＝ちょっと豪華、kakutei＝いちばん豪華（当たり確定）
@@ -328,13 +381,18 @@ export const ORDER_LINES = {
   kakutei: [{ who: 'daisuke', text: 'ばあちゃん、これはすごい！' }, { who: 'nanae', text: 'おかあさん、特別だよ！' }],
 };
 
+// 大当たり中の盤面の背景の絵（assets/img）。絵がない話は、色と花びら（lcd ではなく cabinet.css の .t-○○）
+export const BOARD_IMAGES = {};
+
 // すべての場面（確かめ用）
 export const MOVIE = [...FILLER, ...EPISODES.flatMap(e => e.scenes)];
 
 // 次に流す話：まだ見ていない話から選ぶ（ぜんぶ見たら、また最初から）
-export function pickEpisode(seen, rng) {
+// cat：猫の図柄で当たったときはその猫。その猫が出る、まだ見ていない話があればそれを流す
+export function pickEpisode(seen, rng, cat = null) {
   const left = EPISODES.filter(e => !seen.includes(e.id));
-  const list = left.length ? left : EPISODES;
+  const starring = left.filter(e => cat && e.cats && e.cats.includes(cat));
+  const list = starring.length ? starring : left.length ? left : EPISODES;
   const ep = list[Math.floor(rng() * list.length)];
   return { episode: ep, seen: left.length ? [...seen, ep.id] : [ep.id] };
 }

@@ -40,12 +40,7 @@ function drawStatic(layout, scale) {
   c.height = Math.round(layout.h * scale);
   const ctx = c.getContext('2d');
   ctx.scale(scale, scale);
-  const g = ctx.createRadialGradient(160, 60, 20, 160, 200, 300);
-  g.addColorStop(0, '#ffffff');
-  g.addColorStop(0.6, '#eef6fb');
-  g.addColorStop(1, '#fbe9f0');
-  ctx.fillStyle = g;
-  ctx.fillRect(0, 0, layout.w, layout.h);
+  // 板の色は描かない（後ろの .board と、大当たり中の背景 .boardBg が見えるように）
 
   const gold = ctx.createLinearGradient(0, 0, layout.w, layout.h);
   gold.addColorStop(0, '#fff0b3');
@@ -85,6 +80,7 @@ export function drawBoard(ctx, layout, balls, scale, opts = {}) {
     cachedScale = scale;
   }
   ctx.setTransform(1, 0, 0, 1, 0, 0);
+  ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
   ctx.drawImage(bg, 0, 0);
   ctx.setTransform(scale, 0, 0, scale, 0, 0);
   if (opts.hesoBoost) line(ctx, layout.boostWalls, '#ffd34d', 3);

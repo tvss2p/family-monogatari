@@ -3,7 +3,7 @@ import { LAYOUT } from './board-layout.js';
 import { createMachine } from './machine.js';
 import { createPhysics } from './physics.js';
 import { buildSpin, holdColor } from './scenario.js';
-import { pickLine, pickEpisode } from './story.js';
+import { pickLine, pickEpisode, CAST, BOARD_IMAGES } from './story.js';
 import { drawBoard, resetBoardCache } from './render/board.js';
 import { createLcd } from './render/lcd.js';
 import { createGimmicks } from './render/gimmicks.js';
@@ -71,7 +71,14 @@ lcd.onEvent = e => {
   if (e === 'promoChance') audio.play('reach');
   if (e === 'promoWin') { audio.play('jackpot'); audio.play('meow', 1.2, 0.4); speak('promoWin'); }
   if (e === 'promoLose') audio.play('miss');
+  // 大当たりの話に合わせて、盤面の背景を変える（絵があれば絵、なければ色と花びら）
+  if (e.startsWith('episode:')) setBoardBg(e.slice(8));
 };
+function setBoardBg(id) {
+  const el = $('#boardBg');
+  el.className = `boardBg t-${id}`;
+  el.querySelector('.img').style.backgroundImage = BOARD_IMAGES[id] ? `url(assets/img/${BOARD_IMAGES[id]})` : '';
+}
 const audio = createAudio();
 audio.setOn(!saved || saved.sound !== false);
 const filesIn = map => Object.fromEntries(Object.entries(map).map(([k, f]) => [k, `${AUDIO_DIR}/${f}`]));
@@ -87,8 +94,8 @@ let locked = !!(saved && saved.locked);
 let chain = saved && Number.isFinite(saved.chain) ? saved.chain : 0;
 // 大当たりのおでかけの話：見た話をおぼえて、まだ見ていない話から流す
 let seenEp = saved && Array.isArray(saved.seenEp) ? saved.seenEp : [];
-lcd.episodePicker = () => {
-  const r = pickEpisode(seenEp, Math.random);
+lcd.episodePicker = symbolId => {
+  const r = pickEpisode(seenEp, Math.random, CAST[symbolId] && !CAST[symbolId].human ? symbolId : null);
   seenEp = r.seen;
   return r.episode;
 };
