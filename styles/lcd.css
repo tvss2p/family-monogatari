@@ -602,3 +602,34 @@
 .person.art.p-hiroko .head{left:3px}
 /* 大江さんの顔の絵は首と肩まで入っているので、あご（絵の上から 78%）の下を丸く切って、体の絵の首につなげる */
 .person.art.p-oe .head{left:3px;top:3px;clip-path:ellipse(35.5% 38.5% at 43.5% 39.5%)}
+
+/* ===== 歩くときの手足：右手と左足が前のとき、左手と右足は後ろ（交互に入れかわる） =====
+   正面向きの絵なので、前に出た手足は体より手前（大きく・上に重ねる）、後ろの手足は体の奥（小さく・少し暗く）に描いて前後を見せる。
+   進む向き（--dir）に前の手を振り出す。左へ歩くときは .flip で -1 */
+.actor{--dir:1}
+.actor.flip{--dir:-1}
+.person.art .arm{clip-path:inset(7% 0 0 0)}
+.walking .person.art .arm.r,.walking .person.art .leg.l{animation:artFwd .55s ease-in-out infinite alternate}
+.walking .person.art .arm.l,.walking .person.art .leg.r{animation:artBack .55s ease-in-out infinite alternate}
+.walking .person.art .leg.l{animation-name:legFwd}
+.walking .person.art .leg.r{animation-name:legBack}
+@keyframes artFwd{
+  0%{transform:rotate(calc(-30deg * var(--dir))) scale(1.06);z-index:4;filter:none}
+  49%{z-index:4}
+  50%{z-index:1}
+  100%{transform:rotate(calc(9deg * var(--dir))) scale(.9);z-index:1;filter:brightness(.82)}}
+@keyframes artBack{
+  0%{transform:rotate(calc(9deg * var(--dir))) scale(.9);z-index:1;filter:brightness(.82)}
+  49%{z-index:1}
+  50%{z-index:4}
+  100%{transform:rotate(calc(-30deg * var(--dir))) scale(1.06);z-index:4;filter:none}}
+@keyframes legFwd{
+  0%{transform:rotate(calc(-22deg * var(--dir))) translateY(1px);z-index:1;filter:none}
+  49%{z-index:1}
+  50%{z-index:0}
+  100%{transform:rotate(calc(8deg * var(--dir))) translateY(-1px) scaleY(.95);z-index:0;filter:brightness(.85)}}
+@keyframes legBack{
+  0%{transform:rotate(calc(8deg * var(--dir))) translateY(-1px) scaleY(.95);z-index:0;filter:brightness(.85)}
+  49%{z-index:0}
+  50%{z-index:1}
+  100%{transform:rotate(calc(-22deg * var(--dir))) translateY(1px);z-index:1;filter:none}}
