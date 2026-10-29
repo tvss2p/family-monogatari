@@ -124,6 +124,8 @@ export function createLcd(root) {
   let sceneTimers = [];
   let talkTimer = null;
   let onEvent = () => {};
+  // 話のあいだにはさむ、いつもの場面の順番（大当たりをまたいで続ける）
+  let fillerNo = 0;
   // 次に流すおでかけの話を決める（main.js が、まだ見ていない話から選ぶ）
   let pickEpisode = () => EPISODES[Math.floor(Math.random() * EPISODES.length)];
   const rnd = () => SYMBOLS[Math.floor(Math.random() * SYMBOLS.length)].id;
@@ -367,12 +369,19 @@ export function createLcd(root) {
       const stage = movie.querySelector('.stage');
       // 大当たりのたびに、おでかけの話を 1 話（spin.episode は確かめ用に話を決めるとき）。話のあとは家族と猫の場面
       // 1話（4場面）が終わったら、まだ見ていない話を次々に流す（大当たりが終わるまで）
+      // 話と話のあいだには、いつもの短い場面（家族と猫）を1つはさむ（お家・おさんぽ・花火・パーティーの順に）
       let ep = EPISODES.find(e => e.id === (spin && spin.episode)) || pickEpisode(id);
       let k = 0;
       const next = () => {
         movie.classList.add('playing');
         root.classList.add('movieOn');
-        if (k === ep.scenes.length) { ep = pickEpisode(); k = 0; }
+        if (k === ep.scenes.length) {
+          playScene(stage, FILLER[fillerNo++ % FILLER.length], null, 0);
+          ep = pickEpisode();
+          k = 0;
+          sceneTimer = setTimeout(next, SCENE_MS);
+          return;
+        }
         if (k === 0) {
           onEvent(`episode:${ep.id}`);
           const et = movie.querySelector('.epTitle');
